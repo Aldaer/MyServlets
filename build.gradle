@@ -1,0 +1,19 @@
+group 'Aldors Projects'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'jetty'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "javax.servlet:javax.servlet-api:+"
+    compileOnly "org.jetbrains:annotations:+"
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
