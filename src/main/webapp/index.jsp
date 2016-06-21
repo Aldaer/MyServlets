@@ -3,6 +3,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -11,7 +12,7 @@
 <body>
 <h1>My first jsp page</h1>
 To know time, select timezone:<br>
-<form action="serv" method="get">
+<form action="${pageContext.request.contextPath}/serv" method="get">
     <p>
         <select name="timezone">
             <option value="GMT" >Greenwich</option>
@@ -22,10 +23,5 @@ To know time, select timezone:<br>
     </p>
 
 </form>
-
-Meanwhile, this is what timer bean reports:<br>
-${sessionScope.timer}
-<br>
-That's all for now!
 </body>
 </html>
