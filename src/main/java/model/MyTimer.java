@@ -12,23 +12,21 @@ public class MyTimer {
     public MyTimer(String locale, String timeZone) {
         this.locale = Locale.forLanguageTag(locale);
         tz = TimeZone.getTimeZone(timeZone);
-        cal = Calendar.getInstance(tz, this.locale);
     }
 
     public String toString() {
-        return String.format(locale, "Current time is: %tH:%<tM %<tZ %<td.%<tm.%<ty\n", cal);
+        return String.format(locale, "Current time is %tH:%<tM:%<tS %<tZ %<td.%<tm.%<ty\n", Calendar.getInstance(tz, this.locale));
     }
     public Date getDate() {
-        return cal.getTime();
+        return Calendar.getInstance(tz, this.locale).getTime();
     }
 
-    private final Locale locale;
 
     public String getTz() {
         return tz.getID();
     }
 
     private final TimeZone tz;
-    private final Calendar cal;
+    private final Locale locale;
 
 }

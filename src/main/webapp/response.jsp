@@ -25,8 +25,8 @@ To know time, select timezone:<br>
 </form>
 
 This is what timer bean reports:<br>
-${sessionScope.timer}<br>
-<fmt:formatDate patttern = "HH:mm:ss Z dd-MM-yyyy" value="${sessionScope.timer.date}" /><br>
+By toString(): <i>${sessionScope.timer}</i><br>
+By fmt:formatDate: <i><fmt:formatDate pattern = "HH:mm:ss dd-MM-yyyy (z)" value="${sessionScope.timer.date}" timeZone="${sessionScope.timer.tz}"/></i><br>
 <br>
 That's all for now!
 </body>
