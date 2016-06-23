@@ -1,5 +1,9 @@
 package model;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -9,18 +13,19 @@ import java.util.TimeZone;
  * Model class
  */
 public class MyTimer {
-    public MyTimer(String locale, String timeZone) {
-        this.locale = Locale.forLanguageTag(locale);
+    public MyTimer(String language, String timeZone) {
+        locale = Locale.forLanguageTag(language);
+        dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL).withLocale(locale).withZone(ZoneId.of(timeZone, ZoneId.SHORT_IDS));
+
         tz = TimeZone.getTimeZone(timeZone);
     }
 
     public String toString() {
-        return String.format(locale, "Current time is %tH:%<tM:%<tS %<tZ %<td.%<tm.%<ty\n", Calendar.getInstance(tz, this.locale));
+        return dtf.format(ZonedDateTime.now());
     }
     public Date getDate() {
-        return Calendar.getInstance(tz, this.locale).getTime();
+        return Calendar.getInstance(tz, locale).getTime();
     }
-
 
     public String getTz() {
         return tz.getID();
@@ -28,5 +33,6 @@ public class MyTimer {
 
     private final TimeZone tz;
     private final Locale locale;
+    private final DateTimeFormatter dtf;
 
 }

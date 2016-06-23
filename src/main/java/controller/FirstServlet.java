@@ -34,7 +34,8 @@ public class FirstServlet extends HttpServlet {
         System.out.println("Processing request...");
         String tz = Optional.ofNullable(request.getParameter("timezone")).orElse("GMT");
         String lang = Optional.ofNullable(request.getParameter("language")).orElse("en");
-        if ((t == null) || !t.getTz().equals(tz)) {
+        if (request.getSession().isNew() || t == null || !t.getTz().equals(tz)) {
+            System.out.println("Creating new timer");
             t = new MyTimer(lang, tz);
             request.getSession().setAttribute("timer", t);
         }
