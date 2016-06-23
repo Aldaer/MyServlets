@@ -1,6 +1,7 @@
 package controller;
 
 import model.MyTimer;
+import model.TimeZoneNames;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -32,11 +33,13 @@ public class FirstServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("Processing request...");
         String tz = Optional.ofNullable(request.getParameter("timezone")).orElse("GMT");
+        String lang = Optional.ofNullable(request.getParameter("language")).orElse("en");
         if ((t == null) || !t.getTz().equals(tz)) {
-            t = new MyTimer("en-us", tz);
+            t = new MyTimer(lang, tz);
             request.getSession().setAttribute("timer", t);
         }
         request.setAttribute("lastTZ", tz);
+        request.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
         RequestDispatcher respJSP = request.getRequestDispatcher("response.jsp");
         respJSP.forward(request, response);
     }
