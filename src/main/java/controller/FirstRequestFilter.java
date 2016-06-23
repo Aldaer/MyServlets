@@ -22,6 +22,11 @@ public class FirstRequestFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         System.out.println("Filtering request #" + ++n);
         if (req.getSession().isNew()) System.out.println("New session detected");
+        if ("restart".equals(req.getParameter("action"))) {
+            req.getRequestDispatcher("index.jsp").forward(req, res);
+            req.getSession().invalidate();
+            return;
+        }
         super.doFilter(req, res, chain);
         System.out.println("Filtering response #" + n);
     }
