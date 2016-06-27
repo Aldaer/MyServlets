@@ -1,7 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -19,7 +15,7 @@ Select language:<br>
     <input name="language" type="radio" value="en" onclick=this.form.submit()>English<br>
     <input name="language" type="radio" value="ru" onclick=this.form.submit()>Русский<br>
     <noscript>
-        <input type="submit" value="Show time...">
+        <input type="submit" value="Continue...">
     </noscript>
 </form>
 

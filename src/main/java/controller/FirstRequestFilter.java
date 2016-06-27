@@ -16,7 +16,7 @@ import java.util.Collections;
  */
 @WebFilter(servletNames = "controller.FirstServlet")
 public class FirstRequestFilter extends HttpFilter {
-    int n = 0;
+    private int n = 0;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -25,6 +25,10 @@ public class FirstRequestFilter extends HttpFilter {
         if ("restart".equals(req.getParameter("action"))) {
             req.getRequestDispatcher("index.jsp").forward(req, res);
             req.getSession().invalidate();
+            return;
+        }
+        if (req.getSession().getAttribute("userID") == null) {
+            req.getRequestDispatcher("login.jsp").forward(req, res);
             return;
         }
         super.doFilter(req, res, chain);

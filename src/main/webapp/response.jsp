@@ -5,16 +5,18 @@
 <head>
     <fmt:setLocale value="${param['language']}"/>
     <fmt:setBundle basename="jsp"/>
-    <title><fmt:message key="title"/></title>
+    <title><fmt:message key="main.title"/></title>
     <c:set var="root" value = "${pageContext.request.contextPath}" />
     <link href="${root}/images/clock_icon.png" rel="icon" type="image/png" />
 </head>
 <body>
-<h1><fmt:message key="header"/></h1>
+<h1><fmt:message key="main.header"/></h1>
 
-<p><fmt:message key="selectedlocale"/> = "${param['language']}"</p>
 
-<p><fmt:message key="selecttz"/></p>
+<p><fmt:message key="main.currentlogin"/> ${sessionScope.userName}<br>
+    <fmt:message key="main.selectedlocale"/> = "${param['language']}"</p>
+
+<p><fmt:message key="main.selecttz"/></p>
 <form action="${root}/serv" method="get">
     <p>
         <select name="timezone" onchange="submit()">
@@ -30,12 +32,12 @@
 
 </form>
 
-<p><fmt:message key="beanreport"/><br>
-    <fmt:message key="through"/> fmt:formatDate: <i><fmt:formatDate pattern = "HH:mm:ss dd-MM-yyyy (z)" value="${sessionScope.timer.date}" timeZone="${sessionScope.timer.tz}"/></i><br>
-    <fmt:message key="through"/>  getDate(): <i>${sessionScope.timer.date}</i><br>
-    <fmt:message key="through"/> toString(): <i>${sessionScope.timer}</i>
+<p><fmt:message key="main.beanreport"/><br>
+    <fmt:message key="main.through"/> fmt:formatDate: <i><fmt:formatDate pattern = "HH:mm:ss dd-MM-yyyy (z)" value="${sessionScope.timer.date}" timeZone="${sessionScope.timer.tz}"/></i><br>
+    <fmt:message key="main.through"/>  getDate(): <i>${sessionScope.timer.date}</i><br>
+    <fmt:message key="main.through"/> toString(): <i>${sessionScope.timer}</i>
 </p>
-<a href="${root}/serv?action=restart"><fmt:message key="newsession"/></a>
+<a href="${root}/serv?action=restart"><fmt:message key="main.newsession"/></a>
 
 </body>
 </html>
