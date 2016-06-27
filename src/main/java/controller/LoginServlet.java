@@ -1,7 +1,6 @@
 package controller;
 
 import model.dao.UserDAO;
-import model.utils.TextUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,10 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
 
-import static controller.AttributeNames.USER_DAO;
-import static controller.AttributeNames.USER_ID;
-import static controller.AttributeNames.USER_NAME;
-import static model.utils.TextUtils.convertFromUTF8;
+import static controller.AttributeNames.*;
 
 /**
  * Login servlet. Accepts only POST requests
@@ -25,8 +21,9 @@ import static model.utils.TextUtils.convertFromUTF8;
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String userName = convertFromUTF8((String)request.getParameter("username"));
-        String userPassword = convertFromUTF8((String)request.getParameter("password"));
+        request.setCharacterEncoding("UTF-8");
+        String userName = request.getParameter("username");
+        String userPassword = request.getParameter("password");
         System.out.println("LOGGING IN USER = " + userName + " PASSWORD = " + userPassword);
 
         UserDAO userDAO = (UserDAO) this.getServletContext().getAttribute(USER_DAO);
