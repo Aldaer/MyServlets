@@ -36,11 +36,10 @@ public interface UserDAO {
      * @param password User password
      * @return User id on successful authentication, empty otherwise
      */
-    default Optional<Long> authenticateUser(String name, String password) {
+    default Optional<Long> authenticatedId(String name, String password) {
         Optional<Long> id;
         id = getIdByName(name);
-        if (id.isPresent() && ! authenticateUser(id.get(), password)) id = Optional.empty();
-        return id;
+        return (id.isPresent() && authenticateUser(id.get(), password))? id : Optional.empty();
     }
 
 

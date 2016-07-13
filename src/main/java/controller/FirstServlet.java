@@ -1,7 +1,7 @@
 package controller;
 
 import model.MyTimer;
-import model.TimeZoneNames;
+import model.utils.TimeZoneNames;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -18,23 +18,21 @@ import java.util.Optional;
  * My first attempt on servlets
  * Doubles as a JavaBean
  */
+
 @WebServlet("/serv")
 public class FirstServlet extends HttpServlet {
     private static int id = 0;
-    private MyTimer t;
 
     public FirstServlet() { }
-
-    MyTimer getTimer() {
-        return t;
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("Processing request...");
         String tz = Optional.ofNullable(request.getParameter("timezone")).orElse("GMT");
-        String lang = Optional.ofNullable(request.getParameter("language")).orElse("en");
-        if (request.getSession().isNew() || t == null || !t.getTz().equals(tz)) {
+        String lang = Optional.ofNullable((String)request.getSession().getAttribute("language")).orElse("en");
+        MyTimer t = (MyTimer) request.getSession().getAttribute("timer");
+
+        if (t == null || ! t.getTz().equals(tz)) {
             System.out.println("Creating new timer");
             t = new MyTimer(lang, tz);
             request.getSession().setAttribute("timer", t);

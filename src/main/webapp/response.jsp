@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <fmt:setLocale value="${param['language']}"/>
+    <fmt:setLocale value="${sessionScope.language}"/>
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
     <c:set var="root" value = "${pageContext.request.contextPath}" />
@@ -14,7 +14,7 @@
 
 
 <p><fmt:message key="main.currentlogin"/> ${sessionScope.userName}<br>
-    <fmt:message key="main.selectedlocale"/> = "${param['language']}"</p>
+    <fmt:message key="main.selectedlocale"/> = "${sessionScope.language}"</p>
 
 <p><fmt:message key="main.selecttz"/></p>
 <form action="${root}/serv" method="get">

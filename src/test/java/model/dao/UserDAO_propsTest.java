@@ -1,6 +1,5 @@
 package model.dao;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -27,23 +26,23 @@ public class UserDAO_propsTest {
 
     @Test
     public void testAuthenticateUser() throws Exception {
-        assertThat(udao.authenticateUser("Вася", "qwerty"), is(true));
-        assertThat(udao.authenticateUser("Петя", "qwerty"), is(true));
-        assertThat(udao.authenticateUser("Миша", "qwerty"), is(true));
+        assertThat(udao.authenticatedId("Вася", "qwerty").get(), is(123L));
+        assertThat(udao.authenticatedId("Петя", "qwerty").get(), is(456L));
+        assertThat(udao.authenticatedId("Миша", "qwerty").get(), is(789L));
     }
 
     @Test
     public void testCaseInsensitiveUser() throws Exception {
-        assertThat(udao.authenticateUser("вася", "qwerty"), is(true));
+        assertThat(udao.authenticatedId("вася", "qwerty").get(), is(123L));
     }
 
     @Test
     public void testWrongUsername() throws Exception {
-        assertThat(udao.authenticateUser("Васю", "qwerty"), is(false));
+        assertThat(udao.authenticatedId("Васю", "qwerty"), is(Optional.empty()));
     }
 
     @Test
     public void testWrongPassword() throws Exception {
-        assertThat(udao.authenticateUser("Вася", "Qwerty"), is(false));
+        assertThat(udao.authenticatedId("Вася", "Qwerty"), is(Optional.empty()));
     }
 }

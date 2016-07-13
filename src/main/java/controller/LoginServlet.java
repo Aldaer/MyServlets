@@ -28,14 +28,16 @@ public class LoginServlet extends HttpServlet {
 
         UserDAO userDAO = (UserDAO) this.getServletContext().getAttribute(USER_DAO);
 
-        Optional<Long> id = userDAO.authenticateUser(userName, userPassword);
+        Optional<Long> id = userDAO.authenticatedId(userName, userPassword);
         if (id.isPresent()) {
             HttpSession s;
             if ((s = request.getSession(false)) != null) s.invalidate();                                      // Recreate session to combat session fixation attacks
             request.getSession(true).setAttribute(USER_ID, id.get());
             request.getSession(false).setAttribute(USER_NAME, userName);
-            RequestDispatcher respJSP = request.getRequestDispatcher("/serv");
-            respJSP.forward(request, response);
+            request.getSession(false).setAttribute(LANGUAGE, request.getParameter(LANGUAGE));
+            response.sendRedirect(request.getServletContext().getContextPath() + "/serv");
+//            RequestDispatcher respJSP = request.getRequestDispatcher("/serv");
+//            respJSP.forward(request, response);
         } else {
             RequestDispatcher respLogin = request.getRequestDispatcher("login.jsp");
             respLogin.forward(request, response);
