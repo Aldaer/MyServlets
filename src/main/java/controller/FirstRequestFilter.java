@@ -1,5 +1,7 @@
 package controller;
 
+import lombok.extern.log4j.Log4j2;
+
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -11,38 +13,44 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 
+import static controller.AttributeNames.USER_ID;
+import static controller.AttributeNames.USER_NAME;
+
 /**
  * My first attempt on HTTP Filters
  */
-@WebFilter(servletNames = "controller.FirstServlet")
+@Log4j2
+@WebFilter(filterName = "Filter1st")
 public class FirstRequestFilter extends HttpFilter {
     private int n = 0;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        System.out.println("Filtering request #" + ++n);
-        if (req.getSession().isNew()) System.out.println("New session detected");
-        if ("restart".equals(req.getParameter("action"))) {
-            req.getRequestDispatcher("index.jsp").forward(req, res);
+        log.trace("Filtering request {}", ++n);
+        if ("logout".equals(req.getParameter("action"))) {
+            String uname;
+            if ((uname = (String) req.getSession().getAttribute(USER_NAME)) != null)
+                log.info("Logging out user: {}", uname);
             req.getSession().invalidate();
+            res.sendRedirect("index.jsp");
             return;
         }
-        if (req.getSession().getAttribute("userID") == null) {
+        if (req.getSession().getAttribute(USER_ID) == null) {
             req.getRequestDispatcher("login.jsp").forward(req, res);
             return;
         }
         super.doFilter(req, res, chain);
-        System.out.println("Filtering response #" + n);
+        log.trace("Filtering response {}", n);
     }
 
     @Override
     public void init(FilterConfig config) throws ServletException {
         super.init(config);
 
-        System.out.println("Initializing filter");
-        System.out.println("Filter name = " + config.getFilterName());
-        System.out.println("Servlet context = " + config.getServletContext().getContextPath());
+        log.debug("Initializing filter");
+        log.debug("Filter name = " + config.getFilterName());
+        log.debug("Servlet context = " + config.getServletContext().getContextPath());
         Collections.list(config.getInitParameterNames()).
-                forEach(s -> System.out.println(s + " = " + config.getInitParameter(s)));
+                forEach(s -> log.debug("{} = {}", s, config.getInitParameter(s)));
     }
 }

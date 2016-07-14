@@ -38,6 +38,5 @@ public class CryptoUtilsTest {
         System.out.println("Вася = " + CryptoUtils.stringRandomSaltedHash("qwerty"));
         System.out.println("Петя = " + CryptoUtils.stringRandomSaltedHash("qwerty"));
         System.out.println("Миша = " + CryptoUtils.stringRandomSaltedHash("qwerty"));
-
     }
 }

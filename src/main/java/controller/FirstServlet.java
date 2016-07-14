@@ -1,5 +1,6 @@
 package controller;
 
+import lombok.extern.log4j.Log4j2;
 import model.MyTimer;
 import model.utils.TimeZoneNames;
 
@@ -19,7 +20,8 @@ import java.util.Optional;
  * Doubles as a JavaBean
  */
 
-@WebServlet("/serv")
+@Log4j2
+@WebServlet(name = "MyFirstServlet", urlPatterns = "/serv")
 public class FirstServlet extends HttpServlet {
     private static int id = 0;
 
@@ -27,13 +29,12 @@ public class FirstServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("Processing request...");
+        log.debug("Processing request...");
         String tz = Optional.ofNullable(request.getParameter("timezone")).orElse("GMT");
         String lang = Optional.ofNullable((String)request.getSession().getAttribute("language")).orElse("en");
         MyTimer t = (MyTimer) request.getSession().getAttribute("timer");
 
         if (t == null || ! t.getTz().equals(tz)) {
-            System.out.println("Creating new timer");
             t = new MyTimer(lang, tz);
             request.getSession().setAttribute("timer", t);
         }
@@ -53,10 +54,10 @@ public class FirstServlet extends HttpServlet {
         super.init(config);
 
         ++id;
-        System.out.println("Initializing servlet");
-        System.out.println("Servlet id = " + id);
-        System.out.println("Servlet name = " + config.getServletName());
-        System.out.println("Servlet context = " + config.getServletContext().getContextPath());
-        Collections.list(config.getInitParameterNames()).forEach(s -> System.out.println(s + " = " + config.getInitParameter(s)));
+        log.info("Initializing servlet");
+        log.info("Servlet id = {}", id);
+        log.info("Servlet name = {}", config.getServletName());
+        log.info("Servlet context = {}", config.getServletContext().getContextPath());
+        Collections.list(config.getInitParameterNames()).forEach(s -> log.info("{} = {}", s, config.getInitParameter(s)));
     }
 }

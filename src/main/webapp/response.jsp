@@ -24,7 +24,6 @@
                 <option value="${tzentry.key}" ${lastTZ == tzentry.key ? 'selected' : ''} >${tzentry.value}</option>
             </c:forEach>
         </select>
-        <input type="hidden" name="language" value="${param['language']}">
     <noscript>
         <input type="submit" value="Show time...">
     </noscript>
@@ -37,7 +36,7 @@
     <fmt:message key="main.through"/>  getDate(): <i>${sessionScope.timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${sessionScope.timer}</i>
 </p>
-<a href="${root}/serv?action=restart"><fmt:message key="main.newsession"/></a>
+<a href="${root}/serv?action=logout"><fmt:message key="main.newsession"/></a>
 
 </body>
 </html>

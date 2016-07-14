@@ -4,6 +4,12 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'war'
 
+
+task testWar(type: War) {
+    classifier = 'tests'
+    from (sourceSets.test.output) { into 'WEB-INF/classes' }
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -12,9 +18,15 @@ repositories {
 }
 
 dependencies {
-    compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
+    compileOnly 'org.jetbrains:annotations:+'
+    compileOnly 'org.projectlombok:lombok:+'
 
-    compile "javax.servlet:javax.servlet-api:+"
-    compileOnly "org.jetbrains:annotations:+"
+    compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
+    compile 'javax.servlet:javax.servlet-api:+'
+
+    compile 'org.apache.logging.log4j:log4j-api:+'
+    compile 'org.apache.logging.log4j:log4j-core:+'
+    compile 'org.apache.logging.log4j:log4j-web:+'
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
