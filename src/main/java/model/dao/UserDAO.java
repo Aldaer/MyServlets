@@ -1,5 +1,6 @@
 package model.dao;
 
+import model.utils.CryptoUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -8,39 +9,28 @@ import java.util.Optional;
  * Common interface to support user DAO functionality
  */
 public interface UserDAO {
-    /**
-     * Returns user id for given username, empty if no such user. User name is NOT case-sensitive
-     * @param Username User name
-     * @return User id or empty optional
-     */
-    Optional<Long> getIdByName(String Username);
 
     /**
      * Returns user object for given id, null if no such user
      * @param id User id to find
      * @return User object loaded from the database
      */
-    @Nullable User getUser(long id);
+    Optional<User> getUser(long id);
 
     /**
-     * Checks if id-password pair is valid
-     * @param id User id
-     * @param password User password
-     * @return True if correct password is presented for an existing user, false otherwise
+     * Returns user id for given username, empty if no such user. User name is NOT case-sensitive
+     * @param username User name
+     * @return User id or empty optional
      */
-    boolean authenticateUser(long id, String password);
+    Optional<User> getUser(String username);
 
     /**
-     * Checks if name-password pair is valid
-     * @param name User name
-     * @param password User password
-     * @return User id on successful authentication, empty otherwise
+     * Checks if username-password pair is valid
+     * @param user User object
+     * @param password User password (clear-text)
+     * @return True if correct password is presented for an existing non-empty user, false otherwise
      */
-    default Optional<Long> authenticatedId(String name, String password) {
-        Optional<Long> id;
-        id = getIdByName(name);
-        return (id.isPresent() && authenticateUser(id.get(), password))? id : Optional.empty();
-    }
+    ;
 
-
+    boolean authenticateUser(Optional<User> user, String password);
 }

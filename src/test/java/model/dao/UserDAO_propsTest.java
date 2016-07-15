@@ -11,38 +11,38 @@ public class UserDAO_propsTest {
     UserDAO udao = new UserDAO_props();
 
     @Test
-    public void testGetIdByName() throws Exception {
-        assertThat(udao.getIdByName("Вася"), is(Optional.of(123L)));
-        assertThat(udao.getIdByName("Петя"), is(Optional.of(456L)));
-        assertThat(udao.getIdByName("Миша"), is(Optional.of(789L)));
+    public void testGetUserByName() throws Exception {
+        assertThat(udao.getUser("Вася").get().getId(), is(123L));
+        assertThat(udao.getUser("Петя").get().getId(), is(456L));
+        assertThat(udao.getUser("Миша").get().getId(), is(789L));
     }
 
     @Test
-    public void testGetUser() throws Exception {
-        assertThat(udao.getUser(123).getUserName(), is("Вася"));
-        assertThat(udao.getUser(456).getUserName(), is("Петя"));
-        assertThat(udao.getUser(789).getUserName(), is("Миша"));
+    public void testGetUserNyID() throws Exception {
+        assertThat(udao.getUser(123).get().getUsername(), is("Вася"));
+        assertThat(udao.getUser(456).get().getUsername(), is("Петя"));
+        assertThat(udao.getUser(789).get().getUsername(), is("Миша"));
     }
 
     @Test
     public void testAuthenticateUser() throws Exception {
-        assertThat(udao.authenticatedId("Вася", "qwerty").get(), is(123L));
-        assertThat(udao.authenticatedId("Петя", "qwerty").get(), is(456L));
-        assertThat(udao.authenticatedId("Миша", "qwerty").get(), is(789L));
+        assertThat(udao.authenticateUser(udao.getUser("Вася"), "qwerty"), is(true));
+        assertThat(udao.authenticateUser(udao.getUser("Петя"), "qwerty"), is(true));
+        assertThat(udao.authenticateUser(udao.getUser("Миша"), "qwerty"), is(true));
     }
 
     @Test
     public void testCaseInsensitiveUser() throws Exception {
-        assertThat(udao.authenticatedId("вася", "qwerty").get(), is(123L));
+        assertThat(udao.authenticateUser(udao.getUser("вася"), "qwerty"), is(true));
     }
 
     @Test
     public void testWrongUsername() throws Exception {
-        assertThat(udao.authenticatedId("Васю", "qwerty"), is(Optional.empty()));
+        assertThat(udao.authenticateUser(udao.getUser("васq"), "qwerty"), is(false));
     }
 
     @Test
     public void testWrongPassword() throws Exception {
-        assertThat(udao.authenticatedId("Вася", "Qwerty"), is(Optional.empty()));
+        assertThat(udao.authenticateUser(udao.getUser("уУася"), "qwerty"), is(false));
     }
 }

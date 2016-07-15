@@ -1,6 +1,7 @@
 package model.dao;
 
 import model.utils.CryptoUtils;
+import org.omg.PortableServer.POAPackage.AdapterAlreadyExistsHelper;
 
 import java.util.*;
 
@@ -26,19 +27,20 @@ public class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public Optional<Long> getIdByName(String username) {
-        return userNames.entrySet().parallelStream().filter(un -> un.getValue().equalsIgnoreCase(username)).findAny().map(Map.Entry::getKey);
+    public Optional<User> getUser(String username) {
+        return userNames.entrySet().parallelStream().filter(un -> un.getValue().equalsIgnoreCase(username)).findAny()
+                .map(idName -> new SimpleUser(idName.getKey(), idName.getValue(), userPwds.get(idName.getKey())));
     }
 
     @Override
-    public User getUser(long id) {
-        if (!userNames.containsKey(id)) return null;
-        return new SimpleUser(id).setUsername(userNames.get(id));
+    public Optional<User> getUser(long id) {
+        return Optional.ofNullable(userNames.get(id)).map(name -> new SimpleUser(id, name, userPwds.get(id)));
     }
 
     @Override
-    public boolean authenticateUser(long id, String password) {
-        assert userPwds.containsKey(id);
-        return CryptoUtils.verifySaltedHash(userPwds.get(id), password);
+    public boolean authenticateUser(Optional<User> user, String password) {
+        return user.map(User::getDPassword).map(pwd -> CryptoUtils.verifySaltedHash(pwd, password)).orElse(false);
     }
+
+
 }

@@ -1,6 +1,7 @@
 package controller;
 
 import lombok.extern.log4j.Log4j2;
+import model.dao.User;
 import model.dao.UserDAO;
 
 import javax.servlet.RequestDispatcher;
@@ -29,13 +30,13 @@ public class LoginServlet extends HttpServlet {
 
         UserDAO userDAO = (UserDAO) this.getServletContext().getAttribute(USER_DAO);
 
-        Optional<Long> id = userDAO.authenticatedId(userName, userPassword);
-        if (id.isPresent()) {
+        Optional<User> uid = userDAO.getUser(userName);
+        if (userDAO.authenticateUser(uid, userPassword)) {
             log.info("LOGGING IN USER = {}, PASSWORD = *HIDDEN*", userName);
 
             HttpSession s;
             if ((s = request.getSession(false)) != null) s.invalidate();                                      // Recreate session to combat session fixation attacks
-            request.getSession(true).setAttribute(USER_ID, id.get());
+            request.getSession(true).setAttribute(USER_ID, uid.get().getId());
             request.getSession(false).setAttribute(USER_NAME, userName);
             request.getSession(false).setAttribute(LANGUAGE, request.getParameter(LANGUAGE));
             response.sendRedirect(request.getServletContext().getContextPath() + "/serv");

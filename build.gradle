@@ -29,4 +29,6 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-web:+'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'com.h2database:h2:+'
+
 }
