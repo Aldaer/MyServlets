@@ -35,6 +35,5 @@ gradle-app.setting
 *.iml
 out
 gen
-/.idea/libraries/
-/.idea/modules/
-/.idea/copyright/
+/src/test/resources.lock.db
+/src/test/resources.trace.db

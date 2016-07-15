@@ -4,12 +4,6 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'war'
 
-
-task testWar(type: War) {
-    classifier = 'tests'
-    from (sourceSets.test.output) { into 'WEB-INF/classes' }
-}
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -18,8 +12,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:+'
-    compileOnly 'org.projectlombok:lombok:+'
+    compile 'org.jetbrains:annotations:+'
+    compile 'org.projectlombok:lombok:+'
 
     compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
     compile 'javax.servlet:javax.servlet-api:+'
@@ -30,5 +24,14 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile 'com.h2database:h2:+'
+}
 
+task testWar(type: War) {
+    classifier = 'tests'
+    from (sourceSets.test.output) { into 'WEB-INF/classes' }
+}
+
+task copyTomcatConfig(type: Copy) {
+    from 'src/main/tomcat-conf'
+    into System.env.CATALINA_HOME + '/conf'
 }

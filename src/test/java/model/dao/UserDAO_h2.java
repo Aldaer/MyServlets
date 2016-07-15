@@ -12,8 +12,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static model.dao.StandardDAO.CONFIG_DATABASE_DRIVER;
-import static model.dao.StandardDAO.CONFIG_DATABASE_URI;
+import static model.dao.StandardDAO.*;
 
 /**
  * Simple user database implementation using h2
@@ -25,13 +24,20 @@ public class UserDAO_h2 implements UserDAO {
     private static final String GET_USER_BY_NAME = "SELECT ID, USERNAME, EMAIL, DPASSWORD FROM USERS WHERE (USERNAME=?)";
     private static final String GET_USER_BY_ID = "SELECT ID, USERNAME, EMAIL, DPASSWORD FROM USERS WHERE (ID=?)";
 
-
     static {
         ResourceBundle conf = ResourceBundle.getBundle("config");
         String uri = conf.getString(CONFIG_DATABASE_URI);
         String drv = conf.getString(CONFIG_DATABASE_DRIVER);
         log.info("Creating connection pool with driver {}, uri {}", drv, uri);
-        cp = ConnectionPool.builder().withDriver(drv).withUrl(uri).withLogger(LogManager.getLogger(ConnectionPool.class)).create();
+        String un = conf.getString(CONFIG_DATABASE_USER);
+        String pwd = conf.getString(CONFIG_DATABASE_PASSWORD);
+        cp = ConnectionPool.builder()
+                .withDriver(drv)
+                .withUrl(uri)
+                .withUserName(un)
+                .withPassword(pwd)
+                .withLogger(LogManager.getLogger(ConnectionPool.class))
+                .create();
     }
 
     @Override

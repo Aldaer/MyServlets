@@ -8,7 +8,7 @@ import java.util.stream.Stream;
  * Constants used by DAO objects
  */
 public interface StandardDAO {
-    enum UserDatabaseFields { ID(0), USERNAME(50), EMAIL(100), DPASSWORD(40);
+    enum UserDatabaseFields { ID(0), USERNAME(50), FULLNAME(255), EMAIL(100), DPASSWORD(40);
         final int lengthConstraint;
         UserDatabaseFields(int lengthConstraint) {
             this.lengthConstraint = lengthConstraint;
@@ -18,4 +18,6 @@ public interface StandardDAO {
 
     String CONFIG_DATABASE_URI = "database_uri";
     String CONFIG_DATABASE_DRIVER = "database_driver";
+    String CONFIG_DATABASE_USER = "username";
+    String CONFIG_DATABASE_PASSWORD = "password";
 }
