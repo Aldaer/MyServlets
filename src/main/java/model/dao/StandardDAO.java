@@ -20,4 +20,5 @@ public interface StandardDAO {
     String CONFIG_DATABASE_DRIVER = "database_driver";
     String CONFIG_DATABASE_USER = "username";
     String CONFIG_DATABASE_PASSWORD = "password";
+    String CONFIG_DATABASE_USE_SHA_DIGEST = "sha_digest";
 }

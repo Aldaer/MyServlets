@@ -1,4 +1,4 @@
-package model.dbconnecton;
+package dbconnecton;
 
 
 import java.sql.*;

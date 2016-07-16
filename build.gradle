@@ -12,8 +12,10 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains:annotations:+'
-    compile 'org.projectlombok:lombok:+'
+    compile project (':crypto')
+
+    compileOnly 'org.projectlombok:lombok:+'
+    compileOnly 'org.jetbrains:annotations:+'
 
     compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
     compile 'javax.servlet:javax.servlet-api:+'
@@ -27,11 +29,17 @@ dependencies {
 }
 
 task testWar(type: War) {
-    classifier = 'tests'
+    classifier = 'test';
     from (sourceSets.test.output) { into 'WEB-INF/classes' }
 }
 
 task copyTomcatConfig(type: Copy) {
     from 'src/main/tomcat-conf'
     into System.env.CATALINA_HOME + '/conf'
+}
+
+task copyTomcatLibs(type: Copy) {
+    from 'crypto/build/libs'
+    from 'saltedjdbc/build/libs'
+    into System.env.CATALINA_HOME + '/lib'
 }

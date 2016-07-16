@@ -2,26 +2,25 @@ package model.dao;
 
 import org.junit.Test;
 
-import java.util.Optional;
-
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
+@SuppressWarnings("All")
 public class UserDAO_propsTest {
     UserDAO udao = new UserDAO_props();
 
     @Test
     public void testGetUserByName() throws Exception {
-        assertThat(udao.getUser("Вася").get().getId(), is(123L));
-        assertThat(udao.getUser("Петя").get().getId(), is(456L));
-        assertThat(udao.getUser("Миша").get().getId(), is(789L));
+        assertThat(udao.getUser("Вася").getId(), is(123L));
+        assertThat(udao.getUser("Петя").getId(), is(456L));
+        assertThat(udao.getUser("Миша").getId(), is(789L));
     }
 
     @Test
     public void testGetUserNyID() throws Exception {
-        assertThat(udao.getUser(123).get().getUsername(), is("Вася"));
-        assertThat(udao.getUser(456).get().getUsername(), is("Петя"));
-        assertThat(udao.getUser(789).get().getUsername(), is("Миша"));
+        assertThat(udao.getUser(123).getUsername(), is("Вася"));
+        assertThat(udao.getUser(456).getUsername(), is("Петя"));
+        assertThat(udao.getUser(789).getUsername(), is("Миша"));
     }
 
     @Test

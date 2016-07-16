@@ -37,7 +37,8 @@ public interface DBDaoClass {
      * Returns class' logger, null if the class isn't logging
      * @return Class logger
      */
-    @Nullable Logger getLogger();
+    @Nullable
+    Logger getLogger();
 
     /**
      * Reconstructs DAO object from a result set

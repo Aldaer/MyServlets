@@ -1,4 +1,4 @@
-package model.utils;
+package com.aldor.utils;
 
 import org.jetbrains.annotations.NotNull;
 

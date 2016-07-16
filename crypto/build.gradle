@@ -1,0 +1,15 @@
+group 'Aldors Projects'
+version '0.1'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:+'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+}
+

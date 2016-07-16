@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Optional;
 
 import static controller.AttributeNames.*;
 
@@ -28,15 +27,15 @@ public class LoginServlet extends HttpServlet {
         String userName = request.getParameter("username");
         String userPassword = request.getParameter("password");
 
-        UserDAO userDAO = (UserDAO) this.getServletContext().getAttribute(USER_DAO);
+        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(USER_DAO);
 
-        Optional<User> uid = userDAO.getUser(userName);
+        User uid = userDAO.getUser(userName);
         if (userDAO.authenticateUser(uid, userPassword)) {
             log.info("LOGGING IN USER = {}, PASSWORD = *HIDDEN*", userName);
 
             HttpSession s;
             if ((s = request.getSession(false)) != null) s.invalidate();                                      // Recreate session to combat session fixation attacks
-            request.getSession(true).setAttribute(USER_ID, uid.get().getId());
+            request.getSession(true).setAttribute(USER_ID, uid.getId());
             request.getSession(false).setAttribute(USER_NAME, userName);
             request.getSession(false).setAttribute(LANGUAGE, request.getParameter(LANGUAGE));
             response.sendRedirect(request.getServletContext().getContextPath() + "/serv");

@@ -3,15 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-
-    <servlet>
-        <servlet-name>MyFirstServlet</servlet-name>
-        <servlet-class>controller.FirstServlet</servlet-class>
-        <init-param>
-            <param-name>weather</param-name>
-            <param-value>nice</param-value>
-        </init-param>
-    </servlet>
+    <display-name>Time Web App</display-name>
 
     <filter-mapping>
         <filter-name>Filter1st</filter-name>

@@ -1,4 +1,4 @@
-package model.dbconnecton;
+package dbconnecton;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,8 @@ import org.apache.logging.log4j.util.Supplier;
 /**
  * Logger class that does nothing. Can be used as a stub when logging isn't required
  */
-public class DummyLogger implements Logger {
+@SuppressWarnings("deprecation")
+class DummyLogger implements Logger {
     @Override
     public void catching(Level level, Throwable t) {}
 

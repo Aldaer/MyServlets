@@ -1,14 +1,16 @@
 package model.dao;
 
-import model.utils.CryptoUtils;
-import org.omg.PortableServer.POAPackage.AdapterAlreadyExistsHelper;
+import com.aldor.utils.CryptoUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * User data access object
  */
-public class UserDAO_props implements UserDAO {
+class UserDAO_props implements UserDAO {
     private static Map<Long, String> userNames;
     private static Map<Long, String> userPwds;
 
@@ -27,19 +29,19 @@ public class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public Optional<User> getUser(String username) {
+    public User getUser(String username) {
         return userNames.entrySet().parallelStream().filter(un -> un.getValue().equalsIgnoreCase(username)).findAny()
-                .map(idName -> new SimpleUser(idName.getKey(), idName.getValue(), userPwds.get(idName.getKey())));
+                .map(idName -> new SimpleUser(idName.getKey(), idName.getValue(), userPwds.get(idName.getKey()))).orElse(null);
     }
 
     @Override
-    public Optional<User> getUser(long id) {
-        return Optional.ofNullable(userNames.get(id)).map(name -> new SimpleUser(id, name, userPwds.get(id)));
+    public User getUser(long id) {
+        return userNames.containsKey(id) ? new SimpleUser(id, userNames.get(id), userPwds.get(id)) : null;
     }
 
     @Override
-    public boolean authenticateUser(Optional<User> user, String password) {
-        return user.map(User::getDPassword).map(pwd -> CryptoUtils.verifySaltedHash(pwd, password)).orElse(false);
+    public boolean authenticateUser(User user, String password) {
+        return Optional.ofNullable(user).map(User::getDPassword).map(pwd -> CryptoUtils.verifySaltedHash(pwd, password)).orElse(false);
     }
 
 

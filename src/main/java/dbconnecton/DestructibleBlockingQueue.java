@@ -1,4 +1,4 @@
-package model.dbconnecton;
+package dbconnecton;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("NullableProblems")
 interface DestructibleBlockingQueue<T> extends BlockingQueue<T>, Wrapper<BlockingQueue<T>> {
     void destroy();
     boolean isDestroyed();
