@@ -116,7 +116,7 @@
         <!-- className="org.apache.catalina.realm.JDBCRealm" -->
         <Realm className="com.aldor.jdbc.SaltedRealm"
                driverName="org.h2.Driver"
-               connectionURL="jdbc:h2:file:E:/Programming/Java/MyServlet/src/test/resources;SCHEMA=USERDATA;user=sa;password=123"
+               connectionURL="jdbc:h2:file:D:/Aldor/Projects/MyServlets/src/test/resources;SCHEMA=USERDATA;user=sa;password=123"
                userTable="users" userNameCol="username" userCredCol="dpassword"
                userRoleTable="user_roles" roleNameCol="user_role"
                />
