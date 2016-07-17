@@ -1,13 +1,12 @@
 package model.dao;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.Set;
-
-import static model.dao.StandardDAO.USER_DATABASE_FIELDS;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Interface for generic User class
@@ -17,6 +16,14 @@ public interface User {
     String getUsername();
     String getEmail();
     String getDPassword();
+
+    enum UserDatabaseFields { ID(0), USERNAME(50), FULLNAME(255), EMAIL(100), DPASSWORD(40);
+        final int lengthConstraint;
+        UserDatabaseFields(int lengthConstraint) {
+            this.lengthConstraint = lengthConstraint;
+        }
+    }
+    Set<String> USER_DATABASE_FIELDS = Stream.of(UserDatabaseFields.values()).map(Enum::name).collect(Collectors.toSet());
 }
 
 
@@ -31,13 +38,13 @@ class SimpleUser implements User, DBDaoClass {
     private String dPassword;
     private Long id;
 
-    public SimpleUser(long id, String username, String dPassword) {
+    SimpleUser(long id, String username, String dPassword) {
         this.id = id;
         this.username = username;
         this.dPassword = dPassword;
     }
 
-    public SimpleUser() {}
+    SimpleUser() {}
 
     @Override
     public Set<String> getFieldNames() {
@@ -47,7 +54,7 @@ class SimpleUser implements User, DBDaoClass {
 
     @Override
     public void setField(String name, Object value) {
-        switch (StandardDAO.UserDatabaseFields.valueOf(name)) {
+        switch (UserDatabaseFields.valueOf(name)) {
             case ID:
                 id = (Long) value;
                 break;
@@ -65,7 +72,7 @@ class SimpleUser implements User, DBDaoClass {
 
     @Override
     public Object getField(String name) {
-        switch (StandardDAO.UserDatabaseFields.valueOf(name)) {
+        switch (UserDatabaseFields.valueOf(name)) {
             case ID:
                 return getId();
             case USERNAME:
@@ -84,3 +91,5 @@ class SimpleUser implements User, DBDaoClass {
         return null;
     }
 }
+
+

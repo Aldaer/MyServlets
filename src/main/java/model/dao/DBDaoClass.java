@@ -1,7 +1,7 @@
 package model.dao;
 
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +12,7 @@ import java.util.function.Supplier;
  * Common functionality for all DAO classes
  */
 public interface DBDaoClass {
+
 
     /**
      * Returns a set of all object fields stored in the database

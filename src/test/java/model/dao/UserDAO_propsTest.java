@@ -8,6 +8,9 @@ import static org.junit.Assert.assertThat;
 @SuppressWarnings("All")
 public class UserDAO_propsTest {
     UserDAO udao = new UserDAO_props();
+    {
+        udao.useSaltedHash(true);
+    }
 
     @Test
     public void testGetUserByName() throws Exception {
@@ -42,6 +45,6 @@ public class UserDAO_propsTest {
 
     @Test
     public void testWrongPassword() throws Exception {
-        assertThat(udao.authenticateUser(udao.getUser("уУася"), "qwerty"), is(false));
+        assertThat(udao.authenticateUser(udao.getUser("Вася"), "qwertz"), is(false));
     }
 }

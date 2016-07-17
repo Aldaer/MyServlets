@@ -1,6 +1,6 @@
 package controller;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -10,12 +10,11 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * My first attempt on HTTP Filters
  */
-@Log4j2
+@Slf4j
 @WebFilter(filterName = "Filter2nd")
 public class SecondRequestFilter extends HttpFilter {
     private int n = 0;

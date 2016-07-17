@@ -2,10 +2,12 @@ package model.dao;
 
 import com.aldor.utils.CryptoUtils;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 /**
  * User data access object
@@ -16,6 +18,7 @@ class UserDAO_props implements UserDAO {
 
     private static final String USER_TABLE = "users";
     private static final String PASSWORD_TABLE = "passwords";
+    private boolean usingSaltedHash = true;
 
 
     @SuppressWarnings("WeakerAccess")
@@ -41,8 +44,16 @@ class UserDAO_props implements UserDAO {
 
     @Override
     public boolean authenticateUser(User user, String password) {
-        return Optional.ofNullable(user).map(User::getDPassword).map(pwd -> CryptoUtils.verifySaltedHash(pwd, password)).orElse(false);
+        return Optional.ofNullable(user).map(User::getDPassword)
+                .map(pwd -> usingSaltedHash ? CryptoUtils.verifySaltedHash(pwd, password) : pwd.equals(password))
+                .orElse(false);
     }
 
+    @Override
+    public void useSaltedHash(boolean doUse) {
+        usingSaltedHash = doUse;
+    }
 
+    @Override
+    public void useConnectionSource(Supplier<Connection> src) { }
 }

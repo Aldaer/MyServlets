@@ -1,6 +1,6 @@
 package controller;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import model.MyTimer;
 import model.utils.TimeZoneNames;
 
@@ -17,10 +17,9 @@ import java.util.Optional;
 
 /**
  * My first attempt on servlets
- * Doubles as a JavaBean
  */
 
-@Log4j2
+@Slf4j
 @WebServlet(name = "MyFirstServlet", urlPatterns = "/serv")
 public class FirstServlet extends HttpServlet {
     private static int id = 0;

@@ -1,8 +1,7 @@
 package controller;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -17,9 +16,9 @@ import static controller.AttributeNames.USER_ID;
 import static controller.AttributeNames.USER_NAME;
 
 /**
- * My first attempt on HTTP Filters
+ * Login filter - to be replaced with container-based auth
  */
-@Log4j2
+@Slf4j
 @WebFilter(filterName = "Filter1st")
 public class FirstRequestFilter extends HttpFilter {
     private int n = 0;

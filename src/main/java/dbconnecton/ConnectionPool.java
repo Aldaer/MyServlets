@@ -1,26 +1,28 @@
 package dbconnecton;
 
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.function.Supplier;
 
 /**
  * Just another implementation of a connection pool...
  */
-public interface ConnectionPool extends AutoCloseable {
+public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
     int DEFAULT_POOL_SIZE = 5;
-
-    Connection getConnection();
-    int available();
 
     static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Creates a connection pool after setting required parameters
+     */
+    @SuppressWarnings("unused")
     class Builder {
         private String driver = "";
         private String url = "";
@@ -29,13 +31,13 @@ public interface ConnectionPool extends AutoCloseable {
         private String password = "";
         private Logger LOG = new DummyLogger();
 
-        public Builder withDriver(String driver) {
-            this.driver = driver;
+        public Builder withDriver(@Nullable String driver) {
+            this.driver = driver == null ? "" : driver;
             return this;
         }
 
-        public Builder withUrl(String url) {
-            this.url = url;
+        public Builder withUrl(@Nullable String url) {
+            this.url = url == null ? "" : url;
             return this;
         }
 
@@ -44,18 +46,18 @@ public interface ConnectionPool extends AutoCloseable {
             return this;
         }
 
-        public Builder withUserName(String userName) {
-            this.userName = userName;
+        public Builder withUserName(@Nullable String userName) {
+            this.userName = userName == null ? "" : userName;
             return this;
         }
 
-        public Builder withPassword(String password) {
-            this.password = password;
+        public Builder withPassword(@Nullable String password) {
+            this.password = password == null ? "" : password;
             return this;
         }
 
-        public Builder withLogger(Logger logger) {
-            LOG = logger;
+        public Builder withLogger(@Nullable Logger logger) {
+            LOG = logger == null ? new DummyLogger() : logger;
             return this;
         }
 
@@ -64,11 +66,12 @@ public interface ConnectionPool extends AutoCloseable {
                 private final int poolSize = Builder.this.poolSize;
                 private final DestructibleBlockingQueue<Connection> cQueue =
                         DestructibleBlockingQueue.create(new ArrayBlockingQueue<>(poolSize));
+
                 {
                     try {
                         Class.forName(driver);              // Load driver to auto-register with Driver manager
                     } catch (ClassNotFoundException e) {
-                        LOG.fatal("Could not find database driver {}", driver);
+                        LOG.error("Could not find database driver {}", driver);
                         throw new RuntimeException();
                     }
 
@@ -76,25 +79,28 @@ public interface ConnectionPool extends AutoCloseable {
                         for (int i = 0; i < poolSize; i++) {
                             Connection conn = DriverManager.getConnection(url, userName, password);
                             ReusableConnection rc = ReusableConnection.create(conn, cQueue, LOG);
-                            cQueue.add(rc);
+                            cQueue.queue().add(rc);
                         }
                     } catch (SQLException e) {
-                        LOG.fatal("Error creating DB connection: {} ", e);
+                        LOG.error("Error creating DB connection: {} ", e);
                         throw new RuntimeException(e);
                     }
                 }
 
                 @Override
-                public void close() throws SQLException {
+                public void close() {
                     cQueue.destroy();
                     Connection c;
-                    while ((c = cQueue.poll()) != null) c.close();
+                    while ((c = cQueue.queue().poll()) != null)
+                        try { c.close(); }
+                        catch (SQLException ignored) {}
                 }
 
                 @Override
-                @Nullable public Connection getConnection() {
+                @Nullable
+                public Connection get() {
                     try {
-                        Connection conn = cQueue.take();
+                        Connection conn = cQueue.queue().take();
                         LOG.trace("Allocating database connection {}", conn);
                         return conn;
                     } catch (InterruptedException e) {
@@ -106,13 +112,13 @@ public interface ConnectionPool extends AutoCloseable {
                     }
                 }
 
-                @Override
-                public int available() {
-                    return cQueue.isDestroyed()? 0 : cQueue.size();
-                }
             };
         }
 
-        private Builder() {}
+        private Builder() {
+        }
     }
+
+    @Override
+    void close();
 }

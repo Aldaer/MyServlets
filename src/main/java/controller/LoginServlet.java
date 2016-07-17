@@ -1,6 +1,6 @@
 package controller;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import model.dao.User;
 import model.dao.UserDAO;
 
@@ -18,7 +18,7 @@ import static controller.AttributeNames.*;
 /**
  * Login servlet. Accepts only POST requests
  */
-@Log4j2
+@Slf4j
 @WebServlet("/doLogin")
 public class LoginServlet extends HttpServlet {
     @Override
@@ -31,6 +31,7 @@ public class LoginServlet extends HttpServlet {
 
         User uid = userDAO.getUser(userName);
         if (userDAO.authenticateUser(uid, userPassword)) {
+            assert uid != null;
             log.info("LOGGING IN USER = {}, PASSWORD = *HIDDEN*", userName);
 
             HttpSession s;
