@@ -144,13 +144,13 @@ public class CryptoUtils {
         return bSalted;
     }
 
-    private static String hexadecimate(final byte b[]) {
+    public static String hexadecimate(final byte b[]) {
         StringBuilder hash = new StringBuilder(b.length * 2);
         for (byte aB : b) hash.append(HEXCHAR[(aB >> 4) & 0xF]).append(HEXCHAR[aB & 0xF]);
         return hash.toString();
     }
 
-    private static byte[] unHexadecimate(String s) {
+    public static byte[] unHexadecimate(String s) {
         assert s.length() % 2 == 0;
         byte recov[] = new byte[s.length() / 2];
         char sChars[] = s.toCharArray();

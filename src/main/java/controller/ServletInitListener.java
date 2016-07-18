@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebListener;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import static controller.AttributeNames.CONTAINER_AUTH;
 import static controller.AttributeNames.USER_DAO;
 import static model.dao.DaoGeneral.*;
 
@@ -19,7 +20,7 @@ import static model.dao.DaoGeneral.*;
  */
 @Slf4j
 @WebListener()
-public class FirstServletContextListener implements ServletContextListener /* , HttpSessionListener, HttpSessionAttributeListener*/ {
+public class ServletInitListener implements ServletContextListener /* , HttpSessionListener, HttpSessionAttributeListener*/ {
     private ConnectionPool connectionPool;
 
     // -------------------------------------------------------
@@ -46,13 +47,17 @@ public class FirstServletContextListener implements ServletContextListener /* , 
 
         UserDAO userDAO;
         try {
-            String daoClass = conf.getString("user_dao_class");
+            String daoClass = conf.getString(CONFIG_DATABASE_USER_DAO);
             userDAO = (UserDAO) Class.forName(daoClass).newInstance();
             userDAO.useConnectionSource(connectionPool);
             userDAO.useSaltedHash(Boolean.valueOf(conf.getString(CONFIG_DATABASE_USE_SHA_DIGEST)));
         } catch (MissingResourceException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new RuntimeException("User DAO config error", e);
         }
+
+        sce.getServletContext().setAttribute(CONTAINER_AUTH, conf.getString(CONFIG_CONTAINER_SECURITY));
+
+        // Put data access objects into servlet context
         sce.getServletContext().setAttribute(USER_DAO, userDAO);
     }
 

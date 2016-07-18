@@ -32,9 +32,6 @@ gradle-app.setting
 
 # IntelliJ project files
 .idea
-*.iml
 out
 gen
-/src/test/resources/config.properties
-/src/main/tomcat-conf/
 /src/test/userdatabase.*

@@ -8,6 +8,9 @@ import java.security.Principal;
 import java.sql.Connection;
 import java.util.ArrayList;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * A custom JDBC realm implementation that stores passwords digested with random salt.
  */
@@ -22,6 +25,8 @@ public class SaltedRealm extends JDBCRealm {
     public synchronized Principal authenticate(Connection dbConnection,
                                                String username,
                                                String credentials) {
+
+        username = new String(username.getBytes(ISO_8859_1), UTF_8);  //<=== HACK!!!
 
         String dbCredentials = this.getPassword(username);
 

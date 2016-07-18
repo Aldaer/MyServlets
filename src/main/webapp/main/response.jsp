@@ -30,7 +30,8 @@
 
 </form>
 
-<p><fmt:message key="main.beanreport"/><br>
+<p>
+    <fmt:message key="main.beanreport"/><br>
     <fmt:message key="main.through"/> fmt:formatDate: <i><fmt:formatDate pattern = "HH:mm:ss dd-MM-yyyy (z)" value="${sessionScope.timer.date}" timeZone="${sessionScope.timer.tz}"/></i><br>
     <fmt:message key="main.through"/>  getDate(): <i>${sessionScope.timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${sessionScope.timer}</i>

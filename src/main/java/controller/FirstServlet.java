@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
+import static controller.PageURLs.MAIN_PAGE;
+
 /**
  * My first attempt on servlets
  */
@@ -26,6 +28,7 @@ public class FirstServlet extends HttpServlet {
 
     public FirstServlet() { }
 
+    @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
@@ -39,8 +42,9 @@ public class FirstServlet extends HttpServlet {
         }
         request.setAttribute("lastTZ", tz);
         request.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
-        RequestDispatcher respJSP = request.getRequestDispatcher("response.jsp");
+        RequestDispatcher respJSP = request.getRequestDispatcher(MAIN_PAGE);
         respJSP.forward(request, response);
+        return;
     }
 
     @Override
