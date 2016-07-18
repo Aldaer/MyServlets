@@ -36,13 +36,14 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession s;
             if ((s = request.getSession(false)) != null) s.invalidate();                                      // Recreate session to combat session fixation attacks
-            request.getSession(true).setAttribute(USER_ID, uid.getId());
-            request.getSession(false).setAttribute(USER_NAME, userName);
-            request.getSession(false).setAttribute(LANGUAGE, request.getParameter(LANGUAGE));
-            response.sendRedirect(request.getServletContext().getContextPath() + "/serv");
+            request.getSession(true).setAttribute(USER, uid);
+            String lang = request.getParameter(LANGUAGE);
+            if (lang == null || lang.equals("")) lang = "en";
+            request.getSession(false).setAttribute(LANGUAGE, lang);
+            response.sendRedirect(request.getServletContext().getContextPath() + "/main/serv");
         } else {
             log.info("USER = {}: LOGIN FAILED", userName);
-            RequestDispatcher respLogin = request.getRequestDispatcher("login.jsp");
+            RequestDispatcher respLogin = request.getRequestDispatcher("/login.jsp");
             respLogin.forward(request, response);
         }
     }

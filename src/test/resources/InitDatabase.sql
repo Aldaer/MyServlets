@@ -25,8 +25,7 @@ INSERT INTO users (username, email, dpassword) VALUES ('admin', 'admin@email.com
 
 INSERT INTO user_roles (username, user_role) VALUES ('admin', 'authenticated-user');
 INSERT INTO user_roles (username, user_role) VALUES ('admin', 'manager-gui');
+INSERT INTO user_roles (username, user_role) VALUES ('admin', 'admin-gui');
 INSERT INTO user_roles (username, user_role) VALUES ('Вася', 'authenticated-user');
-
-update users SET dpassword='43e3f6d9c10f8ae88f4d0900dc2e11fb0608fb1910f391699360bb32279cbb5e6a2f42032e958509' where username='Вася';
 
 

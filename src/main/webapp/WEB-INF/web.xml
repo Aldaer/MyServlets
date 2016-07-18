@@ -6,12 +6,7 @@
     <display-name>Time Web App</display-name>
 
     <filter-mapping>
-        <filter-name>Filter1st</filter-name>
+        <filter-name>SecurityFilter</filter-name>
         <servlet-name>MyFirstServlet</servlet-name>
     </filter-mapping>
-    <filter-mapping>
-        <filter-name>Filter2nd</filter-name>
-        <servlet-name>MyFirstServlet</servlet-name>
-    </filter-mapping>
-
 </web-app>

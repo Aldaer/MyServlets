@@ -1,6 +1,7 @@
 package controller;
 
 import lombok.extern.slf4j.Slf4j;
+import model.dao.User;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -11,15 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
-import static controller.AttributeNames.USER_ID;
-import static controller.AttributeNames.USER_NAME;
+import static controller.AttributeNames.USER;
 
 /**
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "Filter1st")
+@WebFilter(filterName = "SecurityFilter")
 public class FirstRequestFilter extends HttpFilter {
     private int n = 0;
 
@@ -27,15 +28,15 @@ public class FirstRequestFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         log.trace("Filtering request {}", ++n);
         if ("logout".equals(req.getParameter("action"))) {
-            String uname;
-            if ((uname = (String) req.getSession().getAttribute(USER_NAME)) != null)
-                log.info("Logging out user: {}", uname);
+            final Optional<String> uname = Optional.ofNullable(req.getSession(false)).map(sn -> (User) sn.getAttribute(USER)).map(User::getUsername);
+            if (uname.isPresent())
+                log.info("Logging out user: {}", uname.get());
             req.getSession().invalidate();
-            res.sendRedirect("index.jsp");
+            res.sendRedirect("/index.html");
             return;
         }
-        if (req.getSession().getAttribute(USER_ID) == null) {
-            req.getRequestDispatcher("login.jsp").forward(req, res);
+        if (req.getSession().getAttribute(USER) == null) {
+            req.getRequestDispatcher("/login.jsp").forward(req, res);
             return;
         }
         super.doFilter(req, res, chain);

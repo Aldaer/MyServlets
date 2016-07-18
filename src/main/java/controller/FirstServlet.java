@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 
 @Slf4j
-@WebServlet(name = "MyFirstServlet", urlPatterns = "/serv")
+@WebServlet(name = "MyFirstServlet", urlPatterns = "/main/serv")
 public class FirstServlet extends HttpServlet {
     private static int id = 0;
 

@@ -6,18 +6,17 @@
     <fmt:setLocale value="${sessionScope.language}"/>
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
-    <c:set var="root" value = "${pageContext.request.contextPath}" />
-    <link href="${root}/images/clock_icon.png" rel="icon" type="image/png" />
+    <link href="/images/clock_icon.png" rel="icon" type="image/png" />
 </head>
 <body>
 <h1><fmt:message key="main.header"/></h1>
 
 
-<p><fmt:message key="main.currentlogin"/> ${sessionScope.userName}<br>
+<p><fmt:message key="main.currentlogin"/> ${sessionScope.currentUser.username} [${sessionScope.currentUser.email}]<br>
     <fmt:message key="main.selectedlocale"/> = "${sessionScope.language}"</p>
 
 <p><fmt:message key="main.selecttz"/></p>
-<form action="${root}/serv" method="get">
+<form action="/main/serv" method="get">
     <p>
         <select name="timezone" onchange="submit()">
             <c:forEach items="${supportedTZ}" var="tzentry">
@@ -36,7 +35,7 @@
     <fmt:message key="main.through"/>  getDate(): <i>${sessionScope.timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${sessionScope.timer}</i>
 </p>
-<a href="${root}/serv?action=logout"><fmt:message key="main.newsession"/></a>
+<a href="/main/serv?action=logout"><fmt:message key="main.newsession"/></a>
 
 </body>
 </html>

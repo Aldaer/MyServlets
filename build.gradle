@@ -33,12 +33,18 @@ task testWar(type: War) {
     from (sourceSets.test.output) { into 'WEB-INF/classes' }
 }
 
-task copyTomcatConfig(type: Copy) {
+task updateTomcatConfig(type: Copy) {
+    group='deployment'
+
     from 'src/main/tomcat-conf'
     into System.env.CATALINA_HOME + '/conf'
 }
 
-task copyTomcatLibs(type: Copy) {
+task updateTomcatLibs(type: Copy) {
+    group='deployment'
+
+    dependsOn ':crypto:jar'
+    dependsOn ':saltedjdbc:jar'
     from 'crypto/build/libs'
     from 'saltedjdbc/build/libs'
     into System.env.CATALINA_HOME + '/lib'

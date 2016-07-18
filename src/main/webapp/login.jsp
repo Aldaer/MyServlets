@@ -7,8 +7,7 @@
     <fmt:setLocale value="${param['language']}"/>
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="login.title"/></title>
-    <c:set var="root" value = "${pageContext.request.contextPath}" />
-    <link href="${root}/images/clock_icon.png" rel="icon" type="image/png" />
+    <link href="/images/clock_icon.png" rel="icon" type="image/png" />
 </head>
 <body>
 <h1 align="center"><fmt:message key="login.caption"/></h1>

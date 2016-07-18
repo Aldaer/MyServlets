@@ -17,15 +17,15 @@
         </encoder>
     </appender>
 
-    <logger name="controller" level="DEBUG" additivity="false">
+    <logger name="controller" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="dbconnection" level="DEBUG" additivity="false">
+    <logger name="dbconnection" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="model" level="DEBUG" additivity="false">
+    <logger name="model" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
