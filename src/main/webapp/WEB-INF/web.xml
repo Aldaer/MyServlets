@@ -9,4 +9,34 @@
         <filter-name>SecurityFilter</filter-name>
         <servlet-name>MyFirstServlet</servlet-name>
     </filter-mapping>
+
+    <security-role>
+        <role-name>authenticated-user</role-name>
+    </security-role>
+    <security-role>
+        <role-name>moderator</role-name>
+    </security-role>
+    <security-role>
+        <role-name>app-admin</role-name>
+    </security-role>
+
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>MainInterface</web-resource-name>
+            <url-pattern>/main/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>authenticated-user</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>AppSecurity</realm-name>
+    </login-config>
+
+
+
+
 </web-app>

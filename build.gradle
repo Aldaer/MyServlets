@@ -29,15 +29,9 @@ dependencies {
 }
 
 task testWar(type: War) {
-    classifier = 'test';
-    from (sourceSets.test.output) { into 'WEB-INF/classes' }
-}
-
-task updateTomcatConfig(type: Copy) {
     group='deployment'
-
-    from 'src/main/tomcat-conf'
-    into System.env.CATALINA_HOME + '/conf'
+    classifier = 'test'
+    from (sourceSets.test.output) { into 'WEB-INF/classes' }
 }
 
 task updateTomcatLibs(type: Copy) {
