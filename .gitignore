@@ -38,5 +38,6 @@ gen
 /src/test/resources.lock.db
 /src/test/resources.trace.db
 /src/test/resources.h2.db
-/src/main/tomcat-conf/server.xml
 /src/test/resources/config.properties
+/src/test/resources/resources.h2.db
+/src/main/tomcat-conf/
