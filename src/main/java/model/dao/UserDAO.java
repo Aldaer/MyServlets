@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Common interface to support user DAO functionality
  */
-public interface UserDAO extends DaoGeneral {
+public interface UserDAO {
 
     /**
      * Returns user object for given id, null if no such user
@@ -20,15 +20,4 @@ public interface UserDAO extends DaoGeneral {
      * @return User id or empty optional
      */
     @Nullable User getUser(String username);
-
-    /**
-     * Checks if username-password pair is valid. Performs digesting as required
-     * @param user User object
-     * @param password User password (clear-text)
-     * @return True if correct password is presented for an existing non-empty user, false otherwise
-     */
-
-    boolean authenticateUser(User user, String password);
-
-    void useSaltedHash(boolean doUse);
 }

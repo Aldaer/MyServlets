@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <fmt:setLocale value="${sessionScope.language}"/>
+    <fmt:setLocale value="${language}"/>
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
@@ -12,7 +12,7 @@
 <h1><fmt:message key="main.header"/></h1>
 
 
-<p><fmt:message key="main.currentlogin"/> ${sessionScope.currentUser.username} [${sessionScope.currentUser.email}]<br>
+<p><fmt:message key="main.currentlogin"/> ${currentUser} <%--.fullname} [${currentUser.email}]--%> <br>
     <fmt:message key="main.selectedlocale"/> = "${sessionScope.language}"</p>
 
 <p><fmt:message key="main.selecttz"/></p>

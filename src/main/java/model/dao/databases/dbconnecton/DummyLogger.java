@@ -1,4 +1,4 @@
-package dbconnecton;
+package model.dao.databases.dbconnecton;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;

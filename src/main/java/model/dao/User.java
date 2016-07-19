@@ -1,95 +1,30 @@
 package model.dao;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import lombok.NoArgsConstructor;
+import model.dao.common.Stored;
+import model.dao.common.StoredField;
 
 /**
- * Interface for generic User class
- */
-public interface User {
-    Long getId();
-    String getUsername();
-    String getEmail();
-    String getDPassword();
-
-    enum UserDatabaseFields { ID(0), USERNAME(50), FULLNAME(255), EMAIL(100), DPASSWORD(40);
-        final int lengthConstraint;
-        UserDatabaseFields(int lengthConstraint) {
-            this.lengthConstraint = lengthConstraint;
-        }
-    }
-    Set<String> USER_DATABASE_FIELDS = Stream.of(UserDatabaseFields.values()).map(Enum::name).collect(Collectors.toSet());
-}
-
-
-/**
- * Simple implementation of the User class. Doesn't support logging
+ * User details
  */
 @Getter
-class SimpleUser implements User, DBDaoClass {
+@AllArgsConstructor
+@NoArgsConstructor
+public class User implements Stored {
+    @StoredField(auto = true, column = "id")
+    long id;
 
-    private String username;
-    private String email;
-    private String dPassword;
-    private Long id;
+    @StoredField(column = "username", maxLength = 50)
+    String username;
 
-    SimpleUser(long id, String username, String dPassword) {
-        this.id = id;
-        this.username = username;
-        this.dPassword = dPassword;
-    }
+    @StoredField(column = "fullname", maxLength = 255)
+    String fullName;
 
-    SimpleUser() {}
+    @StoredField(column = "email", maxLength = 100)
+    String email;
 
-    @Override
-    public Set<String> getFieldNames() {
-        return USER_DATABASE_FIELDS;
-    }
-
-
-    @Override
-    public void setField(String name, Object value) {
-        switch (UserDatabaseFields.valueOf(name)) {
-            case ID:
-                id = (Long) value;
-                break;
-            case USERNAME:
-                username = (String) value;
-                break;
-            case EMAIL:
-                email = (String) value;
-                break;
-            case DPASSWORD:
-                dPassword = (String)value;
-                break;
-        }
-    }
-
-    @Override
-    public Object getField(String name) {
-        switch (UserDatabaseFields.valueOf(name)) {
-            case ID:
-                return getId();
-            case USERNAME:
-                return getUsername();
-            case EMAIL:
-                return getEmail();
-            case DPASSWORD:
-                return getDPassword();
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public @Nullable Logger getLogger() {
-        return null;
-    }
 }
 
 

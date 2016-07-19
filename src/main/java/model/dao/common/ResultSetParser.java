@@ -3,25 +3,31 @@ package model.dao.common;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 /**
  * Generic utility class that can reconstructs objects from result set or inject them into result set.
  * Only simple type fields are supported!
- * Object fields to fill from database must be annotated with {@code @StoredField}
+ * Object fields to fill from database must be annotated as {@link StoredField}
  */
+@SuppressWarnings("WeakerAccess")
 public class ResultSetParser {
     /**
-     * Reconstructs a single object from a result set. Does not affect result set cursor. Result set must have all required columns.
+     * Reconstructs a single object from a result set. Does NOT affect result set cursor,
+     * so you must call {@code next()} on new ResultSet before calling this method.
+     * Result set must have ALL required columns.
      * @param rs Result set to read from
      * @param objSource Object factory
      * @param <T> Object type
      * @return Reconstructed object
      * @throws SQLException
      */
-    static <T extends Stored> T reconstructObject(ResultSet rs, Supplier<T> objSource) throws SQLException {
+    public static <T extends Stored> T reconstructObject(ResultSet rs, Supplier<T> objSource) throws SQLException {
         T obj = objSource.get();
         DbFieldData[] fieldData = getClassFieldData(obj.getClass());
         int[] resultColumns = getRSColumns(rs, fieldData);
@@ -30,14 +36,14 @@ public class ResultSetParser {
     }
 
     /**
-     * Updates and object's fields from a result set. Does not affect result set cursor.
+     * Updates an object's fields from a result set. Does not affect result set cursor.
      * Only the fields present in the result set are affected.
      * @param rs Result set to read from
      * @param obj Object to update
      * @param <T> Object type
      * @throws SQLException
      */
-    static <T extends Stored> void updateObject(ResultSet rs, T obj) throws SQLException {
+    public static <T extends Stored> void updateObject(ResultSet rs, T obj) throws SQLException {
         DbFieldData[] fieldData = getClassFieldData(obj.getClass());
         int[] resultColumns = getRSColumns(rs, fieldData);
         fillFields(rs, obj, fieldData, resultColumns, true);
@@ -53,7 +59,7 @@ public class ResultSetParser {
      * @param <T>         Object type
      * @throws SQLException
      */
-    static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
+    public static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
         if (rs.isClosed() || rs.isAfterLast()) return;
         boolean firstLoop = true;
         DbFieldData[] fieldData = null;
@@ -138,21 +144,23 @@ public class ResultSetParser {
             classInfoLock.readLock().unlock();
         }
 
+        // No class data found in the cache, build it
         classInfoLock.writeLock().lock();
         try {
+            // Still no data in cache?
             data = DB_CLASS_INFO_CACHE.get(cName);
             if (data != null) return data;
 
-            Set<DbFieldData> dataSet = new HashSet<>();
             Field[] fields = c.getDeclaredFields();
+            data = new DbFieldData[fields.length];
+            int fCount = 0;
             for (Field f : fields)
                 if (f.isAnnotationPresent(StoredField.class)) {
                     f.setAccessible(true);
                     StoredField asf = f.getAnnotation(StoredField.class);
-                    dataSet.add(new DbFieldData(f, asf.column(), asf.maxLength()));
+                    data[fCount++] = new DbFieldData(f, asf.column(), asf.maxLength(), asf.auto());
                 }
-            data = dataSet.toArray(new DbFieldData[dataSet.size()]);
-            DB_CLASS_INFO_CACHE.put(cName, data);
+            DB_CLASS_INFO_CACHE.put(cName, Arrays.copyOfRange(data, 0, fCount));
             return data;
         } finally {
             classInfoLock.writeLock().unlock();
@@ -163,18 +171,4 @@ public class ResultSetParser {
     private static final ReentrantReadWriteLock classInfoLock = new ReentrantReadWriteLock();
 }
 
-@SuppressWarnings("WeakerAccess")
-class DbFieldData {
-    final Field f;
-    final String fType;
-    final String columnName;
-    final int maxLength;
 
-    DbFieldData(Field f, String columnName, int maxLength) {
-        this.f = f;
-        fType = f.getType().getCanonicalName().intern();
-        this.columnName = columnName;
-        this.maxLength = maxLength;
-    }
-
-}

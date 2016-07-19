@@ -32,7 +32,7 @@ gradle-app.setting
 
 # IntelliJ project files
 /.idea
-/out
+/out/
 gen
 /src/test/userdatabase.*
-/classes
+/classes/

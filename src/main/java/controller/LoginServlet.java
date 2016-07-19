@@ -1,7 +1,8 @@
 package controller;
 
 import lombok.extern.slf4j.Slf4j;
-import model.dao.User;
+import model.dao.Credentials;
+import model.dao.CredentialsDAO;
 import model.dao.UserDAO;
 
 import javax.servlet.RequestDispatcher;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 
-import static controller.AttributeNames.*;
+import static controller.ContextAttributeNames.*;
 import static controller.PageURLs.LOGIN_PAGE;
 import static controller.PageURLs.MAIN_SERVLET;
 
@@ -31,31 +32,35 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Principal authUser = request.getUserPrincipal();
-        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(USER_DAO);
+        UserDAO userDao = (UserDAO) getServletContext().getAttribute(USER_DAO);
 
-        User uid;
+        String login;
         if (authUser == null) {                     // Not authenticated by container
+            CredentialsDAO credsDao = (CredentialsDAO) getServletContext().getAttribute(CREDS_DAO);
+
             request.setCharacterEncoding("UTF-8");
             String userName = request.getParameter("j_username");
             String userPassword = request.getParameter("j_password");
 
-            uid = userDAO.getUser(userName);
-            if (!userDAO.authenticateUser(uid, userPassword)) {
+            Credentials creds = credsDao.getCredentials(userName);
+            if (creds.verify(userPassword)) {
                 log.info("USER = {}: LOGIN FAILED", userName);
                 RequestDispatcher respLogin = request.getRequestDispatcher(LOGIN_PAGE);
                 respLogin.forward(request, response);
                 return;
             }
             log.info("LOGGING IN USER = {}, PASSWORD = *HIDDEN*", userName);
+            login = userName;
         } else {                                    // Authenticated by container
-            uid = userDAO.getUser(authUser.getName());
+            login = authUser.getName();
         }
 
         // Recreate session to combat session fixation attacks. ONLY if container security is OFF.
         if (! "true".equals(request.getServletContext().getAttribute(CONTAINER_AUTH)) && (request.getSession(false) != null))
             request.getSession().invalidate();
 
-        request.getSession(true).setAttribute(USER, uid);
+        request.getSession(true).setAttribute(USER, login);         // TODO: read user data and put into session
+
         String lang = request.getParameter(LANGUAGE);
         if (lang == null || lang.equals("")) lang = "en";
         request.getSession(false).setAttribute(LANGUAGE, lang);

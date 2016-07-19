@@ -1,4 +1,4 @@
-package dbconnecton;
+package model.dao.databases.dbconnecton;
 
 import org.jetbrains.annotations.NotNull;
 
