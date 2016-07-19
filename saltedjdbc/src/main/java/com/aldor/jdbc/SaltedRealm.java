@@ -31,7 +31,7 @@ public class SaltedRealm extends JDBCRealm {
         String dbCredentials = this.getPassword(username);
 
         if (CryptoUtils.verifySaltedHash(dbCredentials, credentials)) {
-            ArrayList roles = this.getRoles(username);
+            ArrayList<String> roles = this.getRoles(username);
             return new GenericPrincipal(username, credentials, roles);
         } else {
             return null;

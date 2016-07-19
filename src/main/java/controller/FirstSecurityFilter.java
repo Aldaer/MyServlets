@@ -1,6 +1,7 @@
 package controller;
 
 import lombok.extern.slf4j.Slf4j;
+import model.dao.User;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -36,17 +37,11 @@ public class FirstSecurityFilter extends HttpFilter {
                 log.warn("Logout error: {}", e);
             }
             ofNullable(req.getSession(false)).ifPresent(sn -> {
-/*
                 ofNullable(sn.getAttribute(USER))
                         .map(u -> (User) u)
                         .map(User::getUsername)
                         .ifPresent(un -> log.info("Logging out user: {}", un));
-*/
-                ofNullable(sn.getAttribute(USER))
-                        .map(u -> (String) u)
-                        .ifPresent(un -> log.info("Logging out user: {}", un));
                 sn.invalidate();
-
             });
 
             res.sendRedirect("/index.html");

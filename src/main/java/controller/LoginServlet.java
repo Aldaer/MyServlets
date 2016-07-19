@@ -3,6 +3,7 @@ package controller;
 import lombok.extern.slf4j.Slf4j;
 import model.dao.Credentials;
 import model.dao.CredentialsDAO;
+import model.dao.User;
 import model.dao.UserDAO;
 
 import javax.servlet.RequestDispatcher;
@@ -59,7 +60,9 @@ public class LoginServlet extends HttpServlet {
         if (! "true".equals(request.getServletContext().getAttribute(CONTAINER_AUTH)) && (request.getSession(false) != null))
             request.getSession().invalidate();
 
-        request.getSession(true).setAttribute(USER, login);         // TODO: read user data and put into session
+        final User user = userDao.getUser(login);
+        assert user != null;
+        request.getSession(true).setAttribute(USER, user);
 
         String lang = request.getParameter(LANGUAGE);
         if (lang == null || lang.equals("")) lang = "en";
