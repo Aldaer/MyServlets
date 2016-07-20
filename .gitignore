@@ -36,3 +36,4 @@ gradle-app.setting
 gen
 /src/test/userdatabase.*
 /classes/
+/resourse_chest

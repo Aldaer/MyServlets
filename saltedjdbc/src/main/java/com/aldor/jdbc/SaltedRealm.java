@@ -25,7 +25,7 @@ public class SaltedRealm extends JDBCRealm {
     public synchronized Principal authenticate(Connection dbConnection,
                                                String username,
                                                String credentials) {
-
+        if (username == null) return null;
         username = new String(username.getBytes(ISO_8859_1), UTF_8);  //<=== HACK!!!
 
         String dbCredentials = this.getPassword(username);

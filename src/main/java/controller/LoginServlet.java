@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 import static controller.ContextAttributeNames.*;
+import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.LOGIN_PAGE;
 import static controller.PageURLs.MAIN_SERVLET;
 
@@ -65,7 +66,7 @@ public class LoginServlet extends HttpServlet {
         request.getSession(true).setAttribute(USER, user);
 
         String lang = request.getParameter(LANGUAGE);
-        if (lang == null || lang.equals("")) lang = "en";
+        if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;
         request.getSession(false).setAttribute(LANGUAGE, lang);
         request.getRequestDispatcher(MAIN_SERVLET).forward(request, response);
         return;

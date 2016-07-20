@@ -13,9 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 
+import static controller.ContextAttributeNames.LANGUAGE;
+import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.MAIN_PAGE;
+import static java.util.Optional.ofNullable;
 
 /**
  * My first attempt on servlets
@@ -32,8 +34,8 @@ public class FirstServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
-        String tz = Optional.ofNullable(request.getParameter("timezone")).orElse("GMT");
-        String lang = Optional.ofNullable((String)request.getSession().getAttribute("language")).orElse("en");
+        String tz = ofNullable(request.getParameter("timezone")).orElse("GMT");
+        String lang = ofNullable((String)request.getSession().getAttribute(LANGUAGE)).orElse(DEFAULT_LOCALE);
         MyTimer t = (MyTimer) request.getSession().getAttribute("timer");
 
         if (t == null || ! t.getTz().equals(tz)) {

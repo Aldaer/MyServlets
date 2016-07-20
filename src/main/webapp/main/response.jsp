@@ -7,6 +7,7 @@
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
+    <link rel="stylesheet" type="text/css" href="/extras/mygreen.css">
 </head>
 <body>
 <h1><fmt:message key="main.header"/></h1>

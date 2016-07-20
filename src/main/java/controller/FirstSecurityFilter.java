@@ -44,7 +44,7 @@ public class FirstSecurityFilter extends HttpFilter {
                 sn.invalidate();
             });
 
-            res.sendRedirect("/index.html");
+            res.sendRedirect(LOGIN_PAGE);
             return;
         }
         if (req.getSession().getAttribute(USER) == null) {
