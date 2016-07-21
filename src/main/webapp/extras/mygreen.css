@@ -5,7 +5,7 @@
     padding: 8% 0 0;
     margin: auto;
 }
-.form {
+.wform {
     position: relative;
     z-index: 1;
     background: #FFFFFF;
@@ -15,7 +15,19 @@
     text-align: center;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
-.form input {
+
+.bigform {
+    position: relative;
+    z-index: 1;
+    background: #FCFCFC;
+    max-width: 900px;
+    margin: 0 auto 100px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.wform input {
     font-family: "Roboto", sans-serif;
     outline: 0;
     background: #f2f2f2;
@@ -26,38 +38,49 @@
     box-sizing: border-box;
     font-size: 14px;
 }
-.form button {
+button {
     font-family: "Roboto", sans-serif;
-    text-transform: uppercase;
     outline: 0;
     background: #4CAF50;
-    width: 100%;
     border: 0;
-    padding: 15px;
+    padding: 5px;
     color: #FFFFFF;
-    font-size: 14px;
+    font-size: 12px;
     -webkit-transition: all;
     transition: all;
     cursor: pointer;
 }
-.form button:hover,.form button:active,.form button:focus {
+
+.wform button {
+    text-transform: uppercase;
+    padding: 15px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.wform button:hover,.wform button:active,.wform button:focus {
     background: #43A047;
 }
-.form .message {
+.wform .message {
     margin: 15px 0 0;
     color: #b3b3b3;
     font-size: 12px;
 }
-.form .message a {
+.wform .message a {
     color: #4CAF50;
     text-decoration: none;
 }
-.form .smallbutton {
+.wform .smallbutton {
     padding: 3px;
     font-size: 10px;
     background: #60AF50;
 }
-.form .register-form {
+
+.wform .login-form .failcause {
+    color: red;
+}
+
+.wform .register-form {
     display: none;
 }
 

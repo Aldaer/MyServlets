@@ -44,7 +44,10 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                 st.setObject(1, key);
                 log.trace("Executing query: {} <== ({})", sql, key);
                 ResultSet rs = st.executeQuery();
-                rs.next();
+                if (!rs.next()){
+                    log.trace("User '{}' not found", key);
+                    return null;
+                }
                 return ResultSetParser.reconstructObject(rs, User::new);
             } catch (SQLException e) {
                 log.error("Error getting data for user [{}]: {}", key, e);
@@ -69,7 +72,10 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                 st.setObject(1, lcName);
                 log.trace("Executing query: {} <== ({})", GET_CREDS_BY_LOGIN_NAME, lcName);
                 ResultSet rs = st.executeQuery();
-                rs.next();
+                if (!rs.next()) {
+                    log.trace("User '{}' not found", username);
+                    return null;
+                }
                 Credentials creds = new Credentials(lcName, "", saltedHash);
                 creds.updateFromResultSet(rs);
                 return creds;

@@ -12,9 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 
-import static controller.ContextAttributeNames.LANGUAGE;
+import static controller.AttributeNames.C.LANGUAGE;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.MAIN_PAGE;
 import static java.util.Optional.ofNullable;
@@ -62,7 +61,5 @@ public class FirstServlet extends HttpServlet {
         log.info("Initializing servlet");
         log.info("Servlet id = {}", id);
         log.info("Servlet name = {}", config.getServletName());
-        log.info("Servlet context = {}", config.getServletContext().getContextPath());
-        Collections.list(config.getInitParameterNames()).forEach(s -> log.info("{} = {}", s, config.getInitParameter(s)));
     }
 }

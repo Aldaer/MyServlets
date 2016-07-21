@@ -12,10 +12,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Collections;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import static controller.ContextAttributeNames.*;
+import static controller.AttributeNames.C.*;
+import static java.util.Optional.ofNullable;
 
 /**
  * This is the main app initializing listener
@@ -24,7 +26,7 @@ import static controller.ContextAttributeNames.*;
 @WebListener()
 public class ServletInitListener implements ServletContextListener /* , HttpSessionListener, HttpSessionAttributeListener*/ {
     private static final String CONFIG_BUNDLE = "config";
-    private static final String CONFIG_DATABASE_DAO = "dao_class";
+    private static final String CONFIG_DAO_CLASS = "dao_class";
     private static final String CONFIG_DATABASE_URI = "database_uri";
     private static final String CONFIG_DATABASE_DRIVER = "database_driver";
     private static final String CONFIG_DATABASE_USER = "username";
@@ -42,39 +44,47 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
          initialized(when the Web application is deployed).
          You can initialize servlet context related data here.
       */
+
+        final ServletContext sContext = sce.getServletContext();
+        log.info("Initializing context {}", sContext.getContextPath());
+        log.info("Root real path = {}", sContext.getRealPath("/"));
+        Collections.list(sContext.getInitParameterNames()).forEach(par -> log.info("{} = {}", par, sContext.getInitParameter(par)));
+
         ResourceBundle conf = ResourceBundle.getBundle(CONFIG_BUNDLE);
-        String uri = conf.getString(CONFIG_DATABASE_URI);
-        String drv = conf.getString(CONFIG_DATABASE_DRIVER);
-        log.info("Creating connection pool with driver {}, uri {}", drv, uri);
-        String un = conf.getString(CONFIG_DATABASE_USER);
-        String pwd = conf.getString(CONFIG_DATABASE_PASSWORD);
-        connectionPool = ConnectionPool.builder()
-                .withDriver(drv)
-                .withUrl(uri)
-                .withUserName(un)
-                .withPassword(pwd)
-                .withLogger(LoggerFactory.getLogger(ConnectionPool.class))
-                .create();
 
         GlobalDAO globalDao;
         try {
-            String userDaoClass = conf.getString(CONFIG_DATABASE_DAO);
+            String userDaoClass = conf.getString(CONFIG_DAO_CLASS);
             globalDao = (GlobalDAO) Class.forName(userDaoClass).newInstance();
         } catch (MissingResourceException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new RuntimeException("Global DAO config error", e);
         }
-        if (globalDao instanceof DatabaseDAO) ((DatabaseDAO) globalDao).useConnectionSource(connectionPool);
+
+        if (globalDao instanceof DatabaseDAO) {
+            String uri = conf.getString(CONFIG_DATABASE_URI);
+            String drv = conf.getString(CONFIG_DATABASE_DRIVER);
+            log.info("Creating connection pool with driver {}, uri {}", drv, uri);
+            String un = conf.getString(CONFIG_DATABASE_USER);
+            String pwd = conf.getString(CONFIG_DATABASE_PASSWORD);
+            connectionPool = ConnectionPool.builder()
+                    .withDriver(drv)
+                    .withUrl(uri)
+                    .withUserName(un)
+                    .withPassword(pwd)
+                    .withLogger(LoggerFactory.getLogger(ConnectionPool.class))
+                    .create();
+            ((DatabaseDAO) globalDao).useConnectionSource(connectionPool);
+        }
 
         CredentialsDAO credsDao = globalDao.instantiateCredentialsDAO();
         credsDao.useSaltedHash(conf.getString(CONFIG_DATABASE_USE_SHA_DIGEST).toLowerCase().equals("true"));
         UserDAO uDao = globalDao.instantiateUserDAO();
 
         // Put data access objects and config parameters into servlet context
-        final ServletContext servletContext = sce.getServletContext();
-        servletContext.setAttribute(USER_DAO, uDao);
-        servletContext.setAttribute(CREDS_DAO, credsDao);
+        sContext.setAttribute(USER_DAO, uDao);
+        sContext.setAttribute(CREDS_DAO, credsDao);
 
-        servletContext.setAttribute(CONTAINER_AUTH, conf.getString(CONFIG_CONTAINER_SECURITY));
+        sContext.setAttribute(CONTAINER_AUTH, conf.getString(CONFIG_CONTAINER_SECURITY));
 
     }
 
@@ -83,6 +93,6 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
          (the Web application) is undeployed or
          Application Server shuts down.
       */
-        connectionPool.close();
+        ofNullable(connectionPool).ifPresent(ConnectionPool::close);
     }
 }

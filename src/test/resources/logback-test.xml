@@ -17,7 +17,7 @@
         </encoder>
     </appender>
 
-    <logger name="controller" level="debug" additivity="false">
+    <logger name="controller" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
@@ -25,7 +25,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="model" level="debug" additivity="false">
+    <logger name="model" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

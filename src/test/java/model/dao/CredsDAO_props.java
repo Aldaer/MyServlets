@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import static java.util.Optional.ofNullable;
+
 @SuppressWarnings("WeakerAccess")
 public class CredsDAO_props implements CredentialsDAO {
     private static Map<String, String> userPwds = new HashMap<>();
@@ -17,7 +19,7 @@ public class CredsDAO_props implements CredentialsDAO {
     @Override
     public Credentials getCredentials(String username) {
         String lcName = username.toLowerCase();
-        return new Credentials(lcName, userPwds.get(lcName), usingSaltedHash);
+        return ofNullable(userPwds.get(lcName)).map(pwd -> new Credentials(lcName, pwd, usingSaltedHash)).orElse(null);
     }
 
     @Override

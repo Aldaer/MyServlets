@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="login-page">
-    <div class="form">
+    <div class="wform">
         <form class="register-form" name="register" method="post" action="/registerUser" accept-charset="UTF-8">
             <input type="text" placeholder="<fmt:message key="register.username"/>" name="username"/>
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="password"/>
@@ -33,12 +33,18 @@
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password" />
             <button action="submit"><fmt:message key="login.enter"/></button>
 
+            <p class="failcause"><c:choose>
+            <c:when test="${empty userFound}"></c:when>
+            <c:when test="${! userFound}"><fmt:message key="login.badLogin"/></c:when>
+            <c:otherwise><fmt:message key="login.badPassword"/></c:otherwise>
+            </c:choose></p>
+
             <p class="message"><fmt:message key="login.notRegistered"/> <a href="#"><fmt:message key="register.begin"/></a></p>
             <input type="hidden" name="language" value="${locale}">
         </form>
     <table width="100%"><tr>
-      <td><button class="smallbutton" onclick="location.href='/main/serv?language=en'">English</a></button></td>
-      <td><button class="smallbutton" onclick="location.href='/main/serv?language=ru'">Русский</a></button></td>
+      <td><button class="smallbutton" onclick="location.href='/main/serv?language=en'">English</button></td>
+      <td><button class="smallbutton" onclick="location.href='/main/serv?language=ru'">Русский</button></td>
     </tr></table>
     </div>
 </div>

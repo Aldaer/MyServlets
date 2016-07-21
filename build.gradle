@@ -4,8 +4,8 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'war'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+//sourceCompatibility = 1.8
+//targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -29,9 +29,18 @@ dependencies {
 }
 
 task testWar(type: War) {
-    group='deployment'
+    group = 'deployment'
     classifier = 'test'
-    from (sourceSets.test.output) { into 'WEB-INF/classes' }
+
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    classpath(sourceSets.test.output)
+
+    exclude('**/web.xml')
+
+    webInf {
+        from 'src/test/resources/web-test.xml'
+        rename('web-test.xml','web.xml')
+    }
 }
 
 task updateTomcatLibs(type: Copy) {

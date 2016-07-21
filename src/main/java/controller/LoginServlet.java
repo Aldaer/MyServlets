@@ -7,6 +7,7 @@ import model.dao.User;
 import model.dao.UserDAO;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,10 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 
-import static controller.ContextAttributeNames.*;
+import static controller.AttributeNames.C.*;
+import static controller.AttributeNames.R.USER_FOUND;
+import static controller.AttributeNames.S.USER;
 import static controller.MiscConstants.DEFAULT_LOCALE;
-import static controller.PageURLs.LOGIN_PAGE;
-import static controller.PageURLs.MAIN_SERVLET;
+import static controller.PageURLs.*;
 
 /**
  * Login servlet. Accepts only POST requests
@@ -34,19 +36,27 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Principal authUser = request.getUserPrincipal();
-        UserDAO userDao = (UserDAO) getServletContext().getAttribute(USER_DAO);
+        final ServletContext srvContext = getServletContext();
+        UserDAO userDao = (UserDAO) srvContext.getAttribute(USER_DAO);
 
         String login;
         if (authUser == null) {                     // Not authenticated by container
-            CredentialsDAO credsDao = (CredentialsDAO) getServletContext().getAttribute(CREDS_DAO);
+            CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(CREDS_DAO);
 
             request.setCharacterEncoding("UTF-8");
             String userName = request.getParameter("j_username");
             String userPassword = request.getParameter("j_password");
 
             Credentials creds = credsDao.getCredentials(userName);
-            if (creds.verify(userPassword)) {
-                log.info("USER = {}: LOGIN FAILED", userName);
+            if (creds == null) {
+                log.debug("User '{}' not found", userName);
+                request.setAttribute(USER_FOUND, Boolean.FALSE);
+                RequestDispatcher respLogin = request.getRequestDispatcher(LOGIN_PAGE);
+                respLogin.forward(request, response);
+                return;
+            } else if (!creds.verify(userPassword)) {
+                log.info("User '{}' presented wrong password", userName);
+                request.setAttribute(USER_FOUND, Boolean.TRUE);
                 RequestDispatcher respLogin = request.getRequestDispatcher(LOGIN_PAGE);
                 respLogin.forward(request, response);
                 return;
@@ -58,7 +68,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         // Recreate session to combat session fixation attacks. ONLY if container security is OFF.
-        if (! "true".equals(request.getServletContext().getAttribute(CONTAINER_AUTH)) && (request.getSession(false) != null))
+        if (! "true".equals(srvContext.getAttribute(CONTAINER_AUTH)) && (request.getSession(false) != null))
             request.getSession().invalidate();
 
         final User user = userDao.getUser(login);
@@ -82,6 +92,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        response.sendRedirect(LOGIN_PAGE);                  // Won't accept user credentials if sent through GET method
+        // Won't accept user credentials if sent through GET method, redirect without authentication will bring user to login page
+        response.sendRedirect(MAIN_PAGE);
     }
 }

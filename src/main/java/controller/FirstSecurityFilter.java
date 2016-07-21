@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
 
-import static controller.ContextAttributeNames.USER;
+import static controller.AttributeNames.S.USER;
 import static controller.PageURLs.LOGIN_PAGE;
 import static java.util.Optional.ofNullable;
 
@@ -22,7 +22,7 @@ import static java.util.Optional.ofNullable;
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "SecurityFilter")
+@WebFilter(filterName = "SecurityFilter", servletNames = "MyFirstServlet")
 public class FirstSecurityFilter extends HttpFilter {
     private int n = 0;
 
@@ -44,10 +44,10 @@ public class FirstSecurityFilter extends HttpFilter {
                 sn.invalidate();
             });
 
-            res.sendRedirect(LOGIN_PAGE);
+            res.sendRedirect("/");
             return;
         }
-        if (req.getSession().getAttribute(USER) == null) {
+        if (req.getSession(true).getAttribute(USER) == null) {
             final Principal authUser = req.getUserPrincipal();          // User already authenticated by container?
             if (authUser == null) {
                 log.trace("No user info, forwarding to login page");
