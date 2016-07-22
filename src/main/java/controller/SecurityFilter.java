@@ -30,7 +30,7 @@ public class SecurityFilter extends HttpFilter {
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         log.trace("[SEC] Filtering request {}: {}", ++n, req.getRequestURL());
 
-        if ("logout".equals(req.getParameter("action"))) {
+        if ("logout".equals(req.getParameter(ParameterNames.ACTION))) {
             if (req.getUserPrincipal() != null) try {
                 req.logout();
             } catch (ServletException e) {

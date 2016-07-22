@@ -14,7 +14,7 @@ $('.login-form').submit(function () {
 
 
 $('.register-form').submit(function () {
-    var un = document.forms["register"]["username"].value;
+    var un = document.forms["register"]["j_username"].value;
     if (un == null || un == "") {
         alert(noUser);
         return false;
@@ -23,9 +23,14 @@ $('.register-form').submit(function () {
         alert(unTooLong);
         return false;
     }
+    if (un.length < 4) {
+        alert(unTooShort);
+        return false;
+    }
 
-    var p1 = document.forms["register"]["password"].value;
-    var p2 = document.forms["register"]["password2"].value;
+
+    var p1 = document.forms["register"]["j_password"].value;
+    var p2 = document.forms["register"]["j_password2"].value;
     if (p1.length < 3) {
         alert(pwdTooShort);
         return false;
@@ -36,4 +41,19 @@ $('.register-form').submit(function () {
         return false;
     }
     return true;
+});
+
+$('#r_name').keypress(function () {
+    $(this).css("color", "");
+    $('.register-form .failcause').html("");
+});
+
+$(document).ready(function () {
+    if (regAttempt != '') {
+        var rinp = $('#r_name');
+        rinp.val(regAttempt);
+        rinp.css("color", "red");
+        $('form').animate({height: "toggle", opacity: "toggle"}, "fast");
+        $('.register-form .failcause').html(userExists);
+    }
 });

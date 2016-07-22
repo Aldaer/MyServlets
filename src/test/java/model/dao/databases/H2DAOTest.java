@@ -31,10 +31,10 @@ public class H2DAOTest {
                 return null;
             }
         });
-        creds = glob.instantiateCredentialsDAO();
+        creds = glob.getCredentialsDAO();
         creds.useSaltedHash(true);
         creds.purgeTemporaryUsers(System.currentTimeMillis());
-        usr = glob.instantiateUserDAO();
+        usr = glob.getUserDAO();
     }
 
 

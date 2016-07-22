@@ -26,138 +26,131 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 
 
     private Supplier<Connection> cSource;
-    private final H2user userDAO;
-    private final H2credentials credsDAO;
+    private UserDAO userDAO;
 
-    private class H2user implements UserDAO, DatabaseDAO {
-        private volatile Supplier<Connection> usersSource;
+    private CredentialsDAO credsDAO;
+    private volatile boolean saltedHash = false;
 
-        @Override
-        public @Nullable User getUser(long id) {
-            return getUserByAnyKey(GET_USER_BY_ID, id);
-        }
-
-        @Override
-        public @Nullable User getUser(String username) {
-            return getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
-        }
-
-        private User getUserByAnyKey(String sql, Object key) {
-            try (Connection conn = usersSource.get(); PreparedStatement st = conn.prepareStatement(sql)) {
-                st.setObject(1, key);
-                log.trace("Executing query: {} <== ({})", sql, key);
-                ResultSet rs = st.executeQuery();
-                if (!rs.next()) {
-                    log.trace("User '{}' not found", key);
-                    return null;
+    @Override
+    public UserDAO getUserDAO() {
+        synchronized (this) {
+            if (userDAO == null) userDAO = new UserDAO() {
+                @Override
+                public @Nullable User getUser(long id) {
+                    return getUserByAnyKey(GET_USER_BY_ID, id);
                 }
-                return ResultSetParser.reconstructObject(rs, User::new);
-            } catch (SQLException e) {
-                log.error("Error getting data for user [{}]: {}", key, e);
-                return null;
-            }
-        }
 
-        @Override
-        public void useConnectionSource(Supplier<Connection> src) {
-            usersSource = src;
-        }
-    }
-
-    private class H2credentials implements CredentialsDAO, DatabaseDAO {
-        private volatile Supplier<Connection> credsSource;
-        private volatile boolean saltedHash = false;
-
-        @Override
-        public Credentials getCredentials(String username) {
-            String lcName = username.toLowerCase();
-            try (Connection conn = credsSource.get(); PreparedStatement st = conn.prepareStatement(GET_CREDS_BY_LOGIN_NAME)) {
-                st.setObject(1, lcName);
-                log.trace("Executing query: {} <== ({})", GET_CREDS_BY_LOGIN_NAME, lcName);
-                ResultSet rs = st.executeQuery();
-                if (!rs.next()) {
-                    log.trace("User '{}' not found", username);
-                    return null;
+                @Override
+                public @Nullable User getUser(String username) {
+                    return getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
                 }
-                Credentials creds = new Credentials(lcName, "", saltedHash);
-                creds.updateFromResultSet(rs);
-                return creds;
-            } catch (SQLException e) {
-                log.error("Error getting user credentials: {}", e);
-                return null;
-            }
-        }
 
-        @Override
-        public void useSaltedHash(boolean doUse) {
-            saltedHash = doUse;
-        }
+                private User getUserByAnyKey(String sql, Object key) {
+                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(sql)) {
+                        st.setObject(1, key);
+                        log.trace("Executing query: {} <== ({})", sql, key);
+                        ResultSet rs = st.executeQuery();
+                        if (!rs.next()) {
+                            log.trace("User '{}' not found", key);
+                            return null;
+                        }
+                        return ResultSetParser.reconstructObject(rs, User::new);
+                    } catch (SQLException e) {
+                        log.error("Error getting data for user [{}]: {}", key, e);
+                        return null;
+                    }
+                }
+            };
 
-        @Override
-        public void useConnectionSource(Supplier<Connection> src) {
-            credsSource = src;
+            return userDAO;
         }
-
-        @Override
-        public boolean checkIfUserExists(String username) {
-            try (Connection conn = credsSource.get(); PreparedStatement st = conn.prepareStatement(CHECK_IF_USER_EXISTS)) {
-                st.setString(1, username);
-                st.setString(2, username);
-                log.trace("Executing query: {} <== ({}, {})", CHECK_IF_USER_EXISTS, username, username);
-                return st.executeQuery().next();
-            } catch (SQLException e) {
-                log.error("Error checking if user {} exists: {}", username, e);
-                return false;
-            }
-        }
-
-        @Override
-        public boolean createTemporaryUser(String username) {
-            String lcName = username.toLowerCase();
-            try (Connection conn = credsSource.get(); PreparedStatement st = conn.prepareStatement(CREATE_TEMPORARY_ACCOUNT)) {
-                st.setString(1, lcName);
-                st.setTime(2, new Time(System.currentTimeMillis()));
-                log.trace("Executing query: {} <== ({})", CREATE_TEMPORARY_ACCOUNT, username);
-                if (st.executeUpdate() != 1) throw new SQLException("Wrong affected row count");
-            } catch (SQLException e) {
-                log.error("Error creating temporary account for user: {}", username);
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public void purgeTemporaryUsers(long timeThreshold) {
-            try (Connection conn = credsSource.get(); PreparedStatement st = conn.prepareStatement(PURGE_TEMPORARY_ACCOUNTS)) {
-                st.setDate(1, new Date(timeThreshold));
-                log.trace("Executing query: {} <== ({})", PURGE_TEMPORARY_ACCOUNTS, timeThreshold);
-                int numPurged = st.executeUpdate();
-                log.debug("Purged {} temporary user accounts", numPurged);
-            } catch (SQLException e) {
-                log.error("Error purging temporary user accounts: {}", e);
-            }
-        }
-    }
-
-    public H2GlobalDAO() {
-        userDAO = new H2user();
-        credsDAO = new H2credentials();
     }
 
     @Override
-    public H2user instantiateUserDAO() {
-        userDAO.useConnectionSource(cSource);
-        return userDAO;
-    }
+    public CredentialsDAO getCredentialsDAO() {
+        synchronized (this) {
+            if (credsDAO == null) credsDAO = new CredentialsDAO() {
+                @Override
+                public Credentials getCredentials(String username) {
+                    String lcName = username.toLowerCase();
+                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(GET_CREDS_BY_LOGIN_NAME)) {
+                        st.setObject(1, lcName);
+                        log.trace("Executing query: {} <== ({})", GET_CREDS_BY_LOGIN_NAME, lcName);
+                        ResultSet rs = st.executeQuery();
+                        if (!rs.next()) {
+                            log.trace("User '{}' not found", username);
+                            return null;
+                        }
+                        Credentials creds = new Credentials(lcName, "", saltedHash);
+                        creds.updateFromResultSet(rs);
+                        return creds;
+                    } catch (SQLException e) {
+                        log.error("Error getting user credentials: {}", e);
+                        return null;
+                    }
+                }
 
-    @Override
-    public H2credentials instantiateCredentialsDAO() {
-        credsDAO.useConnectionSource(cSource);
-        return credsDAO;
+                @Override
+                public void useSaltedHash(boolean doUse) {
+                    saltedHash = doUse;
+                }
+
+                @Override
+                public boolean checkIfUserExists(String username) {
+                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(CHECK_IF_USER_EXISTS)) {
+                        st.setString(1, username);
+                        st.setString(2, username);
+                        log.trace("Executing query: {} <== ({}, {})", CHECK_IF_USER_EXISTS, username, username);
+                        return st.executeQuery().next();
+                    } catch (SQLException e) {
+                        log.error("Error checking if user {} exists: {}", username, e);
+                        return false;
+                    }
+                }
+
+                @Override
+                public boolean createTemporaryUser(String username) {
+                    String lcName = username.toLowerCase();
+                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(CREATE_TEMPORARY_ACCOUNT)) {
+                        st.setString(1, lcName);
+                        st.setTime(2, new Time(System.currentTimeMillis()));
+                        log.trace("Executing query: {} <== ({})", CREATE_TEMPORARY_ACCOUNT, username);
+                        if (st.executeUpdate() != 1) throw new SQLException("Wrong affected row count");
+                    } catch (SQLException e) {
+                        log.error("Error creating temporary account for user: {}", username);
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public void purgeTemporaryUsers(long timeThreshold) {
+                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(PURGE_TEMPORARY_ACCOUNTS)) {
+                        st.setDate(1, new Date(timeThreshold));
+                        log.trace("Executing query: {} <== ({})", PURGE_TEMPORARY_ACCOUNTS, timeThreshold);
+                        int numPurged = st.executeUpdate();
+                        log.debug("Purged {} temporary user accounts", numPurged);
+                    } catch (SQLException e) {
+                        log.error("Error purging temporary user accounts: {}", e);
+                    }
+                }
+
+                @Override
+                public Credentials storeNewCredentials(String username, String password) {
+                    return null; // TODO: implement!!!
+                }
+            };
+
+            return credsDAO;
+        }
     }
 
     @Override
     public void useConnectionSource(Supplier<Connection> src) {
-        cSource = src;
+        synchronized (this) {
+            credsDAO = null;
+            userDAO = null;
+            cSource = src;
+        }
     }
 }

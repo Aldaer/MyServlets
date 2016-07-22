@@ -76,7 +76,7 @@ button {
     background: #60AF50;
 }
 
-.wform .login-form .failcause {
+.failcause {
     color: red;
 }
 

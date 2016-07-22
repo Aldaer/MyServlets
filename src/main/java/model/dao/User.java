@@ -25,6 +25,9 @@ public class User implements Stored {
     @StoredField(column = "email", maxLength = 100)
     String email;
 
+    @StoredField(column = "regcomplete")
+    boolean regComplete;
+
 }
 
 

@@ -1,9 +1,10 @@
 package model.dao;
 
-import lombok.AllArgsConstructor;
+import com.aldor.utils.CryptoUtils;
 import lombok.Getter;
 import model.dao.common.Stored;
 import model.dao.common.StoredField;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.aldor.utils.CryptoUtils.verifySaltedHash;
@@ -11,7 +12,6 @@ import static com.aldor.utils.CryptoUtils.verifySaltedHash;
 /**
  * Username and password
  */
-@AllArgsConstructor
 public class Credentials implements Stored {
     @Getter
     @StoredField(column = "username", maxLength = 50)
@@ -21,8 +21,14 @@ public class Credentials implements Stored {
 
     private final boolean saltedHash;
 
-    public Credentials() {
-        saltedHash = false;
+    public Credentials(boolean saltedHash) {
+        this("", "", saltedHash);
+    }
+
+    public Credentials(@NotNull String uName, @NotNull String pwd, boolean saltedHash) {
+        this.uName = uName;
+        this.saltedHash = saltedHash;
+        this.pwd = saltedHash? CryptoUtils.stringRandomSaltedHash(pwd) : pwd;
     }
 
     /**

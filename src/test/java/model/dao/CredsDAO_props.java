@@ -1,5 +1,7 @@
 package model.dao;
 
+import com.aldor.utils.CryptoUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -13,7 +15,7 @@ public class CredsDAO_props implements CredentialsDAO {
 
     static {
         ResourceBundle userP = ResourceBundle.getBundle("passwords");
-        userP.keySet().forEach(key -> userPwds.put(key.toLowerCase(), userP.getString(key)));
+        userP.keySet().forEach(un -> userPwds.put(un.toLowerCase(), userP.getString(un)));
     }
 
     @Override
@@ -29,13 +31,13 @@ public class CredsDAO_props implements CredentialsDAO {
 
     @Override
     public boolean checkIfUserExists(String username) {
-        return (userPwds.containsKey(username));
+        return (userPwds.containsKey(username.toLowerCase()));
     }
 
     @Override
     public boolean createTemporaryUser(String username) {
         if (checkIfUserExists(username)) return false;
-        userPwds.put(username, "" + System.currentTimeMillis());
+        userPwds.put(username.toLowerCase(), "" + System.currentTimeMillis());
         return true;
     }
 
@@ -48,5 +50,13 @@ public class CredsDAO_props implements CredentialsDAO {
                 return false;
             }
         }).forEach(userPwds::remove);
+    }
+
+    @Override
+    public Credentials storeNewCredentials(String username, String password) {
+        if (usingSaltedHash)
+            password = CryptoUtils.stringRandomSaltedHash(password);
+        userPwds.put(username, password);
+        return new Credentials(username, password, usingSaltedHash);
     }
 }

@@ -8,12 +8,12 @@ public class PropsDAO implements GlobalDAO {
     private final CredentialsDAO credsDAO = new CredsDAO_props();
 
     @Override
-    public UserDAO instantiateUserDAO() {
+    public UserDAO getUserDAO() {
         return userDAO;
     }
 
     @Override
-    public CredentialsDAO instantiateCredentialsDAO() {
+    public CredentialsDAO getCredentialsDAO() {
         return credsDAO;
     }
 }

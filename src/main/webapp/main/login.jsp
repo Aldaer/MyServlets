@@ -18,11 +18,13 @@
 <div class="login-page">
     <div class="wform">
         <form class="register-form" name="register" method="post" action="/registerUser" accept-charset="UTF-8">
-            <input type="text" placeholder="<fmt:message key="register.username"/>" name="username"/>
-            <input type="password" placeholder="<fmt:message key="login.password"/>" name="password"/>
-            <input type="password" placeholder="<fmt:message key="register.repeatPassword"/>" name="password2"/>
+            <input type="text" placeholder="<fmt:message key="register.username"/>" name="j_username" id="r_name"/>
+            <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password"/>
+            <input type="password" placeholder="<fmt:message key="register.repeatPassword"/>" name="j_password2"/>
             <button action="submit"><fmt:message key="register.do"/></button>
+            <p class="failcause"></p>
             <p class="message"><fmt:message key="login.registered"/> <a href="#"><fmt:message key="login.signIn"/></a></p>
+            <input type="hidden" name="language" value="${locale}">
         </form>
         <form class="login-form" name="login" method="post" action=<c:choose>
             <c:when test="${authByContainer == true}">"j_security_check"</c:when>
@@ -54,6 +56,9 @@
    var pwdMismatch = '<fmt:message key="alert.pwdMismatch"/>';
    var pwdTooShort = '<fmt:message key="alert.pwdTooShort"/>';
    var unTooLong = '<fmt:message key="alert.unTooLong"/>';
+
+   var regAttempt = '${regAttempt}';
+   var userExists = '<fmt:message key="register.userExists"/>';
 </script>
 
 <script src="/extras/login.js"></script>

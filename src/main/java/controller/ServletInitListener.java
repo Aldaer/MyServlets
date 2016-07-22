@@ -76,16 +76,17 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
             ((DatabaseDAO) globalDao).useConnectionSource(connectionPool);
         }
 
-        CredentialsDAO credsDao = globalDao.instantiateCredentialsDAO();
+        CredentialsDAO credsDao = globalDao.getCredentialsDAO();
         credsDao.useSaltedHash(conf.getString(CONFIG_DATABASE_USE_SHA_DIGEST).toLowerCase().equals("true"));
-        UserDAO uDao = globalDao.instantiateUserDAO();
+        // Cancel all unfinished registration attempts
+        credsDao.purgeTemporaryUsers(System.currentTimeMillis());
+        UserDAO uDao = globalDao.getUserDAO();
 
         // Put data access objects and config parameters into servlet context
         sContext.setAttribute(USER_DAO, uDao);
         sContext.setAttribute(CREDS_DAO, credsDao);
 
         sContext.setAttribute(CONTAINER_AUTH, conf.getString(CONFIG_CONTAINER_SECURITY));
-
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

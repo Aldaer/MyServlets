@@ -53,4 +53,12 @@ public class PropsDAO_Test {
     public void testWrongPassword() throws Exception {
         assertThat(cdao.getCredentials("Вася").verify("qwertz"), is(false));
     }
+
+    @Test
+    public void testCreateNewCreds() throws Exception {
+        cdao.storeNewCredentials("света", "123321");
+        Credentials creds = cdao.getCredentials("света");
+        assertThat(creds.verify("123321"), is(true));
+        assertThat(creds.verify("123322"), is(false));
+    }
 }

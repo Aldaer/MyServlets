@@ -26,7 +26,7 @@ public interface CredentialsDAO {
 
     /**
      * Creates a user in a TEMPORARY table setting UTC timestamp for time of creation
-     * @param username User login name, converted to lowercase
+     * @param username User login name (not case-sensitive)
      * @return True if successful, false if such temporary user already exists
      */
     boolean createTemporaryUser(String username);
@@ -36,4 +36,12 @@ public interface CredentialsDAO {
      * @param timeThreshold UTC threshold time in millis. All records older than this will be purged
      */
     void purgeTemporaryUsers(long timeThreshold);
+
+    /**
+     * Stores new credential info in credentials database. Password is automatically hashed if {@code useSaltedHash==true}
+     * @param username User login name (must be a new user)
+     * @param password Password (plain-text)
+     * @return New {@link Credentials} object, null on database error
+     */
+    Credentials storeNewCredentials(String username, String password);
 }

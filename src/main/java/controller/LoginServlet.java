@@ -21,6 +21,8 @@ import static controller.AttributeNames.R.USER_FOUND;
 import static controller.AttributeNames.S.USER;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.*;
+import static controller.ParameterNames.L_PASSWORD;
+import static controller.ParameterNames.L_USERNAME;
 
 /**
  * Login servlet. Accepts only POST requests
@@ -44,8 +46,8 @@ public class LoginServlet extends HttpServlet {
             CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(CREDS_DAO);
 
             request.setCharacterEncoding("UTF-8");
-            String userName = request.getParameter("j_username");
-            String userPassword = request.getParameter("j_password");
+            String userName = request.getParameter(L_USERNAME);
+            String userPassword = request.getParameter(L_PASSWORD);
 
             Credentials creds = credsDao.getCredentials(userName);
             if (creds == null) {
@@ -61,7 +63,7 @@ public class LoginServlet extends HttpServlet {
                 respLogin.forward(request, response);
                 return;
             }
-            log.info("LOGGING IN USER = {}, PASSWORD = *HIDDEN*", userName);
+            log.info("LOGGING IN USER = {}, L_PASSWORD = *HIDDEN*", userName);
             login = userName;
         } else {                                    // Authenticated by container
             login = authUser.getName();
@@ -75,7 +77,7 @@ public class LoginServlet extends HttpServlet {
         assert user != null;
         request.getSession(true).setAttribute(USER, user);
 
-        String lang = request.getParameter(LANGUAGE);
+        String lang = request.getParameter(ParameterNames.LANGUAGE);
         if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;
         request.getSession(false).setAttribute(LANGUAGE, lang);
         request.getRequestDispatcher(MAIN_SERVLET).forward(request, response);
