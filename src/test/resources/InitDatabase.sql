@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS temp_credentials;
 
 CREATE TABLE temp_credentials (
   username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
-  created SMALLDATETIME
+  created BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -47,5 +47,7 @@ INSERT INTO user_roles (username, user_role) VALUES ('admin', 'manager-gui');
 INSERT INTO user_roles (username, user_role) VALUES ('admin', 'admin-gui');
 INSERT INTO user_roles (username, user_role) VALUES ('вася', 'authenticated-user');
 INSERT INTO user_roles (username, user_role) VALUES ('петя', 'authenticated-user');
+
+
 
 

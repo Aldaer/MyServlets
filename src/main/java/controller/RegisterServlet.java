@@ -1,6 +1,7 @@
 package controller;
 
 import lombok.extern.slf4j.Slf4j;
+import model.dao.Credentials;
 import model.dao.CredentialsDAO;
 
 import javax.servlet.ServletContext;
@@ -14,8 +15,8 @@ import java.io.IOException;
 import static controller.AttributeNames.C.CREDS_DAO;
 import static controller.AttributeNames.R.REG_ATTEMPT;
 import static controller.MiscConstants.*;
-import static controller.ParameterNames.L_PASSWORD;
-import static controller.ParameterNames.L_USERNAME;
+import static controller.ParameterNames.*;
+import static java.util.Optional.ofNullable;
 
 /**
  * Gets called from registration form in login.jsp
@@ -25,12 +26,12 @@ import static controller.ParameterNames.L_USERNAME;
 public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String newName = request.getParameter(L_USERNAME);
+        String newName = ofNullable(request.getParameter(L_USERNAME)).map(String::trim).orElse("");
         String newPassword = request.getParameter(L_PASSWORD);
-        String newPassword2 = request.getParameter(L_PASSWORD);
+        String newPassword2 = request.getParameter(L_PASSWORD2);
 
-        // Usually checked by JavaScript client-side
-        if (newName == null || newPassword == null || newPassword2 == null ||
+        // Re-check things checked by JavaScript client-side
+        if (newPassword == null || newPassword2 == null ||
                 newName.length() < MIN_USERNAME_LENGTH || newName.length() > MAX_USERNAME_LENGTH ||
                 newPassword.length() < MIN_PASSWORD_LENGTH || ! newPassword.equals(newPassword2)) {
             log.debug("Invalid registration data for user '{}'", newName);
@@ -48,9 +49,14 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         log.info("Created temporary registration for user '{}'", newName);
-
-
-
+        Credentials newCreds = credsDao.storeNewCredentials(newName, newPassword);
+        if (newCreds == null) {
+            log.error("Error creating user {}", newName);
+            request.setAttribute(REG_ATTEMPT, "");
+            returnToRegistration(request, response);
+            return;
+        }
+        log.info("Successfully created user '{}'", newName);
     }
 
     private void returnToRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

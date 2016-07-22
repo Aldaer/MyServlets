@@ -4,7 +4,8 @@ $('.message a').click(function () {
 
 
 $('.login-form').submit(function () {
-    var x = document.forms["login"]["j_username"].value;
+    var x = document.forms["login"]["j_username"].value.trim();
+    document.forms["login"]["j_username"].value = x;
     if (x == null || x == "") {
         alert(noUser);
         return false;
@@ -14,8 +15,9 @@ $('.login-form').submit(function () {
 
 
 $('.register-form').submit(function () {
-    var un = document.forms["register"]["j_username"].value;
-    if (un == null || un == "") {
+    var un = document.forms["register"]["j_username"].value.trim();
+    document.forms["register"]["j_username"].value = un;
+    if (un == "") {
         alert(noUser);
         return false;
     }
@@ -27,7 +29,6 @@ $('.register-form').submit(function () {
         alert(unTooShort);
         return false;
     }
-
 
     var p1 = document.forms["register"]["j_password"].value;
     var p2 = document.forms["register"]["j_password2"].value;

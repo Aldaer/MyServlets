@@ -1,17 +1,18 @@
 package model.dao;
 
-import com.aldor.utils.CryptoUtils;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import model.dao.common.Stored;
 import model.dao.common.StoredField;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.aldor.utils.CryptoUtils.stringRandomSaltedHash;
 import static com.aldor.utils.CryptoUtils.verifySaltedHash;
 
 /**
  * Username and password
  */
+@AllArgsConstructor
 public class Credentials implements Stored {
     @Getter
     @StoredField(column = "username", maxLength = 50)
@@ -25,10 +26,16 @@ public class Credentials implements Stored {
         this("", "", saltedHash);
     }
 
-    public Credentials(@NotNull String uName, @NotNull String pwd, boolean saltedHash) {
-        this.uName = uName;
-        this.saltedHash = saltedHash;
-        this.pwd = saltedHash? CryptoUtils.stringRandomSaltedHash(pwd) : pwd;
+    /**
+     * If {@code saltedHash == true}, applies hashing to password. Otherwise, does nothing.
+     * Call this method after creating {@code Credentials} object with a constructor.
+     * Multiple calls will rehash the password and make it unusable!
+     * @return Reference to this object
+     */
+    public Credentials applyHash() {
+        if (pwd == null) pwd = "";
+        if (saltedHash) pwd = stringRandomSaltedHash(pwd);
+        return this;
     }
 
     /**

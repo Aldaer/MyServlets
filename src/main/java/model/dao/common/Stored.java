@@ -1,5 +1,6 @@
 package model.dao.common;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -14,5 +15,18 @@ import java.sql.SQLException;
 public interface Stored {
     default void updateFromResultSet(ResultSet rs) throws SQLException {
         ResultSetParser.updateObject(rs, this);
+    }
+
+    default String generateInsertSQL(String table) {
+        return ResultSetParser.generateInsertStatement(table, this);
+    }
+
+    /**
+     * Puts field values as parameters of a prepared SQL statement.
+     * Only call on prepared statements made from generated SQL strings! Column order isn't checked.
+     * @param pst Statement prepared from string returned by {@code generateInsertSQL} etc.
+     */
+    default void packIntoPreparedStatement(PreparedStatement pst) {
+        ResultSetParser.packIntoPreparedStatement(pst, this);
     }
 }

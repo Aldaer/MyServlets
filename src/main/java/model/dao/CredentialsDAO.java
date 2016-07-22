@@ -38,7 +38,10 @@ public interface CredentialsDAO {
     void purgeTemporaryUsers(long timeThreshold);
 
     /**
-     * Stores new credential info in credentials database. Password is automatically hashed if {@code useSaltedHash==true}
+     * Stores new credential info in credentials database. Password is automatically hashed if {@code useSaltedHash==true}.
+     * Call to this method must atomically create user records with the same username in
+     * {@code users}. If this database is used for container-based authentication, it must also create a record
+     * in {@code user_roles} table, with {@code user_role='authenticated_user'}.
      * @param username User login name (must be a new user)
      * @param password Password (plain-text)
      * @return New {@link Credentials} object, null on database error

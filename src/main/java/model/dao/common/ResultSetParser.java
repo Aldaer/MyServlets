@@ -1,6 +1,7 @@
 package model.dao.common;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -21,9 +22,10 @@ public class ResultSetParser {
      * Reconstructs a single object from a result set. Does NOT affect result set cursor,
      * so you must call {@code next()} on new ResultSet before calling this method.
      * Result set must have ALL required columns.
-     * @param rs Result set to read from
+     *
+     * @param rs        Result set to read from
      * @param objSource Object factory
-     * @param <T> Object type
+     * @param <T>       Object type
      * @return Reconstructed object
      * @throws SQLException
      */
@@ -38,7 +40,8 @@ public class ResultSetParser {
     /**
      * Updates an object's fields from a result set. Does not affect result set cursor.
      * Only the fields present in the result set are affected.
-     * @param rs Result set to read from
+     *
+     * @param rs  Result set to read from
      * @param obj Object to update
      * @param <T> Object type
      * @throws SQLException
@@ -66,7 +69,7 @@ public class ResultSetParser {
         int[] resultColumns = null;
 
         if (rs.isBeforeFirst()) {
-            if (! rs.next()) return;
+            if (!rs.next()) return;
         }
         do {
             T obj = objSource.get();
@@ -175,6 +178,64 @@ public class ResultSetParser {
 
     private static final Map<String, DbFieldData[]> DB_CLASS_INFO_CACHE = new HashMap<>();
     private static final ReentrantReadWriteLock classInfoLock = new ReentrantReadWriteLock();
+
+    public static String generateInsertStatement(String tableName, Stored obj) {
+        StringBuilder sqlB = new StringBuilder(200);
+        StringBuilder qMarks = new StringBuilder(20);
+        sqlB.append("INSERT INTO ").append(tableName).append(" (");
+
+        DbFieldData[] fieldData = getClassFieldData(obj.getClass());
+        for (DbFieldData fData : fieldData)
+            if (!fData.auto) {                      // Field order is determined by getClassFieldData()
+                sqlB.append(fData.columnName).append(',');
+                qMarks.append("?,");
+            }
+        sqlB.setLength(sqlB.length() - 1);                              // Remove trailing colon
+        qMarks.setLength(qMarks.length() - 1);
+        sqlB.append(") VALUES (").append(qMarks).append(");");
+        return sqlB.toString();
+    }
+
+    public static void packIntoPreparedStatement(PreparedStatement pst, Stored obj) {
+        DbFieldData[] fieldData = getClassFieldData(obj.getClass());
+        try {
+            int colIndex = 0;
+            for (DbFieldData fData : fieldData)
+                if (!fData.auto) {                                     // Field order is determined by getClassFieldData()
+                    colIndex++;
+                    switch (fData.fType) {                             // Auto-generated fields are not inserted
+                        case "byte":
+                            pst.setByte(colIndex, fData.f.getByte(obj));
+                            break;
+                        case "short":
+                            pst.setShort(colIndex, fData.f.getShort(obj));
+                            break;
+                        case "int":
+                            pst.setInt(colIndex, fData.f.getInt(obj));
+                            break;
+                        case "long":
+                            pst.setLong(colIndex, fData.f.getLong(obj));
+                            break;
+                        case "float":
+                            pst.setFloat(colIndex, fData.f.getFloat(obj));
+                            break;
+                        case "double":
+                            pst.setDouble(colIndex, fData.f.getDouble(obj));
+                            break;
+                        case "boolean":
+                            pst.setBoolean(colIndex, fData.f.getBoolean(obj));
+                            break;
+                        case "char":
+                            pst.setString(colIndex, "" + fData.f.getChar(obj));
+                            break;
+                        default:
+                            pst.setObject(colIndex, fData.f.get(obj));
+                    }
+                }
+        } catch (IllegalAccessException | SQLException e) {
+            throw new RuntimeException("Error putting field value from object " + obj + " [" + obj.getClass() + "] into statement");
+        }
+    }
 }
 
 

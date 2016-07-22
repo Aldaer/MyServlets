@@ -5,7 +5,7 @@
          version="3.1">
     <display-name>Time Web App</display-name>
 
-    <!-- Container-managed security -->
+    <!-- Container-managed security. Comment out to disable. -->
 <!--
         <security-role>
             <role-name>authenticated-user</role-name>

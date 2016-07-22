@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("All")
@@ -46,7 +47,7 @@ public class PropsDAO_Test {
 
     @Test
     public void testWrongUsername() throws Exception {
-        assertThat(cdao.getCredentials("Бася").verify("qwerty"), is(false));
+        assertNull(cdao.getCredentials("Бася"));
     }
 
     @Test

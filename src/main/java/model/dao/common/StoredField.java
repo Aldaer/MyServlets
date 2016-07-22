@@ -49,7 +49,7 @@ class DbFieldData {
     DbFieldData(Field f, String columnName, int maxLength, boolean auto) {
         this.f = f;
         fType = f.getType().getCanonicalName().intern();
-        this.columnName = columnName;
+        this.columnName = columnName.intern();
         this.maxLength = maxLength;
         this.auto = auto;
     }
