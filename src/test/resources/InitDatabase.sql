@@ -7,6 +7,13 @@ CREATE TABLE IF NOT EXISTS credentials (
   dpassword CHAR(80)
 );
 
+DROP TABLE IF EXISTS temp_credentials;
+
+CREATE TABLE temp_credentials (
+  username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
+  created SMALLDATETIME
+);
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   fullname VARCHAR(255),

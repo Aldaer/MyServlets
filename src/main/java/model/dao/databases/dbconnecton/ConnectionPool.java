@@ -111,7 +111,6 @@ public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
                         return null;
                     }
                 }
-
             };
         }
 

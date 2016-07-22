@@ -7,6 +7,7 @@
     <title>Login error</title>
   </head>
   <body>
+    <%-- cannot check whether username or password was wrong when using container-based authentication --%>
     <c:set var="userFound" value="${Boolean.TRUE}" scope="session"/>
     <c:redirect url="/main/serv"/>
   </body>

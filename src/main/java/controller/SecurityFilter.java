@@ -22,8 +22,8 @@ import static java.util.Optional.ofNullable;
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "SecurityFilter", servletNames = "MyFirstServlet")
-public class FirstSecurityFilter extends HttpFilter {
+@WebFilter(filterName = "SecurityFilter", servletNames = "MainServlet")
+public class SecurityFilter extends HttpFilter {
     private int n = 0;
 
     @Override

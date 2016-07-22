@@ -12,7 +12,7 @@
     <title><fmt:message key="login.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
     <link rel="stylesheet" type="text/css" href="/extras/mygreen.css">
-    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
 <div class="login-page">
@@ -53,6 +53,7 @@
    var noUser = '<fmt:message key="alert.noUsername"/>';
    var pwdMismatch = '<fmt:message key="alert.pwdMismatch"/>';
    var pwdTooShort = '<fmt:message key="alert.pwdTooShort"/>';
+   var unTooLong = '<fmt:message key="alert.unTooLong"/>';
 </script>
 
 <script src="/extras/login.js"></script>

@@ -23,11 +23,11 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MyFirstServlet", urlPatterns = "/main/serv")
-public class FirstServlet extends HttpServlet {
+@WebServlet(name = "MainServlet", urlPatterns = "/main/serv")
+public class MainServlet extends HttpServlet {
     private static int id = 0;
 
-    public FirstServlet() { }
+    public MainServlet() { }
 
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override

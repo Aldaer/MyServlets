@@ -29,7 +29,7 @@ import static controller.PageURLs.*;
 @WebServlet("/doLogin")
 /**
  * Gets called EITHER from login form (when container-based authentication is off)
- * or from forward by Security filter (when container-based authentication is on)
+ * or by forward from Security filter (when container-based authentication is on)
  */
 public class LoginServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")

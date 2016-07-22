@@ -26,4 +26,27 @@ public class CredsDAO_props implements CredentialsDAO {
     public void useSaltedHash(boolean doUse) {
         usingSaltedHash = doUse;
     }
+
+    @Override
+    public boolean checkIfUserExists(String username) {
+        return (userPwds.containsKey(username));
+    }
+
+    @Override
+    public boolean createTemporaryUser(String username) {
+        if (checkIfUserExists(username)) return false;
+        userPwds.put(username, "" + System.currentTimeMillis());
+        return true;
+    }
+
+    @Override
+    public void purgeTemporaryUsers(long timeThreshold) {
+        userPwds.keySet().parallelStream().filter(un -> {
+            try {
+                return Long.valueOf(userPwds.get(un)) < timeThreshold;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }).forEach(userPwds::remove);
+    }
 }

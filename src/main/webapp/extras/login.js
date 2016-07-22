@@ -14,9 +14,13 @@ $('.login-form').submit(function () {
 
 
 $('.register-form').submit(function () {
-    var x = document.forms["register"]["username"].value;
-    if (x == null || x == "") {
+    var un = document.forms["register"]["username"].value;
+    if (un == null || un == "") {
         alert(noUser);
+        return false;
+    }
+    if (un.length > 50) {
+        alert(unTooLong);
         return false;
     }
 

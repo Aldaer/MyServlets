@@ -65,7 +65,9 @@ public class ResultSetParser {
         DbFieldData[] fieldData = null;
         int[] resultColumns = null;
 
-        if (rs.isBeforeFirst()) rs.next();
+        if (rs.isBeforeFirst()) {
+            if (! rs.next()) return;
+        }
         do {
             T obj = objSource.get();
             if (firstLoop) {
@@ -81,8 +83,11 @@ public class ResultSetParser {
     private static <T extends Stored> void fillFields(ResultSet rs, T obj, DbFieldData[] fieldData, int[] columns, boolean ignoreAbsent) throws SQLException {
         try {
             for (int i = 0; i < fieldData.length; i++) {
-                if (!ignoreAbsent && columns[i] < 0)
-                    throw new RuntimeException("Column [" + fieldData[i].columnName + "] not present in result set");
+                if (columns[i] < 0)
+                    if (ignoreAbsent)
+                        continue;
+                    else
+                        throw new RuntimeException("Column [" + fieldData[i].columnName + "] not present in result set");
 
                 DbFieldData fd = fieldData[i];
 
@@ -160,7 +165,8 @@ public class ResultSetParser {
                     StoredField asf = f.getAnnotation(StoredField.class);
                     data[fCount++] = new DbFieldData(f, asf.column(), asf.maxLength(), asf.auto());
                 }
-            DB_CLASS_INFO_CACHE.put(cName, Arrays.copyOfRange(data, 0, fCount));
+            data = Arrays.copyOfRange(data, 0, fCount);
+            DB_CLASS_INFO_CACHE.put(cName, data);
             return data;
         } finally {
             classInfoLock.writeLock().unlock();
