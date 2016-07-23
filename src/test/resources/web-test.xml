@@ -5,6 +5,15 @@
          version="3.1">
     <display-name>Time Web App</display-name>
 
+    <servlet>
+        <servlet-name>UserDetails</servlet-name>
+        <jsp-file>/WEB-INF/userdetails.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserDetails</servlet-name>
+        <url-pattern>/main/userdetails</url-pattern>
+    </servlet-mapping>
+
     <!-- Container-managed security. Comment out to disable. -->
 <!--
         <security-role>

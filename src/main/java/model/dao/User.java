@@ -3,6 +3,7 @@ package model.dao;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import model.dao.common.Stored;
 import model.dao.common.StoredField;
 
@@ -14,19 +15,29 @@ import model.dao.common.StoredField;
 @NoArgsConstructor
 public class User implements Stored {
     @StoredField(auto = true, column = "id")
-    long id;
+    long id = 0;
 
     @StoredField(column = "username", maxLength = 50)
-    String username;
+    String username = "";
 
+    @Setter
     @StoredField(column = "fullname", maxLength = 255)
-    String fullName;
+    String fullName = "";
 
+    @Setter
     @StoredField(column = "email", maxLength = 100)
-    String email;
+    String email = "";
 
+    @Setter
     @StoredField(column = "regcomplete")
-    boolean regComplete;
+    boolean regComplete = false;
+
+    public User(String username, String fullName, String email, boolean regComplete) {
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.regComplete = regComplete;
+    }
 
 }
 

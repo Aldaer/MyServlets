@@ -22,13 +22,13 @@ import static java.util.Optional.ofNullable;
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "SecurityFilter", urlPatterns = {"/main/*"})
+@WebFilter(filterName = "SecurityFilter", urlPatterns = "/main/*")
 public class SecurityFilter extends HttpFilter {
     private int n = 0;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        log.trace("[SEC] Filtering request {}: {}", ++n, req.getRequestURL());
+        log.trace("[SEC] Filtering request {}: pathInfo {}, uri {}", ++n, req.getPathInfo(), req.getRequestURI());
 
         if ("logout".equals(req.getParameter(ParameterNames.ACTION))) {
             if (req.getUserPrincipal() != null) try {
@@ -62,7 +62,8 @@ public class SecurityFilter extends HttpFilter {
         }
         if (! user.isRegComplete())                     // Registration incomplete, forward to user details page
             req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
-        super.doFilter(req, res, chain);
+        else
+            chain.doFilter(req, res);
         log.trace("[SEC] Filtering response {}", n);
     }
 

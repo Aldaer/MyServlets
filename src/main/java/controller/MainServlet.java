@@ -24,7 +24,7 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(MAIN_SERVLET)
+@WebServlet(name="MainServlet", urlPatterns = MAIN_SERVLET)
 public class MainServlet extends HttpServlet {
     public MainServlet() { }
 

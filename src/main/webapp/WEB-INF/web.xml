@@ -5,6 +5,16 @@
          version="3.1">
     <display-name>Time Web App</display-name>
 
+    <servlet>
+        <servlet-name>UserDetails</servlet-name>
+        <jsp-file>/WEB-INF/userdetails.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UserDetails</servlet-name>
+        <url-pattern>/main/userdetails</url-pattern>
+    </servlet-mapping>
+
     <!-- Container-managed security -->
 
     <security-role>
@@ -32,8 +42,8 @@
         <auth-method>FORM</auth-method>
         <realm-name>AppSecurity</realm-name>
         <form-login-config>
-            <form-login-page>/main/login.jsp</form-login-page>
-            <form-error-page>/main/login-error.jsp</form-error-page>
+            <form-login-page>/WEB-INF/login.jsp</form-login-page>
+            <form-error-page>/WEB-INF/login-error.jsp</form-error-page>
         </form-login-config>
     </login-config>
 

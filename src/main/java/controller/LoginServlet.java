@@ -6,6 +6,7 @@ import model.dao.CredentialsDAO;
 import model.dao.User;
 import model.dao.UserDAO;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -80,10 +81,12 @@ public class LoginServlet extends HttpServlet {
         String lang = request.getParameter(ParameterNames.LANGUAGE);
         if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;
         request.getSession(false).setAttribute(LANGUAGE, lang);
-        if (user.isRegComplete())
-            request.getRequestDispatcher(MAIN_SERVLET).forward(request, response);
+
+        String whereTo = user.isRegComplete()? MAIN_SERVLET : DETAILS_PAGE;
+        if (request.getDispatcherType() == DispatcherType.FORWARD)
+            request.getRequestDispatcher(whereTo).forward(request, response);
         else
-            request.getRequestDispatcher(DETAILS_PAGE).forward(request, response);
+            response.sendRedirect(whereTo);
         return;
     }
 

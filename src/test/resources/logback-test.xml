@@ -21,7 +21,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="dbconnection" level="debug" additivity="false">
+    <logger name="databases" level="debug" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

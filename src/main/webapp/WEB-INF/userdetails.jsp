@@ -8,6 +8,7 @@
     <title>User details</title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
     <link rel="stylesheet" type="text/css" href="/extras/mymain.css">
+    <c:set target="${currentUser}" property="regComplete" value="true"/>
 </head>
 <body>
 <div class="bigform">
@@ -17,9 +18,9 @@
 <p class="login">${currentUser.username}</p>
 <input type="text" value="${currentUser.fullName}"/>
 <input type="text" value="${currentUser.email}"/>
-<td><button class="smallbutton" action="submit">Update user data</button></td>
+<tr><td><button class="smallbutton" action="submit">Update user data</button></td></tr>
 </form>
-<td><button class="smallbutton" onclick="location.href='/main/serv'">Go to main page...</button></td>
+<tr><td><button class="smallbutton" onclick="location.href='/main/serv'">Go to main page...</button></td></tr>
 </div>
 </body>
 </html>

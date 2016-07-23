@@ -45,9 +45,10 @@ interface ParameterNames {
  * Page and servlet URLs
  */
 interface PageURLs {
-    String LOGIN_PAGE = "/main/login.jsp";
-    String MAIN_PAGE = "/main/mainpage.jsp";
-    String DETAILS_PAGE = "/main/userdetails.jsp";
+    String LOGIN_PAGE = "/WEB-INF/login.jsp";
+    String MAIN_PAGE = "/WEB-INF/mainpage.jsp";
+
+    String DETAILS_PAGE = "/main/userdetails";      // actually, /WEB-INF/userdetails.jsp - bound through web.xml
 
     String MAIN_SERVLET = "/main/serv";
     String LOGIN_SERVLET = "/doLogin";

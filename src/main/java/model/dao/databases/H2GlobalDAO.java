@@ -166,7 +166,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                             log.trace("Setting role for user {}", username);
                             if (createRole.executeUpdate() != 1) throw new SQLException("Error assigning role for user " + username);
 
-                            User emptyUser = new User(0, username, username, "", false);
+                            User emptyUser = new User(username, username, "", false);
                             PreparedStatement createUser = conn.prepareStatement(emptyUser.generateInsertSQL(TABLE_USERS));
                             emptyUser.packIntoPreparedStatement(createUser);
                             log.trace("Creating main record for user {}", username);
