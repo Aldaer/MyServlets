@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import model.dao.Credentials;
 import model.dao.CredentialsDAO;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static controller.AttributeNames.C.CREDS_DAO;
 import static controller.AttributeNames.R.REG_ATTEMPT;
@@ -64,5 +66,15 @@ public class RegisterServlet extends HttpServlet {
 
     private void returnToRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        log.info("Initializing servlet: name = {}, mappings = {}",
+                config.getServletName(),
+                Arrays.toString(getServletContext()
+                        .getServletRegistration(config.getServletName())
+                        .getMappings().stream().toArray(String[]::new)));
     }
 }

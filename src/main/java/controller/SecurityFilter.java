@@ -60,7 +60,7 @@ public class SecurityFilter extends HttpFilter {
             req.getRequestDispatcher(LOGIN_SERVLET).forward(req, res);
             return;
         }
-        if (! user.isRegComplete())                     // Registration incomplete, forward to user details page
+        if (! user.isRegComplete())                     // Registration incomplete, forward to user details page (once per session)
             req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
         else
             chain.doFilter(req, res);

@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static controller.AttributeNames.C.LANGUAGE;
 import static controller.MiscConstants.DEFAULT_LOCALE;
-import static controller.PageURLs.MAIN_PAGE;
-import static controller.PageURLs.MAIN_SERVLET;
+import static controller.PageURLs.*;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -24,19 +24,20 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name="MainServlet", urlPatterns = MAIN_SERVLET)
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_DATA_SERVLET})
 public class MainServlet extends HttpServlet {
-    public MainServlet() { }
+    public MainServlet() {
+    }
 
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
         String tz = ofNullable(request.getParameter("timezone")).orElse("GMT");
-        String lang = ofNullable((String)request.getSession().getAttribute(LANGUAGE)).orElse(DEFAULT_LOCALE);
+        String lang = ofNullable((String) request.getSession().getAttribute(LANGUAGE)).orElse(DEFAULT_LOCALE);
         MyTimer t = (MyTimer) request.getSession().getAttribute("timer");
 
-        if (t == null || ! t.getTz().equals(tz)) {
+        if (t == null || !t.getTz().equals(tz)) {
             t = new MyTimer(lang, tz);
             request.getSession().setAttribute("timer", t);
         }
@@ -55,8 +56,10 @@ public class MainServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-
-        log.info("Initializing servlet");
-        log.info("Servlet name = {}", config.getServletName());
+        log.info("Initializing servlet: name = {}, mappings = {}",
+                config.getServletName(),
+                Arrays.toString(getServletContext()
+                        .getServletRegistration(config.getServletName())
+                        .getMappings().stream().toArray(String[]::new)));
     }
 }
