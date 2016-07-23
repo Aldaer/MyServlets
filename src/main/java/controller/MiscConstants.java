@@ -48,10 +48,11 @@ interface PageURLs {
     String LOGIN_PAGE = "/WEB-INF/login.jsp";
     String MAIN_PAGE = "/WEB-INF/mainpage.jsp";
 
+    String SECURED_AREA = "/main/*";
     String DETAILS_PAGE = "/main/userdetails";      // actually, /WEB-INF/userdetails.htm - bound through web.xml
 
     String MAIN_SERVLET = "/main/serv";
     String LOGIN_SERVLET = "/doLogin";
     String REGISTER_SERVLET = "/doRegister";
-    String USER_DATA_SERVLET = "/updateUser";
+    String USER_DATA_SERVLET = "/main/updateUser";
 }

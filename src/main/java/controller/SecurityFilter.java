@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collections;
+import java.util.Arrays;
 
 import static controller.AttributeNames.S.USER;
 import static controller.PageURLs.*;
@@ -22,13 +22,13 @@ import static java.util.Optional.ofNullable;
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "SecurityFilter", urlPatterns = "/main/*")
+@WebFilter(urlPatterns = SECURED_AREA)
 public class SecurityFilter extends HttpFilter {
     private int n = 0;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        log.trace("[SEC] Filtering request {}: uri {}", ++n, req.getRequestURI());
+        log.trace("Filtering request {}: uri {}", ++n, req.getRequestURI());
 
         if ("logout".equals(req.getParameter(ParameterNames.ACTION))) {
             if (req.getUserPrincipal() != null) try {
@@ -71,10 +71,11 @@ public class SecurityFilter extends HttpFilter {
     public void init(FilterConfig config) throws ServletException {
         super.init(config);
 
-        log.debug("Initializing filter");
-        log.debug("Filter name = " + config.getFilterName());
-        log.debug("Servlet context path = " + config.getServletContext().getContextPath());
-        Collections.list(config.getInitParameterNames()).
-                forEach(s -> log.debug("{} = {}", s, config.getInitParameter(s)));
+        log.info("Initializing filter: name = {}, mappings = {}",
+                config.getFilterName(),
+                Arrays.toString(getServletContext()
+                        .getFilterRegistration(config.getFilterName())
+                        .getUrlPatternMappings()
+                        .stream().toArray(String[]::new)));
     }
 }

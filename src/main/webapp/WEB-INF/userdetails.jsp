@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -16,8 +17,12 @@
 
 <form class="details-form" method="post" action="/updateUser" accept-charset="UTF-8">
 <p class="login">${currentUser.username}</p>
+<label>Full name:
 <input type="text" value="${currentUser.fullName}"/>
+</label>
+<label>Email:
 <input type="text" value="${currentUser.email}"/>
+</label>
 <tr><td><button class="smallbutton" action="submit">Update user data</button></td></tr>
 </form>
 <tr><td><button class="smallbutton" onclick="location.href='/main/serv'">Go to main page...</button></td></tr>
