@@ -28,7 +28,7 @@ public class SecurityFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        log.trace("[SEC] Filtering request {}: pathInfo {}, uri {}", ++n, req.getPathInfo(), req.getRequestURI());
+        log.trace("[SEC] Filtering request {}: uri {}", ++n, req.getRequestURI());
 
         if ("logout".equals(req.getParameter(ParameterNames.ACTION))) {
             if (req.getUserPrincipal() != null) try {
