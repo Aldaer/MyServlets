@@ -15,14 +15,14 @@ import java.security.Principal;
 import java.util.Collections;
 
 import static controller.AttributeNames.S.USER;
-import static controller.PageURLs.LOGIN_PAGE;
+import static controller.PageURLs.*;
 import static java.util.Optional.ofNullable;
 
 /**
  * Login filter - to be replaced with container-based auth
  */
 @Slf4j
-@WebFilter(filterName = "SecurityFilter", servletNames = "MainServlet")
+@WebFilter(filterName = "SecurityFilter", urlPatterns = {"/main/*"})
 public class SecurityFilter extends HttpFilter {
     private int n = 0;
 
@@ -47,7 +47,8 @@ public class SecurityFilter extends HttpFilter {
             res.sendRedirect("/");
             return;
         }
-        if (req.getSession(true).getAttribute(USER) == null) {
+        User user = (User) req.getSession(true).getAttribute(USER);
+        if (user == null) {
             final Principal authUser = req.getUserPrincipal();          // User already authenticated by container?
             if (authUser == null) {
                 log.trace("No user info, forwarding to login page");
@@ -56,9 +57,11 @@ public class SecurityFilter extends HttpFilter {
             }
 
             log.info("User {} authenticated by app container", authUser.getName());
-            req.getRequestDispatcher("/doLogin").forward(req, res);
+            req.getRequestDispatcher(LOGIN_SERVLET).forward(req, res);
             return;
         }
+        if (! user.isRegComplete())                     // Registration incomplete, forward to user details page
+            req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
         super.doFilter(req, res, chain);
         log.trace("[SEC] Filtering response {}", n);
     }

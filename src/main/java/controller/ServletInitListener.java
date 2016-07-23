@@ -86,7 +86,9 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         sContext.setAttribute(USER_DAO, uDao);
         sContext.setAttribute(CREDS_DAO, credsDao);
 
-        sContext.setAttribute(CONTAINER_AUTH, conf.getString(CONFIG_CONTAINER_SECURITY));
+        String contAuth = conf.getString(CONFIG_CONTAINER_SECURITY).toLowerCase();
+        sContext.setAttribute(CONTAINER_AUTH, contAuth);
+        log.info("Container-based authentication = {}", contAuth);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

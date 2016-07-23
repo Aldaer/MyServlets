@@ -28,7 +28,7 @@ import static controller.ParameterNames.L_USERNAME;
  * Login servlet. Accepts only POST requests
  */
 @Slf4j
-@WebServlet("/doLogin")
+@WebServlet(LOGIN_SERVLET)
 /**
  * Gets called EITHER from login form (when container-based authentication is off)
  * or by forward from Security filter (when container-based authentication is on)
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
                 respLogin.forward(request, response);
                 return;
             }
-            log.info("LOGGING IN USER = {}, L_PASSWORD = *HIDDEN*", userName);
+            log.info("Logging in user = '{}', password = *HIDDEN*", userName);
             login = userName;
         } else {                                    // Authenticated by container
             login = authUser.getName();
@@ -80,7 +80,10 @@ public class LoginServlet extends HttpServlet {
         String lang = request.getParameter(ParameterNames.LANGUAGE);
         if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;
         request.getSession(false).setAttribute(LANGUAGE, lang);
-        request.getRequestDispatcher(MAIN_SERVLET).forward(request, response);
+        if (user.isRegComplete())
+            request.getRequestDispatcher(MAIN_SERVLET).forward(request, response);
+        else
+            request.getRequestDispatcher(DETAILS_PAGE).forward(request, response);
         return;
     }
 

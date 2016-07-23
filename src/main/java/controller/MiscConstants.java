@@ -46,6 +46,10 @@ interface ParameterNames {
  */
 interface PageURLs {
     String LOGIN_PAGE = "/main/login.jsp";
-    String MAIN_PAGE = "/main/response.jsp";
+    String MAIN_PAGE = "/main/mainpage.jsp";
+    String DETAILS_PAGE = "/main/userdetails.jsp";
+
     String MAIN_SERVLET = "/main/serv";
+    String LOGIN_SERVLET = "/doLogin";
+    String REGISTER_SERVLET = "/doRegister";
 }

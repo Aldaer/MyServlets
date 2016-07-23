@@ -16,6 +16,7 @@ import java.io.IOException;
 import static controller.AttributeNames.C.LANGUAGE;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.MAIN_PAGE;
+import static controller.PageURLs.MAIN_SERVLET;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -23,10 +24,8 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = "/main/serv")
+@WebServlet(MAIN_SERVLET)
 public class MainServlet extends HttpServlet {
-    private static int id = 0;
-
     public MainServlet() { }
 
     @SuppressWarnings("UnnecessaryReturnStatement")
@@ -57,9 +56,7 @@ public class MainServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        ++id;
         log.info("Initializing servlet");
-        log.info("Servlet id = {}", id);
         log.info("Servlet name = {}", config.getServletName());
     }
 }

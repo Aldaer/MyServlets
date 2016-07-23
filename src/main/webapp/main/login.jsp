@@ -17,7 +17,7 @@
 <body>
 <div class="login-page">
     <div class="wform">
-        <form class="register-form" name="register" method="post" action="/registerUser" accept-charset="UTF-8">
+        <form class="register-form" name="register" method="post" action="/doRegister" accept-charset="UTF-8">
             <input type="text" placeholder="<fmt:message key="register.username"/>" name="j_username" id="r_name"/>
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password"/>
             <input type="password" placeholder="<fmt:message key="register.repeatPassword"/>" name="j_password2"/>

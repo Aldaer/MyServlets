@@ -15,6 +15,7 @@ import java.io.IOException;
 import static controller.AttributeNames.C.CREDS_DAO;
 import static controller.AttributeNames.R.REG_ATTEMPT;
 import static controller.MiscConstants.*;
+import static controller.PageURLs.*;
 import static controller.ParameterNames.*;
 import static java.util.Optional.ofNullable;
 
@@ -22,9 +23,10 @@ import static java.util.Optional.ofNullable;
  * Gets called from registration form in login.jsp
  */
 @Slf4j
-@WebServlet("/registerUser")
+@WebServlet(REGISTER_SERVLET)
 public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        log.debug("Processing request...");
         request.setCharacterEncoding("UTF-8");
         String newName = ofNullable(request.getParameter(L_USERNAME)).map(String::trim).orElse("");
         String newPassword = request.getParameter(L_PASSWORD);
@@ -57,9 +59,10 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         log.info("Successfully created user '{}'", newName);
+        request.getRequestDispatcher(LOGIN_SERVLET).forward(request, response);
     }
 
     private void returnToRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/main/login.jsp").forward(request, response);
+        request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
     }
 }
