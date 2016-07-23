@@ -1,3 +1,9 @@
+<%--suppress JspAbsolutePathInspection --%>
+<%--@elvariable id="timer" type="model.MyTimer"--%>
+<%--@elvariable id="language" type="java.lang.String"--%>
+<%--@elvariable id="currentUser" type="model.dao.User"--%>
+<%--@elvariable id="lastTZ" type="java.lang.String"--%>
+<%--@elvariable id="supportedTZ" type="java.util.Properties"--%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -15,22 +21,21 @@
 <h1><fmt:message key="main.header"/></h1>
 
 
-<p><fmt:message key="main.currentlogin"/> ${currentUser.fullName} [${currentUser.email}]<br>
+<p><fmt:message key="main.currentlogin"/> <a href="/main/userdetails">${currentUser.fullName} [${currentUser.email}]</a><br>
     <fmt:message key="main.selectedlocale"/> = "${language}"</p>
 
 <p><fmt:message key="main.selecttz"/></p>
 <form action="/main/serv" method="get">
     <p>
         <select name="timezone" onchange="submit()">
-            <c:forEach items="${supportedTZ}" var="tzentry">
-                <option value="${tzentry.key}" ${lastTZ == tzentry.key ? 'selected' : ''} >${tzentry.value}</option>
-            </c:forEach>
-        </select>
+        <c:forEach items="${supportedTZ}" var="tzentry">
+            <option value="${tzentry.key}" ${lastTZ == tzentry.key ? 'selected' : ''} >${tzentry.value}</option>
+        </c:forEach>
+    </select>
+    </p>
     <noscript>
         <input type="submit" value="Show time...">
     </noscript>
-    </p>
-
 </form>
 
 <p>
@@ -39,7 +44,7 @@
     <fmt:message key="main.through"/>  getDate(): <i>${timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${timer}</i>
 </p>
-<td><button class="smallbutton" onclick="location.href='/main/serv?action=logout'"><fmt:message key="main.newsession"/></button></td>
+<button class="smallbutton" onclick="location.href='/main/serv?action=logout'"><fmt:message key="main.newsession"/></button>
 
 </div>
 </body>

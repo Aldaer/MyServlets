@@ -64,7 +64,6 @@ public class SecurityFilter extends HttpFilter {
             req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
         else
             chain.doFilter(req, res);
-        log.trace("[SEC] Filtering response {}", n);
     }
 
     @Override
