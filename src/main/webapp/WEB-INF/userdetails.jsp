@@ -12,14 +12,12 @@
     <title><fmt:message key="details.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
     <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
-    <c:set var="incomplete" value="${not currentUser.regComplete}"/>
-    <c:set target="${currentUser}" property="regComplete" value="true"/>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
 <div class="bigform">
 <h1><fmt:message key="details.header"/></h1>
-<c:if test="${incomplete}"><p class="warning"><fmt:message key="details.unconfirmed"/></p></c:if>
+<c:if test="${not currentUser.regComplete}"><p class="warning"><fmt:message key="details.unconfirmed"/></p></c:if>
 
 <form class="details-form" method="post" action="/main/updateUser" accept-charset="UTF-8">
 <p class="login">${currentUser.username}</p>

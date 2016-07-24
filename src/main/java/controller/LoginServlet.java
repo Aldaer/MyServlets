@@ -65,6 +65,7 @@ public class LoginServlet extends HttpServlet {
             login = userName;
         } else {                                    // Authenticated by container
             login = authUser.getName();
+            log.debug("Autologin: user = '{}'", login);
         }
 
         // Recreate session to combat session fixation attacks. ONLY if container security is OFF.

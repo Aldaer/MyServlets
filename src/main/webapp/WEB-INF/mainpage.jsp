@@ -14,7 +14,7 @@
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="/extras/mymain.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
 </head>
 <body>
 <div class="bigform">
@@ -44,8 +44,7 @@
     <fmt:message key="main.through"/>  getDate(): <i>${timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${timer}</i>
 </p>
-<button class="smallbutton" onclick="location.href='/main/serv?action=logout'"><fmt:message key="main.logout"/></button>
-
+    <a href="/main/logout" class="smallbutton"><fmt:message key="main.logout"/></a>
 </div>
 </body>
 </html>
