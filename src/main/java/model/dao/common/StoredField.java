@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 /**
  * Indicates that the field is stored in the database. Allows to set the column name and optional constraint.
  * Use with objects implementing interface {@link Stored}.
- * To avoid security issues, annotating {@code final} fields with {@code StoredField} is not recommended.
+ * To avoid security issues, annotating {@code final} fields with {@code StoredField} is not recommended. *
  */
 @SuppressWarnings("WeakerAccess")
 @Retention(RetentionPolicy.RUNTIME)

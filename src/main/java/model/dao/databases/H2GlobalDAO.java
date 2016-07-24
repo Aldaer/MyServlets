@@ -2,7 +2,7 @@ package model.dao.databases;
 
 import lombok.extern.slf4j.Slf4j;
 import model.dao.*;
-import model.dao.common.ResultSetProcessor;
+import model.dao.common.Stored;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,7 +121,7 @@ class H2UserDAO implements UserDAO {
                 log.trace("User '{}' not found", key);
                 return null;
             }
-            return ResultSetProcessor.reconstructObject(rs, User::new);
+            return Stored.Processor.reconstructObject(rs, User::new);
         } catch (SQLException e) {
             log.error("Error getting data for user [{}]: {}", key, e);
             return null;
