@@ -22,7 +22,7 @@ public interface Stored {
 
     /**
      * Puts field values as parameters of a prepared SQL statement.
-     * Only call on prepared statements made from generated SQL strings! Column order isn't checked.
+     * Column order of the statement MUST be the same as in query returned by generateInsertSQL.
      * @param pst Statement prepared from string returned by {@code generateInsertSQL} etc.
      */
     default void packIntoPreparedStatement(PreparedStatement pst) throws SQLException {

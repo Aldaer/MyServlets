@@ -1,7 +1,7 @@
 package model.dao;
 
 /**
- * Gets credential info for login. Allows authenticating users by name and password
+ * Gets credential info for login
  */
 public interface CredentialsDAO {
     /**

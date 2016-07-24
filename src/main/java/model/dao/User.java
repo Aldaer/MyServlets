@@ -29,7 +29,7 @@ public class User implements Stored {
     String email = "";
 
     @Setter
-    @StoredField(column = "regcomplete")
+    @StoredField("regcomplete")
     boolean regComplete = false;
 
     public User(String username, String fullName, String email, boolean regComplete) {

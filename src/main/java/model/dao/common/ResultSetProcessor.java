@@ -166,7 +166,10 @@ public class ResultSetProcessor {
                 if (f.isAnnotationPresent(StoredField.class)) {
                     f.setAccessible(true);
                     StoredField asf = f.getAnnotation(StoredField.class);
-                    data[fCount++] = new DbFieldData(f, asf.column(), asf.maxLength(), asf.auto());
+                    if (! (asf.column().equals("") || asf.value().equals("")))
+                        throw new IllegalArgumentException(
+                                "Both value() and column() attributes were set for the StoredField annotation on class " + c.getCanonicalName());
+                    data[fCount++] = new DbFieldData(f, asf.column() + asf.value(), asf.maxLength(), asf.auto());
                 }
             data = Arrays.copyOfRange(data, 0, fCount);
             DB_CLASS_INFO_CACHE.put(cName, data);

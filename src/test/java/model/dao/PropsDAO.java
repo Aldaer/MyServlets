@@ -16,4 +16,9 @@ public class PropsDAO implements GlobalDAO {
     public CredentialsDAO getCredentialsDAO() {
         return credsDAO;
     }
+
+    @Override
+    public MessageDAO getMessageDAO() {
+        return null;
+    }
 }

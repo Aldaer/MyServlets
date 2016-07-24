@@ -1,9 +1,6 @@
 package model.dao.common;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.Field;
 
 /**
@@ -14,12 +11,19 @@ import java.lang.reflect.Field;
 @SuppressWarnings("WeakerAccess")
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Documented
 public @interface StoredField {
     /**
      * Table column to store field
      * @return column name
      */
-    String column();
+    String column() default "";
+
+    /**
+     * Shorthand for {@code column()}. Setting both will result in {@link IllegalArgumentException}.
+     * @return column name
+     */
+    String value() default "";
 
     /**
      * Maximum String length, -1 for unlimited

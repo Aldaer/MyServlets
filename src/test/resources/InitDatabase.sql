@@ -61,14 +61,13 @@ INSERT INTO user_roles (username, user_role) VALUES ('петя', 'authenticated-
 
 DROP TABLE IF EXISTS messages;
 
-/* conversation_id: null == private message, unread; -1 == private message, read; >0 == conversation (refer to conversations table) */
 CREATE TABLE IF NOT EXISTS messages (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  refid BIGINT,
+  refid BIGINT NOT NULL DEFAULT 0,
   u_from VARCHAR_IGNORECASE(50) NOT NULL,
   u_to VARCHAR_IGNORECASE(50),
   m_time TIMESTAMP NOT NULL DEFAULT CURRENT_UTC_TIMESTAMP(),
-  conversation_id BIGINT,
+  conversation_id BIGINT NOT NULL DEFAULT 0,
   text VARCHAR default ''
 );
 

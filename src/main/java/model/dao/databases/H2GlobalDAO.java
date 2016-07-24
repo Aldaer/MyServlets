@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static java.sql.ResultSet.*;
@@ -30,6 +33,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
     static final String TABLE_ROLES = "user_roles";
     static final String DEFAULT_ROLE = "authenticated-user";
+    static final String TABLE_MESSAGES = "messages";
 
     static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM " + TABLE_CREDENTIALS + " WHERE (username=?);";
     static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?);";
@@ -269,4 +273,16 @@ class H2MessageDAO implements MessageDAO {
     }
 
     private final Supplier<Connection> cSource;
+
+    @Override
+    public Collection<Message> getMessages(MessageConstraint constraint) {
+        StringBuilder sqlB = new StringBuilder(200);
+        sqlB.append("SELECT * FROM ").append(TABLE_MESSAGES);
+
+        List<String> constraintList = new ArrayList<>(10);
+//        ofNullable(constraint.getId()).
+
+        //TODO: implement
+        return null;
+    }
 }
