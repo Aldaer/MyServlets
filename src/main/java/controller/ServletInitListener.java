@@ -45,10 +45,10 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
          You can initialize servlet context related data here.
       */
 
-        final ServletContext sContext = sce.getServletContext();
-        log.info("Initializing context {}", sContext.getContextPath());
-        log.info("Root real path = {}", sContext.getRealPath("/"));
-        Collections.list(sContext.getInitParameterNames()).forEach(par -> log.info("{} = {}", par, sContext.getInitParameter(par)));
+        final ServletContext srvContext = sce.getServletContext();
+        log.info("Initializing context {}", srvContext.getContextPath());
+        log.info("Root real path = {}", srvContext.getRealPath("/"));
+        Collections.list(srvContext.getInitParameterNames()).forEach(par -> log.info("{} = {}", par, srvContext.getInitParameter(par)));
 
         ResourceBundle conf = ResourceBundle.getBundle(CONFIG_BUNDLE);
 
@@ -83,11 +83,11 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         UserDAO uDao = globalDao.getUserDAO();
 
         // Put data access objects and config parameters into servlet context
-        sContext.setAttribute(USER_DAO, uDao);
-        sContext.setAttribute(CREDS_DAO, credsDao);
+        srvContext.setAttribute(USER_DAO, uDao);
+        srvContext.setAttribute(CREDS_DAO, credsDao);
 
-        String contAuth = conf.getString(CONFIG_CONTAINER_SECURITY).toLowerCase();
-        sContext.setAttribute(CONTAINER_AUTH, contAuth);
+        Boolean contAuth = conf.getString(CONFIG_CONTAINER_SECURITY).toLowerCase().equals("true");
+        srvContext.setAttribute(CONTAINER_AUTH, contAuth);
         log.info("Container-based authentication = {}", contAuth);
     }
 

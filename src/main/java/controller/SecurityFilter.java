@@ -28,9 +28,10 @@ public class SecurityFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        req.setCharacterEncoding("UTF-8");
         log.trace("Filtering request {}: uri {}", ++n, req.getRequestURI());
 
-        if ("logout".equals(req.getParameter(ParameterNames.ACTION))) {
+        if (req.getRequestURI().equals(LOGOUT)) {
             if (req.getUserPrincipal() != null) try {
                 req.logout();
             } catch (ServletException e) {
@@ -61,7 +62,8 @@ public class SecurityFilter extends HttpFilter {
             return;
         }
         if (! user.isRegComplete())                     // Registration incomplete, forward to user details page (once per session)
-            req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
+            res.sendRedirect(DETAILS_PAGE);
+//            req.getRequestDispatcher(DETAILS_PAGE).forward(req, res);
         else
             chain.doFilter(req, res);
     }

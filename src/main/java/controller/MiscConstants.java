@@ -10,35 +10,41 @@ public interface MiscConstants {
 }
 
 /**
- * Attributes stores in Request, Session and ServletContext
+ * Attributes stores in (R)equest, (S)ession and Servlet(C)ontext
  */
 interface AttributeNames {
     class R {
-        static String USER_FOUND = "userFound";
-        static String REG_ATTEMPT = "regAttempt";
+        static final String USER_FOUND = "userFound";
+        static final String REG_ATTEMPT = "regAttempt";
     }
 
     class S {
-        static String USER = "currentUser";
+        static final String USER = "currentUser";
     }
 
     class C {
-        static String USER_DAO = "userDAO";
-        static String CREDS_DAO = "credsDAO";
-        static String LANGUAGE = "language";
-        static String CONTAINER_AUTH = "authByContainer";
+        static final String USER_DAO = "userDAO";
+        static final String CREDS_DAO = "credsDAO";
+        static final String LANGUAGE = "language";
+        static final String CONTAINER_AUTH = "authByContainer";
     }
 }
 
 /**
- * Request parameter names
+ * Request parameter names: general, as well as
+ * specific for (L)ogin/Register and (U)pdateUser forms
  */
 interface ParameterNames {
     String LANGUAGE = "language";
-    String ACTION = "action";
-    String L_USERNAME = "j_username";
-    String L_PASSWORD = "j_password";
-    String L_PASSWORD2 = "j_password2";
+    class L {
+        static final String USERNAME = "j_username";
+        static final String PASSWORD = "j_password";
+        static final String PASSWORD2 = "j_password2";
+    }
+    class U {
+        static final String FULLNAME = "fullname";
+        static final String EMAIL = "email";
+    }
 }
 
 /**
@@ -49,10 +55,11 @@ interface PageURLs {
     String MAIN_PAGE = "/WEB-INF/mainpage.jsp";
 
     String SECURED_AREA = "/main/*";
-    String DETAILS_PAGE = "/main/userdetails";      // actually, /WEB-INF/userdetails.htm - bound through web.xml
+    String DETAILS_PAGE = "/main/userdetails";      // actually, /WEB-INF/userdetails.jsp - bound through web.xml
+    String LOGOUT = "/main/logout";                 // performed by SecurityFilter
 
     String MAIN_SERVLET = "/main/serv";
     String LOGIN_SERVLET = "/doLogin";
     String REGISTER_SERVLET = "/doRegister";
-    String USER_DATA_SERVLET = "/main/updateUser";
+    String USER_UPDATE_SERVLET = "/main/updateUser";
 }

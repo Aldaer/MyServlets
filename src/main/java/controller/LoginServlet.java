@@ -15,13 +15,11 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 
-import static controller.AttributeNames.C.*;
-import static controller.AttributeNames.R.USER_FOUND;
-import static controller.AttributeNames.S.USER;
+import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.*;
-import static controller.ParameterNames.L_PASSWORD;
-import static controller.ParameterNames.L_USERNAME;
+import static controller.ParameterNames.L;
+import static controller.ParameterNames.LANGUAGE;
 
 /**
  * Login servlet. Accepts only POST requests
@@ -36,28 +34,29 @@ public class LoginServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+
         Principal authUser = request.getUserPrincipal();
         final ServletContext srvContext = getServletContext();
-        UserDAO userDao = (UserDAO) srvContext.getAttribute(USER_DAO);
+        UserDAO userDao = (UserDAO) srvContext.getAttribute(C.USER_DAO);
 
         String login;
         if (authUser == null) {                     // Not authenticated by container
-            CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(CREDS_DAO);
+            CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(C.CREDS_DAO);
 
-            request.setCharacterEncoding("UTF-8");
-            String userName = request.getParameter(L_USERNAME);
-            String userPassword = request.getParameter(L_PASSWORD);
+            String userName = request.getParameter(L.USERNAME);
+            String userPassword = request.getParameter(L.PASSWORD);
 
             Credentials creds = credsDao.getCredentials(userName);
             if (creds == null) {
                 log.debug("User '{}' not found", userName);
-                request.setAttribute(USER_FOUND, Boolean.FALSE);
+                request.setAttribute(R.USER_FOUND, Boolean.FALSE);
                 RequestDispatcher respLogin = request.getRequestDispatcher(LOGIN_PAGE);
                 respLogin.forward(request, response);
                 return;
             } else if (!creds.verify(userPassword)) {
                 log.info("User '{}' presented wrong password", userName);
-                request.setAttribute(USER_FOUND, Boolean.TRUE);
+                request.setAttribute(R.USER_FOUND, Boolean.TRUE);
                 RequestDispatcher respLogin = request.getRequestDispatcher(LOGIN_PAGE);
                 respLogin.forward(request, response);
                 return;
@@ -69,12 +68,12 @@ public class LoginServlet extends HttpServlet {
         }
 
         // Recreate session to combat session fixation attacks. ONLY if container security is OFF.
-        if (! "true".equals(srvContext.getAttribute(CONTAINER_AUTH)) && (request.getSession(false) != null))
+        if (! (Boolean)srvContext.getAttribute(C.CONTAINER_AUTH) && request.getSession(false) != null)
             request.getSession().invalidate();
 
         final User user = userDao.getUser(login);
         assert user != null;
-        request.getSession(true).setAttribute(USER, user);
+        request.getSession(true).setAttribute(S.USER, user);
 
         String lang = request.getParameter(ParameterNames.LANGUAGE);
         if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;

@@ -44,7 +44,7 @@
     <fmt:message key="main.through"/>  getDate(): <i>${timer.date}</i><br>
     <fmt:message key="main.through"/> toString(): <i>${timer}</i>
 </p>
-<button class="smallbutton" onclick="location.href='/main/serv?action=logout'"><fmt:message key="main.newsession"/></button>
+<button class="smallbutton" onclick="location.href='/main/serv?action=logout'"><fmt:message key="main.logout"/></button>
 
 </div>
 </body>

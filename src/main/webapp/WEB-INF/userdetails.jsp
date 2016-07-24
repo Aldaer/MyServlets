@@ -9,29 +9,35 @@
 <head>
     <fmt:setLocale value="${language}"/>
     <fmt:setBundle basename="jsp"/>
-    <title>User details</title>
+    <title><fmt:message key="details.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="/extras/mymain.css">
-    <c:set var="incomplete" value="${! currentUser.regComplete}"/>
+    <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
+    <c:set var="incomplete" value="${not currentUser.regComplete}"/>
     <c:set target="${currentUser}" property="regComplete" value="true"/>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
 <div class="bigform">
-<h1>Your details</h1>
-<c:if test="incomplete">
-</c:if>
+<h1><fmt:message key="details.header"/></h1>
+<c:if test="${incomplete}"><p class="warning"><fmt:message key="details.unconfirmed"/></p></c:if>
 
 <form class="details-form" method="post" action="/main/updateUser" accept-charset="UTF-8">
 <p class="login">${currentUser.username}</p>
-<table width="100%">
-<tr><td>Full name:</td>
-<td width="80%"><input type="text" value="${currentUser.fullName}"/></td></tr>
-<tr><td>Email:</td>
-<td><input type="text" value="${currentUser.email}"/></td></tr>
-</table>
-<button class="smallbutton" type="submit">Update user data</button>
-<a href="/main/serv" class="smallbutton">Go to main page...</a>
+<table width="100%"><tr><td>
+    <fmt:message key="details.fullname"/>:
+</td>
+<td width="80%">
+    <input type="text" class="details" name="fullname" value="${currentUser.fullName}"/>
+</td></tr><tr><td>
+    <fmt:message key="details.email"/>:
+</td><td>
+    <input type="text" class="details" name="email" value="${currentUser.email}"/>
+</td></tr></table>
+<button class="smallbutton" type="submit"><fmt:message key="details.update"/></button>
+<a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
 </form>
 </div>
+
+<script src="/extras/details.js"></script>
 </body>
 </html>

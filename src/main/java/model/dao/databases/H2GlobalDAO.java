@@ -2,7 +2,8 @@ package model.dao.databases;
 
 import lombok.extern.slf4j.Slf4j;
 import model.dao.*;
-import model.dao.common.ResultSetParser;
+import model.dao.common.ResultSetProcessor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -11,10 +12,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Supplier;
 
+import static java.sql.ResultSet.*;
+
 /**
  * Global DAO for H2 database.
- * Actual User and Credential dao returned by this Global DAO are singletons. By default they use connection source
- * configured in GlobalDAO at the time they are requested.
+ * Actual User and Credentials dao returned by this Global DAO are singletons created with a connection source
+ * configured in GlobalDAO at the time they are requested. Changing connection source in GlobalDAO does not affect
+ * any existing instances of User and Credentials dao, but next request for User and Credentials dao will create new instances.
  * Automatic commit on {@code Connection.close()} expected.
  */
 @Slf4j
@@ -25,20 +29,23 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     private static final String TABLE_ROLES = "user_roles";
     private static final String DEFAULT_ROLE = "authenticated-user";
 
-    private static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM "+ TABLE_CREDENTIALS + " WHERE (username=?)";
-    private static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?)";
-    private static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (id=?)";
+    private static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM "+ TABLE_CREDENTIALS + " WHERE (username=?);";
+    private static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?);";
+    private static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (id=?);";
 
     private static final String CHECK_IF_USER_EXISTS = "SELECT TOP 1 1 FROM " + TABLE_CREDENTIALS
             + " AS C WHERE (C.username=?) UNION SELECT TOP 1 1 FROM "
             + TABLE_TEMP_CREDENTIALS + " AS tc WHERE (TC.username=?);";
-    private static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS + " (username, created) VALUES (?, ?)";
-    private static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS + " WHERE (created < ?)";
+    private static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS + " (username, created) VALUES (?, ?);";
+    private static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS + " WHERE (created < ?);";
+
+    // Default ResultSet behaviour: ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
 
     // private static final String CREATE_USER_CREDS = "INSERT INTO credentials (username, dpassword) VALUES (?, ?)"; // Auto-generated
-    private static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "')";
     // private static final String CREATE_EMPTY_USER = "INSERT INTO " + TABLE_USERS + " (username, fullname, email) VALUES (?, '', '')"; // Auto-generated
+    private static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "');";
 
+    private static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
 
     private Supplier<Connection> cSource;
     private UserDAO userDAO;
@@ -59,18 +66,36 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                 }
 
                 private User getUserByAnyKey(String sql, Object key) {
-                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(sql)) {
-                        st.setObject(1, key);
+                    try (Connection conn = cSource.get();
+                         PreparedStatement pst = conn.prepareStatement(sql)) {
+                        pst.setObject(1, key);
                         log.trace("Executing query: {} <== ({})", sql, key);
-                        ResultSet rs = st.executeQuery();
+                        ResultSet rs = pst.executeQuery();
                         if (!rs.next()) {
                             log.trace("User '{}' not found", key);
                             return null;
                         }
-                        return ResultSetParser.reconstructObject(rs, User::new);
+                        return ResultSetProcessor.reconstructObject(rs, User::new);
                     } catch (SQLException e) {
                         log.error("Error getting data for user [{}]: {}", key, e);
                         return null;
+                    }
+                }
+
+                @Override
+                public void updateUserInfo(@NotNull User user) {
+                    try (Connection conn = cSource.get();
+                         PreparedStatement pst = conn.prepareStatement(GET_USER_FOR_UPDATE,
+                                 TYPE_FORWARD_ONLY, CONCUR_UPDATABLE, CLOSE_CURSORS_AT_COMMIT)) {
+                        pst.setString(1, user.getUsername());
+                        log.trace("Executing query: {} <== ({})", GET_USER_FOR_UPDATE, user.getUsername());
+                        ResultSet rs = pst.executeQuery();
+                        if (!rs.next()) throw new SQLException("User not found");
+                        user.injectIntoResultSet(rs);
+                        rs.updateRow();
+                        rs.close();
+                    } catch (SQLException e) {
+                        log.error("Error updating data for user [{}]: {}", user.getUsername(), e);
                     }
                 }
             };
@@ -88,10 +113,11 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                 @Override
                 public Credentials getCredentials(String username) {
                     String lcName = username.toLowerCase();
-                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(GET_CREDS_BY_LOGIN_NAME)) {
-                        st.setObject(1, lcName);
+                    try (Connection conn = cSource.get();
+                         PreparedStatement pst = conn.prepareStatement(GET_CREDS_BY_LOGIN_NAME)) {
+                        pst.setObject(1, lcName);
                         log.trace("Executing query: {} <== ({})", GET_CREDS_BY_LOGIN_NAME, lcName);
-                        ResultSet rs = st.executeQuery();
+                        ResultSet rs = pst.executeQuery();
                         if (!rs.next()) {
                             log.trace("User '{}' not found", username);
                             return null;
@@ -112,11 +138,12 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 
                 @Override
                 public boolean checkIfUserExists(String username) {
-                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(CHECK_IF_USER_EXISTS)) {
-                        st.setString(1, username);
-                        st.setString(2, username);
+                    try (Connection conn = cSource.get();
+                         PreparedStatement pst = conn.prepareStatement(CHECK_IF_USER_EXISTS)) {
+                        pst.setString(1, username);
+                        pst.setString(2, username);
                         log.trace("Executing query: {} <== ({}, {})", CHECK_IF_USER_EXISTS, username, username);
-                        return st.executeQuery().next();
+                        return pst.executeQuery().next();
                     } catch (SQLException e) {
                         log.error("Error checking if user {} exists: {}", username, e);
                         return false;
@@ -126,11 +153,12 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                 @Override
                 public boolean createTemporaryUser(String username) {
                     String lcName = username.toLowerCase();
-                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(CREATE_TEMPORARY_ACCOUNT)) {
-                        st.setString(1, lcName);
-                        st.setLong(2, System.currentTimeMillis());
+                    try (Connection conn = cSource.get();
+                         PreparedStatement pst = conn.prepareStatement(CREATE_TEMPORARY_ACCOUNT)) {
+                        pst.setString(1, lcName);
+                        pst.setLong(2, System.currentTimeMillis());
                         log.trace("Executing query: {} <== ({})", CREATE_TEMPORARY_ACCOUNT, username);
-                        if (st.executeUpdate() != 1) throw new SQLException("Wrong affected row count");
+                        if (pst.executeUpdate() != 1) throw new SQLException("Wrong affected row count");
                     } catch (SQLException e) {
                         log.error("Error creating temporary account for user: {}", username);
                         return false;
@@ -140,10 +168,10 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 
                 @Override
                 public void purgeTemporaryUsers(long timeThreshold) {
-                    try (Connection conn = cSource.get(); PreparedStatement st = conn.prepareStatement(PURGE_TEMPORARY_ACCOUNTS)) {
-                        st.setLong(1, timeThreshold);
+                    try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(PURGE_TEMPORARY_ACCOUNTS)) {
+                        pst.setLong(1, timeThreshold);
                         log.trace("Executing query: {} <== ({})", PURGE_TEMPORARY_ACCOUNTS, timeThreshold);
-                        int numPurged = st.executeUpdate();
+                        int numPurged = pst.executeUpdate();
                         log.debug("Purged {} temporary user accounts", numPurged);
                     } catch (SQLException e) {
                         log.error("Error purging temporary user accounts: {}", e);
@@ -160,19 +188,23 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                             creds.packIntoPreparedStatement(createCreds);
                             log.trace("Saving credentials for user {}", username);
                             if (createCreds.executeUpdate() != 1) throw new SQLException("Error storing credentials for user " + username);
+                            createCreds.close();
 
                             PreparedStatement createRole = conn.prepareStatement(CREATE_USER_ROLE_AUTH);
                             createRole.setString(1, username);
                             log.trace("Setting role for user {}", username);
                             if (createRole.executeUpdate() != 1) throw new SQLException("Error assigning role for user " + username);
+                            createRole.close();
 
                             User emptyUser = new User(username, username, "", false);
                             PreparedStatement createUser = conn.prepareStatement(emptyUser.generateInsertSQL(TABLE_USERS));
                             emptyUser.packIntoPreparedStatement(createUser);
                             log.trace("Creating main record for user {}", username);
                             if (createUser.executeUpdate() != 1) throw new SQLException("Error creating main user record for user " + username);
+                            createUser.close();
 
                             conn.commit();
+
                             return creds;
                         } catch (SQLException e) {
                             conn.rollback();

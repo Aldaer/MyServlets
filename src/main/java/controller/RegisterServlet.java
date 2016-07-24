@@ -18,7 +18,7 @@ import static controller.AttributeNames.C.CREDS_DAO;
 import static controller.AttributeNames.R.REG_ATTEMPT;
 import static controller.MiscConstants.*;
 import static controller.PageURLs.*;
-import static controller.ParameterNames.*;
+import static controller.ParameterNames.L;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -30,9 +30,10 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
         request.setCharacterEncoding("UTF-8");
-        String newName = ofNullable(request.getParameter(L_USERNAME)).map(String::trim).orElse("");
-        String newPassword = request.getParameter(L_PASSWORD);
-        String newPassword2 = request.getParameter(L_PASSWORD2);
+
+        String newName = ofNullable(request.getParameter(L.USERNAME)).map(String::trim).orElse("");
+        String newPassword = request.getParameter(L.PASSWORD);
+        String newPassword2 = request.getParameter(L.PASSWORD2);
 
         // Re-check things checked by JavaScript client-side
         if (newPassword == null || newPassword2 == null ||

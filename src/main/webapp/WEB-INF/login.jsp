@@ -1,17 +1,23 @@
+<%--suppress JspAbsolutePathInspection --%>
+<%--suppress CheckTagEmptyBody --%>
+<%--suppress JspAbsolutePathInspection --%>
+<%--@elvariable id="regAttempt" type="java.lang.String"--%>
+<%--@elvariable id="userFound" type="java.lang.Boolean"--%>
+<%--@elvariable id="authByContainer" type="java.lang.Boolean"--%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <meta charset="utf-8"/>
     <c:set var="locale" value="${param['language']}"/>
     <c:if test="${empty locale}"><c:set var="locale" value="en"/></c:if>
     <fmt:setLocale value="${locale}"/>
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="login.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="/extras/mygreen.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green_login.css">
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
@@ -21,19 +27,15 @@
             <input type="text" placeholder="<fmt:message key="register.username"/>" name="j_username" id="r_name"/>
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password"/>
             <input type="password" placeholder="<fmt:message key="register.repeatPassword"/>" name="j_password2"/>
-            <button action="submit"><fmt:message key="register.do"/></button>
+            <button type="submit"><fmt:message key="register.do"/></button>
             <p class="failcause"></p>
             <p class="message"><fmt:message key="login.registered"/> <a href="#"><fmt:message key="login.signIn"/></a></p>
             <input type="hidden" name="language" value="${locale}">
         </form>
-        <form class="login-form" name="login" method="post" action=<c:choose>
-            <c:when test="${authByContainer == true}">"j_security_check"</c:when>
-            <c:otherwise>"/doLogin"</c:otherwise>
-            </c:choose> accept-charset="UTF-8">
-
+        <form class="login-form" name="login" method="post" action="${authByContainer? "j_security_check" : "/doLogin"}" accept-charset="UTF-8">
             <input type="text" placeholder="<fmt:message key="login.username"/>" name="j_username" />
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password" />
-            <button action="submit"><fmt:message key="login.enter"/></button>
+            <button type="submit"><fmt:message key="login.enter"/></button>
 
             <p class="failcause"><c:choose>
             <c:when test="${empty userFound}"></c:when>

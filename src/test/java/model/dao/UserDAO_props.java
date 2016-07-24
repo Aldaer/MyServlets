@@ -1,5 +1,7 @@
 package model.dao;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -29,5 +31,10 @@ class UserDAO_props implements UserDAO {
         if (!userData.containsKey(id)) return null;
         String[] uData = userData.get(id).split(",");
         return new User(id, uData[0], uData[1], uData[2], true);
+    }
+
+    @Override
+    public void updateUserInfo(@NotNull User user) {
+        userData.put(user.id, user.username + "," + user.fullName + "," + user.email);
     }
 }

@@ -1,5 +1,6 @@
 package model.dao;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -15,9 +16,15 @@ public interface UserDAO {
     @Nullable User getUser(long id);
 
     /**
-     * Returns user id for given username, null if no such user. User name is NOT case-sensitive
+     * Returns user object for given username, null if no such user. User name is NOT case-sensitive
      * @param username User name
-     * @return User id or empty optional
+     * @return User object loaded from the database
      */
     @Nullable User getUser(String username);
+
+    /**
+     * Updates info for user with name == {@code user.username } in the database.
+     * @param user User object with updated fields. Users with unknown {@code username} are ignored.
+     */
+    void updateUserInfo(@NotNull User user);
 }

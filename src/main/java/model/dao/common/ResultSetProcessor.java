@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * Object fields to fill from database must be annotated as {@link StoredField}
  */
 @SuppressWarnings("WeakerAccess")
-public class ResultSetParser {
+public class ResultSetProcessor {
     /**
      * Reconstructs a single object from a result set. Does NOT affect result set cursor,
      * so you must call {@code next()} on new ResultSet before calling this method.
@@ -123,7 +123,7 @@ public class ResultSetParser {
                         fd.f.set(obj, rs.getObject(columns[i]));
                 }
             }
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | IndexOutOfBoundsException e) {
             throw new RuntimeException("Error reconstructing instance of " + obj.getClass(), e);
         }
     }
@@ -196,46 +196,86 @@ public class ResultSetParser {
         return sqlB.toString();
     }
 
-    public static void packIntoPreparedStatement(PreparedStatement pst, Stored obj) {
+    public static void packIntoPreparedStatement(PreparedStatement pst, Stored obj) throws SQLException {
         DbFieldData[] fieldData = getClassFieldData(obj.getClass());
+        int colIndex = 0;
+
         try {
-            int colIndex = 0;
             for (DbFieldData fData : fieldData)
-                if (!fData.auto) {                                     // Field order is determined by getClassFieldData()
-                    colIndex++;
+                if (!fData.auto)                                      // Field order is determined by getClassFieldData()
                     switch (fData.fType) {                             // Auto-generated fields are not inserted
                         case "byte":
-                            pst.setByte(colIndex, fData.f.getByte(obj));
+                            pst.setByte(++colIndex, fData.f.getByte(obj));
                             break;
                         case "short":
-                            pst.setShort(colIndex, fData.f.getShort(obj));
+                            pst.setShort(++colIndex, fData.f.getShort(obj));
                             break;
                         case "int":
-                            pst.setInt(colIndex, fData.f.getInt(obj));
+                            pst.setInt(++colIndex, fData.f.getInt(obj));
                             break;
                         case "long":
-                            pst.setLong(colIndex, fData.f.getLong(obj));
+                            pst.setLong(++colIndex, fData.f.getLong(obj));
                             break;
                         case "float":
-                            pst.setFloat(colIndex, fData.f.getFloat(obj));
+                            pst.setFloat(++colIndex, fData.f.getFloat(obj));
                             break;
                         case "double":
-                            pst.setDouble(colIndex, fData.f.getDouble(obj));
+                            pst.setDouble(++colIndex, fData.f.getDouble(obj));
                             break;
                         case "boolean":
-                            pst.setBoolean(colIndex, fData.f.getBoolean(obj));
+                            pst.setBoolean(++colIndex, fData.f.getBoolean(obj));
                             break;
                         case "char":
-                            pst.setString(colIndex, "" + fData.f.getChar(obj));
+                            pst.setString(++colIndex, "" + fData.f.getChar(obj));
                             break;
                         default:
-                            pst.setObject(colIndex, fData.f.get(obj));
+                            pst.setObject(++colIndex, fData.f.get(obj));
                     }
-                }
-        } catch (IllegalAccessException | SQLException e) {
+
+        } catch (IllegalAccessException e) {
             throw new RuntimeException("Error putting field value from object " + obj + " [" + obj.getClass() + "] into statement");
         }
     }
+
+    public static void injectIntoResultSet(ResultSet rs, Stored obj) throws SQLException {
+        DbFieldData[] fieldData = getClassFieldData(obj.getClass());
+        int[] resultColumns = getRSColumns(rs, fieldData);
+
+        try {
+            for (int i = 0; i < fieldData.length; i++) {
+                final DbFieldData fData = fieldData[i];
+                if (!fData.auto)                                       // Field order is determined by getClassFieldData()
+                    switch (fData.fType) {                             // Auto-generated fields are ignored
+                        case "byte":
+                            rs.updateByte(resultColumns[i], fData.f.getByte(obj));
+                            break;
+                        case "short":
+                            rs.updateShort(resultColumns[i], fData.f.getShort(obj));
+                            break;
+                        case "int":
+                            rs.updateInt(resultColumns[i], fData.f.getInt(obj));
+                            break;
+                        case "long":
+                            rs.updateLong(resultColumns[i], fData.f.getLong(obj));
+                            break;
+                        case "float":
+                            rs.updateFloat(resultColumns[i], fData.f.getFloat(obj));
+                            break;
+                        case "double":
+                            rs.updateDouble(resultColumns[i], fData.f.getDouble(obj));
+                            break;
+                        case "boolean":
+                            rs.updateBoolean(resultColumns[i], fData.f.getBoolean(obj));
+                            break;
+                        case "char":
+                            rs.updateString(resultColumns[i], "" + fData.f.getChar(obj));
+                            break;
+                        default:
+                            rs.updateObject(resultColumns[i], fData.f.get(obj));
+                    }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error putting field value from object " + obj + " [" + obj.getClass() + "] into result set");
+        }
+    }
 }
-
-
