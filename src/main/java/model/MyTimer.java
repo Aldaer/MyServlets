@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.time.zone.ZoneRulesException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -15,13 +14,15 @@ import java.util.TimeZone;
  * Model class
  */
 public class MyTimer {
+    private static final ZoneId GMT = ZoneId.of("GMT");
+
     public MyTimer(String language, String timeZone) {
         locale = Locale.forLanguageTag(language);
         ZoneId z;
         try {
             z = ZoneId.of(timeZone, ZoneId.SHORT_IDS);
         } catch (DateTimeException e) {
-            z = ZoneId.of("GMT");
+            z = GMT;
             timeZone= "GMT";
         }
 

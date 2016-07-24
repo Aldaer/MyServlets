@@ -5,11 +5,11 @@ package model.dao;
  */
 public interface CredentialsDAO {
     /**
-     * Gets uiser credential from underlying data source
-     * @param username User login name, NOT case-sensitive
+     * Gets user credential from underlying data source
+     * @param login User login name, NOT case-sensitive
      * @return {@link Credentials} object
      */
-    Credentials getCredentials(String username);
+    Credentials getCredentials(String login);
 
     /**
      * States if user passwords are stored as a randomly salted hash values.
@@ -19,17 +19,17 @@ public interface CredentialsDAO {
 
     /**
      * Checks if user exists in main AND temporary credentials tables
-     * @param username User login name, NOT case-sensitive
+     * @param login User login name, NOT case-sensitive
      * @return True if uses exists in any of the tables
      */
-    boolean checkIfUserExists(String username);
+    boolean checkIfLoginOccupied(String login);
 
     /**
      * Creates a user in a TEMPORARY table setting UTC timestamp for time of creation
-     * @param username User login name (not case-sensitive)
+     * @param login User login name (not case-sensitive)
      * @return True if successful, false if such temporary user already exists
      */
-    boolean createTemporaryUser(String username);
+    boolean createTemporaryUser(String login);
 
     /**
      * Purges credentials from TEMPORARY user table created before indicated time (UTC)

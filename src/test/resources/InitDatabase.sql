@@ -2,6 +2,17 @@ CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 
 SET SCHEMA userdata;
 
+CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+@CODE
+Timestamp ts() {
+return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));
+}
+$$;
+
 CREATE TABLE IF NOT EXISTS credentials (
   username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
   dpassword CHAR(80)
@@ -48,6 +59,22 @@ INSERT INTO user_roles (username, user_role) VALUES ('admin', 'admin-gui');
 INSERT INTO user_roles (username, user_role) VALUES ('вася', 'authenticated-user');
 INSERT INTO user_roles (username, user_role) VALUES ('петя', 'authenticated-user');
 
+DROP TABLE IF EXISTS messages;
 
+/* conversation_id: null == private message, unread; -1 == private message, read; >0 == conversation (refer to conversations table) */
+CREATE TABLE IF NOT EXISTS messages (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  refid BIGINT,
+  u_from VARCHAR_IGNORECASE(50) NOT NULL,
+  u_to VARCHAR_IGNORECASE(50),
+  m_time TIMESTAMP NOT NULL DEFAULT CURRENT_UTC_TIMESTAMP(),
+  conversation_id BIGINT,
+  text VARCHAR default ''
+);
 
+INSERT INTO messages (u_from, u_to, text) VALUES ('вася', 'петя', 'Привет, Петя!');
+INSERT INTO messages (u_from, u_to, text) VALUES ('петя', 'вася', 'И тебе привет!');
+INSERT INTO messages (u_from, u_to, text) VALUES ('вася', 'non existing user', 'Письмо никому');
 
+INSERT INTO messages (u_from, conversation_id, text) VALUES ('вася', 1, 'Письмо в сообщество');
+INSERT INTO messages (u_from, conversation_id, refid, text) VALUES ('петя', 1, identity(), 'А я прочитал!');

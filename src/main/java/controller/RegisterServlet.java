@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import static controller.AttributeNames.C.CREDS_DAO;
 import static controller.AttributeNames.R.REG_ATTEMPT;
@@ -27,6 +28,8 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @WebServlet(REGISTER_SERVLET)
 public class RegisterServlet extends HttpServlet {
+    private static Pattern validLogin = Pattern.compile("[a-zA-Zа-яА-Я][\\-\\.\\wа-яА-Я]{3,49}");
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
         request.setCharacterEncoding("UTF-8");
@@ -47,7 +50,7 @@ public class RegisterServlet extends HttpServlet {
         ServletContext srvContext = request.getServletContext();
         CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(CREDS_DAO);
 
-        if (credsDao.checkIfUserExists(newName) || !credsDao.createTemporaryUser(newName)) {
+        if (credsDao.checkIfLoginOccupied(newName) || !userLoginValid(newName) || !credsDao.createTemporaryUser(newName)) {
             log.debug("Cannot create temporary registration for user '{}'", newName);
             request.setAttribute(REG_ATTEMPT, newName);
             returnToRegistration(request, response);
@@ -63,6 +66,10 @@ public class RegisterServlet extends HttpServlet {
         }
         log.info("Successfully created user '{}'", newName);
         request.getRequestDispatcher(LOGIN_SERVLET).forward(request, response);
+    }
+
+    private boolean userLoginValid(String login) {
+        return validLogin.matcher(login).matches();
     }
 
     private void returnToRegistration(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

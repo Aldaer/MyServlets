@@ -19,8 +19,8 @@ public class CredsDAO_props implements CredentialsDAO {
     }
 
     @Override
-    public Credentials getCredentials(String username) {
-        String lcName = username.toLowerCase();
+    public Credentials getCredentials(String login) {
+        String lcName = login.toLowerCase();
         return ofNullable(userPwds.get(lcName)).map(pwd -> new Credentials(lcName, pwd, usingSaltedHash)).orElse(null);
     }
 
@@ -30,14 +30,14 @@ public class CredsDAO_props implements CredentialsDAO {
     }
 
     @Override
-    public boolean checkIfUserExists(String username) {
-        return (userPwds.containsKey(username.toLowerCase()));
+    public boolean checkIfLoginOccupied(String login) {
+        return (userPwds.containsKey(login.toLowerCase()));
     }
 
     @Override
-    public boolean createTemporaryUser(String username) {
-        if (checkIfUserExists(username)) return false;
-        userPwds.put(username.toLowerCase(), "" + System.currentTimeMillis());
+    public boolean createTemporaryUser(String login) {
+        if (checkIfLoginOccupied(login)) return false;
+        userPwds.put(login.toLowerCase(), "" + System.currentTimeMillis());
         return true;
     }
 

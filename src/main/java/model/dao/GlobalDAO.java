@@ -6,4 +6,5 @@ package model.dao;
 public interface GlobalDAO {
     UserDAO getUserDAO();
     CredentialsDAO getCredentialsDAO();
+    MessageDAO getMessageDAO();
 }
