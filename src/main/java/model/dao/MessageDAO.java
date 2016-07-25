@@ -30,25 +30,62 @@ public interface MessageDAO {
      *
      */
     interface MessageFilter {
+        /**
+         * Unique message id
+         */
         Long getId();
 
+        /**
+         * For replies: message id of the "parent" message.
+         * Otherwise, 0
+         */
         Long getRefId();
 
+        /**
+         * Message author's username
+         */
         String getFrom();
 
+        /**
+         * Message recipients's username. Null for messages in conversations
+         */
         String getTo();
 
+        /**
+         * Minimum UTC timestamp, inclusive
+         */
         Timestamp getMinTime();
 
+        /**
+         * Maximum UTC timestamp, inclusive
+         */
         Timestamp getMaxTime();
 
+        /**
+         * Conversation id. 0 for unread private messages, -1 for read private messages
+         */
         Long getConvId();
 
+        /**
+         *  SQL text pattern, e.g. '%unday%'
+         */
         String getTextLike();
 
+        /**
+         * Skip first N messages
+         */
         Integer getOffset();
 
+        /**
+         * Return no more than M messages
+         */
         Integer getLimit();
+
+        /**
+         * Sort messages by a field indicated by name.
+         * Note this is NOT a column name, but annotated {@link model.dao.databases.StoredField} name.
+         */
+        String getSortField();
 
         static Builder newBuilder() {
             return new Builder();
@@ -74,6 +111,7 @@ public interface MessageDAO {
             private String textLike;
             private Integer offset;
             private Integer limit;
+            private String sortField;
 
             /**
              * Creates a copy of current state oif this builder.

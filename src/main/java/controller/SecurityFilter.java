@@ -2,6 +2,7 @@ package controller;
 
 import lombok.extern.slf4j.Slf4j;
 import model.dao.User;
+import model.dao.UserDAO;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,7 +25,7 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @WebFilter(urlPatterns = SECURED_AREA)
 public class SecurityFilter extends HttpFilter {
-    private int n = 0;
+    private volatile long n = 0;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -50,6 +51,15 @@ public class SecurityFilter extends HttpFilter {
         }
         User user = (User) req.getSession(true).getAttribute(USER);
         if (user == null) {
+            if (getServletContext().getAttribute("AUTOLOGIN") != null) {        // TODO: Remove in production!!!
+                UserDAO userDao = (UserDAO) getServletContext().getAttribute(AttributeNames.C.USER_DAO);
+                user = userDao.getUser((String) getServletContext().getAttribute("AUTOLOGIN"));
+                log.warn("Autologin enabled! Logging in user {}", user.getUsername());
+                req.getSession(false).setAttribute(USER, user);
+                req.getRequestDispatcher(MAIN_SERVLET).forward(req, res);
+                return;
+            }
+
             final Principal authUser = req.getUserPrincipal();          // User already authenticated by container?
             if (authUser == null) {
                 log.trace("No user info, forwarding to login page");

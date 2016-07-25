@@ -7,6 +7,8 @@ public interface MiscConstants {
     int MIN_USERNAME_LENGTH = 4;
     int MAX_USERNAME_LENGTH = 50;
     int MIN_PASSWORD_LENGTH = 3;
+
+    Long UNREAD_PRIVATE = 0L;
 }
 
 /**
@@ -16,6 +18,8 @@ interface AttributeNames {
     class R {
         static final String USER_FOUND = "userFound";
         static final String REG_ATTEMPT = "regAttempt";
+
+        static final String UNREAD_PM = "unreadPM";
     }
 
     class S {
@@ -25,6 +29,8 @@ interface AttributeNames {
     class C {
         static final String USER_DAO = "userDAO";
         static final String CREDS_DAO = "credsDAO";
+        static final String MSG_DAO = "messageDAO";
+
         static final String LANGUAGE = "language";
         static final String CONTAINER_AUTH = "authByContainer";
     }

@@ -4,6 +4,7 @@
 <%--@elvariable id="currentUser" type="model.dao.User"--%>
 <%--@elvariable id="lastTZ" type="java.lang.String"--%>
 <%--@elvariable id="supportedTZ" type="java.util.Properties"--%>
+<%--@elvariable id="unreadPM" type="java.lang.Integer"--%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -22,7 +23,10 @@
 
 
 <p><fmt:message key="main.currentlogin"/> <a href="/main/userdetails">${currentUser.fullName} [${currentUser.email}]</a><br>
-    <fmt:message key="main.selectedlocale"/> = "${language}"</p>
+    <fmt:message key="main.selectedlocale"/> = "${language}"
+</p>
+
+<p>You have unread messages! [${unreadPM}]</p>
 
 <p><fmt:message key="main.selecttz"/></p>
 <form action="/main/serv" method="get">

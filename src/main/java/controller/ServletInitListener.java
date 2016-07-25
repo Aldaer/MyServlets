@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import model.dao.CredentialsDAO;
 import model.dao.DatabaseDAO;
 import model.dao.GlobalDAO;
-import model.dao.UserDAO;
 import model.dao.databases.dbconnecton.ConnectionPool;
 import org.slf4j.LoggerFactory;
 
@@ -80,15 +79,17 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         credsDao.useSaltedHash(conf.getString(CONFIG_DATABASE_USE_SHA_DIGEST).toLowerCase().equals("true"));
         // Cancel all unfinished registration attempts
         credsDao.purgeTemporaryUsers(System.currentTimeMillis());
-        UserDAO uDao = globalDao.getUserDAO();
 
         // Put data access objects and config parameters into servlet context
-        srvContext.setAttribute(USER_DAO, uDao);
         srvContext.setAttribute(CREDS_DAO, credsDao);
+        srvContext.setAttribute(USER_DAO, globalDao.getUserDAO());
+        srvContext.setAttribute(MSG_DAO, globalDao.getMessageDAO());
 
         Boolean contAuth = conf.getString(CONFIG_CONTAINER_SECURITY).toLowerCase().equals("true");
         srvContext.setAttribute(CONTAINER_AUTH, contAuth);
         log.info("Container-based authentication = {}", contAuth);
+
+        if (conf.containsKey("autologin")) srvContext.setAttribute("AUTOLOGIN", conf.getString("autologin")); // TODO: remove in production
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

@@ -2,6 +2,7 @@ package controller;
 
 import lombok.extern.slf4j.Slf4j;
 import model.MyTimer;
+import model.dao.MessageDAO;
 import model.dao.User;
 import model.dao.UserDAO;
 import model.utils.TimeZoneNames;
@@ -17,10 +18,9 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static controller.AttributeNames.C.LANGUAGE;
-import static controller.AttributeNames.C.USER_DAO;
-import static controller.AttributeNames.S.USER;
+import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
+import static controller.MiscConstants.UNREAD_PRIVATE;
 import static controller.PageURLs.*;
 import static java.util.Optional.ofNullable;
 
@@ -62,10 +62,12 @@ public class MainServlet extends HttpServlet {
                         .getMappings().stream().toArray(String[]::new)));
     }
 
+
+    @SuppressWarnings("UnnecessaryReturnStatement")
     private void processMainRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String tz = ofNullable(request.getParameter("timezone")).orElse("GMT");
-        String lang = ofNullable((String) session.getAttribute(LANGUAGE)).orElse(DEFAULT_LOCALE);
+        String lang = ofNullable((String) session.getAttribute(C.LANGUAGE)).orElse(DEFAULT_LOCALE);
         MyTimer t = (MyTimer) session.getAttribute("timer");
 
         if (t == null || !t.getTz().equals(tz)) {
@@ -74,20 +76,31 @@ public class MainServlet extends HttpServlet {
         }
         request.setAttribute("lastTZ", tz);
         request.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
+
+        User user = (User) session.getAttribute(S.USER);
+        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
+
+        MessageDAO.MessageFilter privateUnread = MessageDAO.MessageFilter.newBuilder()
+                .setTo(user.getUsername())
+                .setConvId(UNREAD_PRIVATE);
+        Integer unreadPrivateMessages = mDao.countMessages(privateUnread);
+        request.setAttribute(R.UNREAD_PM, unreadPrivateMessages);
+
         RequestDispatcher respJSP = request.getRequestDispatcher(MAIN_PAGE);
         respJSP.forward(request, response);
+        return;
     }
 
     private void processUserUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute(USER);
+        User user = (User) session.getAttribute(S.USER);
         String newName = request.getParameter(ParameterNames.U.FULLNAME);
         String newEmail = request.getParameter(ParameterNames.U.EMAIL);
         if (newName == null || newName.equals("")) newName = user.getUsername();
         if (newEmail == null) newEmail = "";
         user.setFullName(newName);
         user.setEmail(newEmail);
-        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(USER_DAO);
+        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         log.info("Updating user info for user '{}'", user.getUsername());
         userDAO.updateUserInfo(user);
         response.sendRedirect(DETAILS_PAGE);

@@ -309,7 +309,7 @@ class H2MessageDAO implements MessageDAO {
         }
     }
 
-    private String buildMessageQuery(String prefix, MessageFilter constraint, boolean ignoreLimits) {
+    private String buildMessageQuery(String prefix, MessageFilter constraint, boolean countOnly) {
         StringBuilder sqlB = new StringBuilder(250);
         sqlB.append(prefix).append(TABLE_MESSAGES);
 
@@ -328,10 +328,12 @@ class H2MessageDAO implements MessageDAO {
                 sqlB.append(" AND ").append(constraintList.get(i));
         }
 
-        if (! ignoreLimits) {
+        if (! countOnly) {
             ofNullable(constraint.getLimit()).map(lim -> " LIMIT " + lim).ifPresent(sqlB::append);
             ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).ifPresent(sqlB::append);
+            ofNullable(constraint.getSortField()).map(srtf -> " ORDER BY " + getColumnForField(Message.class, srtf)).ifPresent(constraintList::add);
         }
+
         sqlB.append(';');
         return sqlB.toString();
     }

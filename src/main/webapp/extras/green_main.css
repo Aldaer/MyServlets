@@ -43,7 +43,6 @@ button {
 .bigform .smallbutton, a.smallbutton {
     -webkit-appearance: button;
     -moz-appearance: button;
-    appearance: button;
 
     color: #FFFFFF;
     text-decoration: none;
@@ -51,7 +50,13 @@ button {
     box-sizing: border-box;
     padding: 5px;
     font-size: 12px;
+    line-height: normal;
     background: #60AF50;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
 }
 
 .bigform button:hover,a.smallbutton:hover {
