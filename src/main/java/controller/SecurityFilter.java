@@ -54,8 +54,9 @@ public class SecurityFilter extends HttpFilter {
             if (getServletContext().getAttribute("AUTOLOGIN") != null) {        // TODO: Remove in production!!!
                 UserDAO userDao = (UserDAO) getServletContext().getAttribute(AttributeNames.C.USER_DAO);
                 user = userDao.getUser((String) getServletContext().getAttribute("AUTOLOGIN"));
-                log.warn("Autologin enabled! Logging in user {}", user.getUsername());
+                log.warn("AUTOLOGIN = {}", user.getUsername());
                 req.getSession(false).setAttribute(USER, user);
+                req.setAttribute("language", "ru");
                 req.getRequestDispatcher(MAIN_SERVLET).forward(req, res);
                 return;
             }

@@ -25,6 +25,10 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="model.dao.databases.dbconnecton" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <logger name="model" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

@@ -320,7 +320,7 @@ class H2MessageDAO implements MessageDAO {
         ofNullable(constraint.getTo()).map(to -> getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
-        ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "convId") + "=" + convid).ifPresent(constraintList::add);
+        ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "conversationId") + "=" + convid).ifPresent(constraintList::add);
         ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
         if (constraintList.size() > 0) {
             sqlB.append(" WHERE ").append(constraintList.get(0));
