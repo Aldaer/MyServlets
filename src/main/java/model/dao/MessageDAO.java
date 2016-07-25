@@ -2,6 +2,7 @@ package model.dao;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -10,12 +11,12 @@ import java.util.List;
  * Gets
  */
 public interface MessageDAO {
-    List<Message> getMessages(MessageConstraint constraint);
+    List<Message> getMessages(MessageFilter constraint);
 
     /**
      *
      */
-    interface MessageConstraint {
+    interface MessageFilter {
         Long getId();
 
         Long getRefId();
@@ -36,13 +37,20 @@ public interface MessageDAO {
 
         Integer getMaxReturned();
 
-        static Builder builder() {
+        static Builder newBuilder() {
             return new Builder();
         }
 
+        /**
+         * Reusable builder, can be used to build constraints one by one.
+         * Can be assigned to {@link MessageFilter} directly or by creating
+         * a permanent copy. Default value of all constraints is null
+         * meaning no constraints.
+         */
         @Getter
         @Setter
-        class Builder implements MessageConstraint {
+        @Accessors(chain = true)
+        public class Builder implements MessageFilter, Cloneable {
             private Long id;
             private Long refId;
             private String from;
@@ -54,8 +62,16 @@ public interface MessageDAO {
             private Integer skip;
             private Integer maxReturned;
 
-            public MessageConstraint create() {
-                return this;
+            /**
+             * Creates a copy of current state oif this builder.
+             * @return Cloned {@link MessageFilter} object
+             */
+            public MessageFilter createCopy() {
+                try {
+                    return (MessageFilter) this.clone();
+                } catch (CloneNotSupportedException e) {
+                    return null; // Should never happen
+                }
             }
 
             private Builder() {

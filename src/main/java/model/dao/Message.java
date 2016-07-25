@@ -56,4 +56,9 @@ public class Message implements Stored {
     @Setter
     @StoredField("text")
     String text;
+
+    @Override
+    public String toString() {
+        return "#" + getId() + ". " + getFrom() + " => " + getTo() + ": '" + getText() + "'";
+    }
 }

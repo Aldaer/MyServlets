@@ -272,21 +272,24 @@ class H2MessageDAO implements MessageDAO {
     private final Supplier<Connection> cSource;
 
     @Override
-    public List<Message> getMessages(MessageConstraint constraint) {
+    public List<Message> getMessages(MessageFilter constraint) {
         StringBuilder sqlB = new StringBuilder(250);
-        StringBuilder sqlC = new StringBuilder(200);
         sqlB.append("SELECT * FROM ").append(TABLE_MESSAGES);
 
         List<String> constraintList = new ArrayList<>(10);
-        ofNullable(constraint.getId()).map(id -> getColumnForField(Message.class, "id") + "=" + id).ifPresent(sqlC::append);
-        ofNullable(constraint.getRefId()).map(refid -> " AND " + getColumnForField(Message.class, "refId") + "=" + refid).ifPresent(sqlC::append);
-        ofNullable(constraint.getFrom()).map(from -> " AND " + getColumnForField(Message.class, "from") + "='" + from + "'").ifPresent(sqlC::append);
-        ofNullable(constraint.getTo()).map(to -> " AND " + getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(sqlC::append);
-        ofNullable(constraint.getMinTime()).map(mt -> " AND " + getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(sqlC::append);
-        ofNullable(constraint.getMaxTime()).map(mt -> " AND " + getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(sqlC::append);
-        ofNullable(constraint.getConvId()).map(convid -> " AND " + getColumnForField(Message.class, "convId") + "=" + convid).ifPresent(sqlC::append);
-        ofNullable(constraint.getTextLike()).map(txt -> " AND " + getColumnForField(Message.class, "textLike") + " LIKE '" + txt + "'").ifPresent(sqlC::append);
-        if (sqlC.length() > 0) sqlB.append(" WHERE ").append(sqlC);
+        ofNullable(constraint.getId()).map(id -> getColumnForField(Message.class, "id") + "=" + id).ifPresent(constraintList::add);
+        ofNullable(constraint.getRefId()).map(refid -> getColumnForField(Message.class, "refId") + "=" + refid).ifPresent(constraintList::add);
+        ofNullable(constraint.getFrom()).map(from -> getColumnForField(Message.class, "from") + "='" + from + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getTo()).map(to -> getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "convId") + "=" + convid).ifPresent(constraintList::add);
+        ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "textLike") + " LIKE '" + txt + "'").ifPresent(constraintList::add);
+        if (constraintList.size() > 0) {
+            sqlB.append(" WHERE ").append(constraintList.get(0));
+            for (int i = 1; i < constraintList.size(); i++)
+                sqlB.append(" AND ").append(constraintList.get(i));
+        }
 
         ofNullable(constraint.getMaxReturned()).map(max -> " LIMIT " + max).ifPresent(sqlB::append);
         ofNullable(constraint.getSkip()).map(skip -> " OFFSET " + skip).ifPresent(sqlB::append);

@@ -25,6 +25,8 @@ CREATE TABLE temp_credentials (
   created BIGINT
 );
 
+INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 4102358400);
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   fullname VARCHAR(255),
