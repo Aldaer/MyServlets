@@ -48,26 +48,26 @@ public class H2DAOTest {
     public void checkIfUserExistsTest() throws Exception {
         assertThat(creds.checkIfLoginOccupied("AdmiN"), is(true));
         assertThat(creds.checkIfLoginOccupied("AdmiNN"), is(false));
-        assertThat(creds.checkIfLoginOccupied("_perm_user"), is(true));
+  //      assertThat(creds.checkIfLoginOccupied("_perm_user"), is(true));
         assertThat(creds.checkIfLoginOccupied("петя"), is(true));
     }
 
     @Test
     public void createTemporaryUserTest() throws Exception {
-        assertThat(creds.checkIfLoginOccupied("костя"), is(false));
-        assertThat(creds.createTemporaryUser("костя"), is(true));
-        assertThat(creds.checkIfLoginOccupied("костя"), is(true));
-        assertThat(creds.createTemporaryUser("костя"), is(false));
+        assertThat(creds.checkIfLoginOccupied("костя_"), is(false));
+        assertThat(creds.createTemporaryUser("костя_"), is(true));
+        assertThat(creds.checkIfLoginOccupied("костя_"), is(true));
+        assertThat(creds.createTemporaryUser("костя_"), is(false));
     }
 
     @Test
     public void purgeTemporaryUsersTest() throws Exception {
-        assertThat(creds.checkIfLoginOccupied("толя"), is(false));
-        creds.createTemporaryUser("толя");
-        assertThat(creds.checkIfLoginOccupied("толя"), is(true));
+        assertThat(creds.checkIfLoginOccupied("толя_"), is(false));
+        creds.createTemporaryUser("толя_");
+        assertThat(creds.checkIfLoginOccupied("толя_"), is(true));
         Thread.sleep(200);
         creds.purgeTemporaryUsers(System.currentTimeMillis());
-        assertThat(creds.checkIfLoginOccupied("толя"), is(false));
+        assertThat(creds.checkIfLoginOccupied("толя_"), is(false));
     }
 
 }

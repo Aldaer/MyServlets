@@ -1,7 +1,5 @@
-package model.dao.common;
+package model.dao.databases;
 
-import model.dao.databases.Stored;
-import model.dao.databases.StoredField;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -27,13 +25,11 @@ public class StoredTest {
         Timestamp ts;
     }
 
-    private static String REFERENCE_SQL = "INSERT INTO STUFFTABLE (NAME,DESCRIPTION) VALUES (?,?);";
-
-
 
     @Test
     public void generateInsertSQLTest() throws Exception {
         StoredStuff sts = new StoredStuff();
+        String REFERENCE_SQL = "INSERT INTO STUFFTABLE (NAME,DESCRIPTION) VALUES (?,?);";
         assertThat(sts.generateInsertSQL("STUFFTABLE"), is(REFERENCE_SQL));
     }
 
@@ -46,6 +42,8 @@ public class StoredTest {
         MoreStoredStuff msts = new MoreStoredStuff();
         assertThat(msts.getColumnForField("ts"), is("STUFF_TIME"));
         assertNull(msts.getColumnForField("stuffName"));
+
+        assertThat(Stored.Processor.getColumnForField(StoredStuff.class, "stuffId"), is("ID"));
     }
 
 }

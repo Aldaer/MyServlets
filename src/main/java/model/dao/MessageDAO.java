@@ -4,13 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Gets
  */
 public interface MessageDAO {
-    Collection<Message> getMessages(MessageConstraint constraint);
+    List<Message> getMessages(MessageConstraint constraint);
 
     /**
      *
@@ -18,7 +18,7 @@ public interface MessageDAO {
     interface MessageConstraint {
         Long getId();
 
-        Long getRefid();
+        Long getRefId();
 
         String getFrom();
 
@@ -44,7 +44,7 @@ public interface MessageDAO {
         @Setter
         class Builder implements MessageConstraint {
             private Long id;
-            private Long refid;
+            private Long refId;
             private String from;
             private String to;
             private Timestamp minTime;
