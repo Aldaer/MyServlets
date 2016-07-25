@@ -5,7 +5,10 @@ import model.dao.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -284,7 +287,8 @@ class H2MessageDAO implements MessageDAO {
         ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "convId") + "=" + convid).ifPresent(constraintList::add);
-        ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "textLike") + " LIKE '" + txt + "'").ifPresent(constraintList::add);
+        String textSearch = constraint.getTextLike();
+        ofNullable(textSearch).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
         if (constraintList.size() > 0) {
             sqlB.append(" WHERE ").append(constraintList.get(0));
             for (int i = 1; i < constraintList.size(); i++)
@@ -295,14 +299,15 @@ class H2MessageDAO implements MessageDAO {
         ofNullable(constraint.getSkip()).map(skip -> " OFFSET " + skip).ifPresent(sqlB::append);
         sqlB.append(';');
 
-        try (Connection conn = cSource.get(); Statement st = conn.createStatement()) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(sqlB.toString())) {
             log.trace("Executing query: {}", sqlB);
-            ResultSet rs = st.executeQuery(sqlB.toString());
+            if (textSearch != null) pst.setString(1, textSearch);
+            ResultSet rs = pst.executeQuery();
             List<Message> lm = new ArrayList<>();
             Stored.Processor.reconstructAllObjects(rs, Message::new, lm);
             return lm;
         } catch (SQLException e) {
-            log.error("Error getting data from table {}", TABLE_MESSAGES);
+            log.error("Error getting data from table '{}'", TABLE_MESSAGES);
             return new ArrayList<>();
         }
     }

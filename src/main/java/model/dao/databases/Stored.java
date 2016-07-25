@@ -4,10 +4,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -99,8 +96,8 @@ public interface Stored {
         }
 
         /**
-         * Reads all objects from result set into a collection starting from current row,
-         * or first row if current cursor position is before first.
+         * Reads all objects from result set into a collection. If cursor is not before first row,
+         * this method processes records starting from NEXT row.
          *
          * @param rs          Result set to read from
          * @param objSource   Object factory
@@ -109,24 +106,20 @@ public interface Stored {
          * @throws SQLException
          */
         static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
-            if (rs.isClosed() || rs.isAfterLast()) return;
-            boolean firstLoop = true;
-            DbFieldData[] fieldData = null;
-            int[] resultColumns = null;
+            if (rs.isClosed() || !rs.next()) return;
 
-            if (rs.isBeforeFirst()) {
-                if (!rs.next()) return;
-            }
+            T obj = objSource.get();
+            DbFieldData[] fieldData = getClassFieldData(obj.getClass());
+            int[] resultColumns = getRSColumns(rs, fieldData);
+
             do {
-                T obj = objSource.get();
-                if (firstLoop) {
-                    fieldData = getClassFieldData(obj.getClass());
-                    resultColumns = getRSColumns(rs, fieldData);
-                    firstLoop = false;
-                }
                 fillFields(rs, obj, fieldData, resultColumns, false);
                 destination.add(obj);
-            } while (rs.next());
+                if (rs.next())
+                    obj = objSource.get();
+                else
+                    break;
+            } while (true);
         }
 
         private static <T extends Stored> void updateObject(ResultSet rs, T obj) throws SQLException {
@@ -333,6 +326,9 @@ public interface Stored {
                 throw new RuntimeException("Error putting field value from object " + obj + " [" + obj.getClass() + "] into result set");
             }
         }
+
+        // TODO: add java.util.date conversion to/from UTC
+        private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH);
     }
 
 }

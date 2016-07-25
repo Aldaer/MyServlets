@@ -1,6 +1,10 @@
 CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
+CREATE SCHEMA IF NOT EXISTS testdata AUTHORIZATION SA;
 
 SET SCHEMA userdata;
+/*
+SET SCHEMA testdata;
+ */
 
 CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
 import java.sql.Timestamp;
@@ -12,14 +16,13 @@ Timestamp ts() {
 return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));
 }
 $$;
-
-CREATE TABLE IF NOT EXISTS credentials (
+DROP TABLE IF EXISTS credentials;
+CREATE TABLE credentials (
   username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
   dpassword CHAR(80)
 );
 
 DROP TABLE IF EXISTS temp_credentials;
-
 CREATE TABLE temp_credentials (
   username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
   created BIGINT
@@ -27,7 +30,8 @@ CREATE TABLE temp_credentials (
 
 INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 4102358400);
 
-CREATE TABLE IF NOT EXISTS users (
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   fullname VARCHAR(255),
   email VARCHAR(100),
@@ -36,7 +40,8 @@ CREATE TABLE IF NOT EXISTS users (
   FOREIGN KEY (username) REFERENCES credentials(username) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS user_roles (
+DROP TABLE IF EXISTS user_roles;
+CREATE TABLE user_roles (
   username VARCHAR_IGNORECASE(50),
   user_role VARCHAR(50),
   FOREIGN KEY (username) REFERENCES credentials (username) ON DELETE CASCADE,
@@ -62,8 +67,7 @@ INSERT INTO user_roles (username, user_role) VALUES ('вася', 'authenticated-
 INSERT INTO user_roles (username, user_role) VALUES ('петя', 'authenticated-user');
 
 DROP TABLE IF EXISTS messages;
-
-CREATE TABLE IF NOT EXISTS messages (
+CREATE TABLE messages (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   refid BIGINT NOT NULL DEFAULT 0,
   u_from VARCHAR_IGNORECASE(50) NOT NULL,
@@ -73,9 +77,9 @@ CREATE TABLE IF NOT EXISTS messages (
   text VARCHAR default ''
 );
 
-INSERT INTO messages (u_from, u_to, text) VALUES ('вася', 'петя', 'Привет, Петя!');
-INSERT INTO messages (u_from, u_to, text) VALUES ('петя', 'вася', 'И тебе привет!');
-INSERT INTO messages (u_from, u_to, text) VALUES ('вася', 'non existing user', 'Письмо никому');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
 
-INSERT INTO messages (u_from, conversation_id, text) VALUES ('вася', 1, 'Письмо в сообщество');
-INSERT INTO messages (u_from, conversation_id, refid, text) VALUES ('петя', 1, identity(), 'А я прочитал!');
+INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
+INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, identity(), 'А я прочитал!', '2015-01-03 12:00:00');

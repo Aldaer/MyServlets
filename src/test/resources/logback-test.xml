@@ -21,7 +21,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="model.dao.databases" level="debug" additivity="false">
+    <logger name="model.dao.databases" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

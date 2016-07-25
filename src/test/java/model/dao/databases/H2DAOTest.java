@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -99,12 +100,24 @@ public class H2DAOTest {
         messages = msg.getMessages(bld);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(1));
+    }
 
-        System.out.println("-----");
-        System.out.println("- to вася");
-        bld = MessageFilter.newBuilder().setTo("вася");
-        messages = msg.getMessages(bld);
-        assertThat(messages.get(0).getFrom(), is("петя"));
+    @Test
+    public void testGetMessagesTimestamps() throws Exception {
+        MessageFilter.Builder bld = MessageFilter.newBuilder();
+        bld.setMinTime(Timestamp.valueOf("2015-01-01 12:05:00"));
+        bld.setMaxTime(Timestamp.valueOf("2015-01-02 12:00:00"));
+        List<Message> messages = msg.getMessages(bld);
+        assertThat(messages.size(), is(3));
+        messages.stream().forEach(System.out::println);
+    }
+
+
+    @Test
+    public void testGetMessagesTextSearch() throws Exception {
+        MessageFilter.Builder bld = MessageFilter.newBuilder().setTextLike("%никому%");
+        List<Message> messages = msg.getMessages(bld);
+        assertThat(messages.size(), is(1));
         messages.stream().forEach(System.out::println);
     }
 }
