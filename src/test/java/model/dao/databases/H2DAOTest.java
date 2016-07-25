@@ -84,23 +84,34 @@ public class H2DAOTest {
         List<Message> messages = msg.getMessages(bld);
         assertThat(messages.size(), is(3));
         messages.stream().forEach(System.out::println);
-        System.out.println("---skip 1");
-        bld.setSkip(1);
+        System.out.println("---offset 1");
+        bld.setOffset(1);
         messages = msg.getMessages(bld);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2");
-        bld.setSkip(0);
-        bld.setMaxReturned(2);
+        bld.setOffset(0);
+        bld.setLimit(2);
         messages = msg.getMessages(bld);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(2));
-        System.out.println("---max 2, skip 2");
-        bld.setSkip(2);
+        System.out.println("---max 2, offset 2");
+        bld.setOffset(2);
         messages = msg.getMessages(bld);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(1));
     }
+
+    @Test
+    public void testCountMessages() throws Exception {
+        MessageFilter.Builder bld = MessageFilter.newBuilder().setFrom("вася");
+        assertThat(msg.countMessages(bld), is(3));
+        bld.setFrom(null);
+        bld.setMinTime(Timestamp.valueOf("2015-01-01 12:05:00"));
+        bld.setMaxTime(Timestamp.valueOf("2015-01-02 12:00:00"));
+        assertThat(msg.countMessages(bld), is(3));
+    }
+
 
     @Test
     public void testGetMessagesTimestamps() throws Exception {

@@ -276,8 +276,42 @@ class H2MessageDAO implements MessageDAO {
 
     @Override
     public List<Message> getMessages(MessageFilter constraint) {
+        String query = buildMessageQuery("SELECT * FROM ", constraint, false);
+
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
+            String textSearch = constraint.getTextLike();
+            if (textSearch != null) pst.setString(1, textSearch);
+            log.trace("Executing query: {}", query);
+            ResultSet rs = pst.executeQuery();
+            List<Message> lm = new ArrayList<>();
+            Stored.Processor.reconstructAllObjects(rs, Message::new, lm);
+            return lm;
+        } catch (SQLException e) {
+            log.error("Error getting data from table '{}': {}", TABLE_MESSAGES, e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public int countMessages(MessageFilter constraint) {
+        String query = buildMessageQuery("SELECT COUNT(*) AS mcount FROM ", constraint, true);
+
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
+            String textSearch = constraint.getTextLike();
+            if (textSearch != null) pst.setString(1, textSearch);
+            log.trace("Executing query: {}", query);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            log.error("Error counting rows in table '{}': {}", TABLE_MESSAGES, e);
+            return -1;
+        }
+    }
+
+    private String buildMessageQuery(String prefix, MessageFilter constraint, boolean ignoreLimits) {
         StringBuilder sqlB = new StringBuilder(250);
-        sqlB.append("SELECT * FROM ").append(TABLE_MESSAGES);
+        sqlB.append(prefix).append(TABLE_MESSAGES);
 
         List<String> constraintList = new ArrayList<>(10);
         ofNullable(constraint.getId()).map(id -> getColumnForField(Message.class, "id") + "=" + id).ifPresent(constraintList::add);
@@ -287,28 +321,18 @@ class H2MessageDAO implements MessageDAO {
         ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "convId") + "=" + convid).ifPresent(constraintList::add);
-        String textSearch = constraint.getTextLike();
-        ofNullable(textSearch).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
+        ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
         if (constraintList.size() > 0) {
             sqlB.append(" WHERE ").append(constraintList.get(0));
             for (int i = 1; i < constraintList.size(); i++)
                 sqlB.append(" AND ").append(constraintList.get(i));
         }
 
-        ofNullable(constraint.getMaxReturned()).map(max -> " LIMIT " + max).ifPresent(sqlB::append);
-        ofNullable(constraint.getSkip()).map(skip -> " OFFSET " + skip).ifPresent(sqlB::append);
-        sqlB.append(';');
-
-        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(sqlB.toString())) {
-            log.trace("Executing query: {}", sqlB);
-            if (textSearch != null) pst.setString(1, textSearch);
-            ResultSet rs = pst.executeQuery();
-            List<Message> lm = new ArrayList<>();
-            Stored.Processor.reconstructAllObjects(rs, Message::new, lm);
-            return lm;
-        } catch (SQLException e) {
-            log.error("Error getting data from table '{}'", TABLE_MESSAGES);
-            return new ArrayList<>();
+        if (! ignoreLimits) {
+            ofNullable(constraint.getLimit()).map(lim -> " LIMIT " + lim).ifPresent(sqlB::append);
+            ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).ifPresent(sqlB::append);
         }
+        sqlB.append(';');
+        return sqlB.toString();
     }
 }
