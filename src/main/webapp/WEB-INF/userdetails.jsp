@@ -11,7 +11,7 @@
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="details.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green-common.css">
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>

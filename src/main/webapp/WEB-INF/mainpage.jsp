@@ -15,7 +15,8 @@
     <fmt:setBundle basename="jsp"/>
     <title><fmt:message key="main.title"/></title>
     <link href="/images/clock_icon.png" rel="icon" type="image/png" />
-    <link rel="stylesheet" type="text/css" href="/extras/green_main.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green-main.css">
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
 <div class="bigform">
@@ -26,7 +27,11 @@
     <fmt:message key="main.selectedlocale"/> = "${language}"
 </p>
 
-<p>You have unread messages! [${unreadPM}]</p>
+<p class="messagedata">
+    <c:if test="${unreadPM > 0}">
+        You have unread messages! [${unreadPM}] <button class="smallbutton" id="showmsg">Read now...</button>
+    </c:if>
+</p>
 
 <p><fmt:message key="main.selecttz"/></p>
 <form action="/main/serv" method="get">
@@ -37,9 +42,6 @@
         </c:forEach>
     </select>
     </p>
-    <noscript>
-        <input type="submit" value="Show time...">
-    </noscript>
 </form>
 
 <p>
@@ -49,6 +51,14 @@
     <fmt:message key="main.through"/> toString(): <i>${timer}</i>
 </p>
     <a href="/main/logout" class="smallbutton"><fmt:message key="main.logout"/></a>
+
+    <div id="slideout">
+        <form>
+            <textarea class="form-control"></textarea>
+            <button class="smallbutton" id="retractmsg">&lt&lt Retract</button>
+        </form>
+    </div>
 </div>
+<script src="/extras/mainpage.js"></script>
 </body>
 </html>
