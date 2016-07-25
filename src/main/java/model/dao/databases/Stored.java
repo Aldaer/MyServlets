@@ -1,4 +1,4 @@
-package model.dao.common;
+package model.dao.databases;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -58,12 +58,27 @@ public interface Stored {
         Processor.injectIntoResultSet(rs, this);
     }
 
+    /**
+     * Reads from annotation and returns name of the column where a StoredField is stored.
+     * @param fieldName Stored field name
+     * @return Database column name
+     */
     default String getColumnForField(String fieldName) {
-        DbFieldData[] fData = Processor.getClassFieldData(this.getClass());
-        return Stream.of(fData).filter(fld -> fld.f.getName().equals(fieldName)).findAny().map(fld -> fld.columnName).orElse(null);
+        return Processor.getColumnForField(this.getClass(), fieldName);
     }
 
     class Processor {
+        /**
+         * Reads from annotation and returns name of the column where a StoredField is stored.
+         * @param objClass Class containing @StoredField annotation
+         * @param fieldName Stored field name
+         * @return Database column name
+         */
+        static<T extends Stored> String getColumnForField(Class<T> objClass, String fieldName) {
+            DbFieldData[] fData = getClassFieldData(objClass);
+            return Stream.of(fData).filter(fld -> fld.f.getName().equals(fieldName)).findAny().map(fld -> fld.columnName).orElse(null);
+        }
+
         /**
          * Reconstructs a single object from a result set. Does NOT affect result set cursor,
          * so you must call {@code next()} on new ResultSet before calling this method.
@@ -75,7 +90,7 @@ public interface Stored {
          * @return Reconstructed object
          * @throws SQLException
          */
-        public static <T extends Stored> T reconstructObject(ResultSet rs, Supplier<T> objSource) throws SQLException {
+        static <T extends Stored> T reconstructObject(ResultSet rs, Supplier<T> objSource) throws SQLException {
             T obj = objSource.get();
             DbFieldData[] fieldData = getClassFieldData(obj.getClass());
             int[] resultColumns = getRSColumns(rs, fieldData);
@@ -93,7 +108,7 @@ public interface Stored {
          * @param <T>         Object type
          * @throws SQLException
          */
-        public static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
+        static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
             if (rs.isClosed() || rs.isAfterLast()) return;
             boolean firstLoop = true;
             DbFieldData[] fieldData = null;

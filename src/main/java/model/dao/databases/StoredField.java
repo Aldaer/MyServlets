@@ -1,4 +1,4 @@
-package model.dao.common;
+package model.dao.databases;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Field;

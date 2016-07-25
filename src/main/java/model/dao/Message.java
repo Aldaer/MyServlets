@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import model.dao.common.Stored;
-import model.dao.common.StoredField;
+import model.dao.databases.Stored;
+import model.dao.databases.StoredField;
 
 import java.sql.Timestamp;
 

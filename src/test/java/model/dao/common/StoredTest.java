@@ -1,10 +1,13 @@
 package model.dao.common;
 
+import model.dao.databases.Stored;
+import model.dao.databases.StoredField;
 import org.junit.Test;
 
 import java.sql.Timestamp;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class StoredTest {
@@ -42,7 +45,7 @@ public class StoredTest {
 
         MoreStoredStuff msts = new MoreStoredStuff();
         assertThat(msts.getColumnForField("ts"), is("STUFF_TIME"));
-        assertThat(msts.getColumnForField("stuffName"), is("NAME"));
+        assertNull(msts.getColumnForField("stuffName"));
     }
 
 }

@@ -2,8 +2,8 @@ package model.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import model.dao.common.Stored;
-import model.dao.common.StoredField;
+import model.dao.databases.Stored;
+import model.dao.databases.StoredField;
 import org.jetbrains.annotations.Nullable;
 
 import static com.aldor.utils.CryptoUtils.stringRandomSaltedHash;

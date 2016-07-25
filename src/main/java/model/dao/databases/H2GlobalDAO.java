@@ -2,7 +2,6 @@ package model.dao.databases;
 
 import lombok.extern.slf4j.Slf4j;
 import model.dao.*;
-import model.dao.common.Stored;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -280,7 +279,7 @@ class H2MessageDAO implements MessageDAO {
         sqlB.append("SELECT * FROM ").append(TABLE_MESSAGES);
 
         List<String> constraintList = new ArrayList<>(10);
-//        ofNullable(constraint.getId()).
+//        ofNullable(constraint.getId()).map(id -> Message.Processor.)
 
         //TODO: implement
         return null;
