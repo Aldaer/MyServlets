@@ -51,13 +51,15 @@
     <fmt:message key="main.through"/> toString(): <i>${timer}</i>
 </p>
     <a href="/main/logout" class="smallbutton"><fmt:message key="main.logout"/></a>
-
-    <div id="slideout">
-        <form>
-            <textarea class="form-control"></textarea>
-            <button class="smallbutton" id="retractmsg">&lt&lt Retract</button>
-        </form>
-    </div>
+</div>
+<div class="bigform" id="slideout">
+<table width=100%>
+    <tr>
+        <td>buttons</td><td width=85% rowspan=5 class="messagebox">messages</td>
+    </tr><tr>
+    <td>more buttons</td>
+</tr>
+</table>
 </div>
 <script src="/extras/mainpage.js"></script>
 </body>

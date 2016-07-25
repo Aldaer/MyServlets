@@ -1,11 +1,8 @@
 @import url(/extras/green-common.css);
 
 #slideout {
-    position: relative;
-    z-index: 2;
-    max-width: 920px;
-
-    top: 0px;
+    position: absolute;
+    left: -1000px;
 
     -webkit-transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;
@@ -24,5 +21,12 @@
     width: 500px;
 }
 #slideout.on {
-    left: 0;
+    position: relative;
+    left: 0px;
+}
+
+.bigform .messagebox {
+    background: white;
+    border-style: groove;
+    border-width: 2px;
 }
