@@ -27,7 +27,7 @@
     <fmt:message key="main.selectedlocale"/> = "${language}"
 </p>
 
-<p id="messagedata">
+<p id="messagealert">
     <c:if test="${unreadPM > 0}">
         You have unread messages! [${unreadPM}] <button class="smallbutton" id="showmsg">Read now...</button>
     </c:if>
@@ -55,7 +55,7 @@
 <div class="bigform" id="slideout">
 <table width=100%>
     <tr>
-        <td>buttons</td><td width=85% rowspan=5 class="messagebox">messages</td>
+        <td>buttons</td><td width=85% rowspan=5 id="messagebox">messages</td>
     </tr><tr>
     <td>more buttons</td>
 </tr>

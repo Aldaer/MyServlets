@@ -1,7 +1,5 @@
 package model.dao;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -34,7 +32,7 @@ class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public void updateUserInfo(@NotNull User user) {
+    public void updateUserInfo(User user) {
         userData.put(user.id, user.username + "," + user.fullName + "," + user.email);
     }
 }
