@@ -61,6 +61,7 @@
 </tr>
 </table>
 </div>
+<div class="messagebubble"></div>
 <script src="/extras/mainpage.js"></script>
 </body>
 </html>

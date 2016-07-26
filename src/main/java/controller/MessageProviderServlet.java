@@ -1,5 +1,6 @@
 package controller;
 
+import controller.utils.JsonNullableGenerator;
 import lombok.extern.slf4j.Slf4j;
 import model.dao.Message;
 import model.dao.MessageDAO;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonGeneratorFactory;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,6 +36,8 @@ public class MessageProviderServlet extends HttpServlet {
     private static final String MSG_OFFSET = "offset"; // # of messages to skip
     private static final String MSG_LIMIT = "limit";   // # of messages to send
 
+    private static final JsonGeneratorFactory JF = Json.createGeneratorFactory(null);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String msgTypes = req.getParameter(MSG_TYPE);
@@ -57,8 +61,7 @@ public class MessageProviderServlet extends HttpServlet {
 
         res.setContentType(JSON_TYPE);
 
-        JsonGenerator gen = Json.createGenerator(res.getWriter());
-//        JsonGenerator gen = Json.createGenerator(System.out);
+        JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
 
         log.debug("Outputting {} messages out of {}", messagesByTimestamp.size(), totalCount);
         gen.writeStartObject();
