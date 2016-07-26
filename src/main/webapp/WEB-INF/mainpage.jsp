@@ -22,7 +22,6 @@
 <div class="bigform">
 <h1><fmt:message key="main.header"/></h1>
 
-
 <p><fmt:message key="main.currentlogin"/> <a href="/main/userdetails">${currentUser.fullName} [${currentUser.email}]</a><br>
     <fmt:message key="main.selectedlocale"/> = "${language}"
 </p>
@@ -61,7 +60,12 @@
 </tr>
 </table>
 </div>
-<div class="messagebubble"></div>
+
+<div class="messagebubble" id="bubbleprototype"></div>
+
+<script>
+var user = '${currentUser.username}';
+</script>
 <script src="/extras/mainpage.js"></script>
 </body>
 </html>

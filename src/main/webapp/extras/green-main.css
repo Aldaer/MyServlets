@@ -41,9 +41,10 @@
 
 .messagein {
     background: #8DC26F;
-    left:20 px;
+    left: 50px;
 }
 
 .messageout {
     background: #D3D3D3;
+    margin-right: 50px;
 }
