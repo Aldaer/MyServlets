@@ -6,7 +6,7 @@ $('#showmsg').click(function () {
 });
 
 function onLoadMessages(data) {
-    alert("Received " + data.messages.length + " of " + data.totalCount + " messages.");
+/*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     $('#messagebox').html('');
     $.each(data.messages, outputMessage)
 }
@@ -14,14 +14,14 @@ function onLoadMessages(data) {
 function outputMessage(i, msg) {
     var mdiv = $('#bubbleprototype').clone();
     mdiv.removeAttr("id");
-    mdiv.append(msg.from);
-    mdiv.append(' => ', msg.to, ':<br>');
-    mdiv.append(msg.text);
-    mdiv.css("display", "block");
     if (msg.from == user) {
+        mdiv.append('==> ', msg.to, ':<br>');
         mdiv.addClass("messageout");
     } else {
+        mdiv.append('<== ', msg.from, ':<br>');
         mdiv.addClass("messagein");
     }
+    mdiv.append(msg.text);
+    mdiv.css("display", "block");
     $('#messagebox').append(mdiv);
 }

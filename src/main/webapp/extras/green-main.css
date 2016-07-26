@@ -3,6 +3,7 @@
 #slideout {
     position: absolute;
     left: -1000px;
+    overflow: hidden;
 
     -webkit-transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;
@@ -10,41 +11,42 @@
     transition-duration: 0.3s;
 }
 
-#slideout form {
-    display: block;
-    padding: 20px;
-}
-#slideout textarea {
-    display:block;
-    height: 200px;
-    margin-bottom: 6px;
-    width: 500px;
-}
 #slideout.on {
     position: relative;
     left: 0px;
 }
 
-.bigform .messagebox {
+#messagebox {
     background: white;
     border-style: groove;
     border-width: 2px;
+    max-height: 500px;
+    overflow: auto;
 }
 
 .messagebubble {
     padding: 3px;
     border-style: solid;
     border-width: 1px;
+    border-radius: 5 px;
     margin: 5px;
     display: none;
 }
 
 .messagein {
     background: #8DC26F;
-    left: 50px;
+    margin-left: 50px;
+}
+
+.messagein:hover {
+    background: #ADE28F;
 }
 
 .messageout {
     background: #D3D3D3;
     margin-right: 50px;
+}
+
+.messageout:hover {
+    background: #F3F3F3;
 }

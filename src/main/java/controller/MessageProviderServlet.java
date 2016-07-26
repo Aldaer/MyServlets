@@ -6,7 +6,6 @@ import model.dao.Message;
 import model.dao.MessageDAO;
 import model.dao.MessageDAO.MessageFilter;
 import model.dao.User;
-import org.jetbrains.annotations.Nullable;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
@@ -22,6 +21,7 @@ import java.util.TreeSet;
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
 import static controller.PageURLs.MESSAGE_SERVLET;
+import static controller.utils.IntegerUtils.*;
 
 /**
  * Answers JSON requests, such as getting message lists
@@ -35,6 +35,7 @@ public class MessageProviderServlet extends HttpServlet {
     private static final String MSG_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add "conv" etc.
     private static final String MSG_OFFSET = "offset"; // # of messages to skip
     private static final String MSG_LIMIT = "limit";   // # of messages to send
+    private static final int MAX_MESSAGES_RETURNED = 100;
 
     private static final JsonGeneratorFactory JF = Json.createGeneratorFactory(null);
 
@@ -47,12 +48,12 @@ public class MessageProviderServlet extends HttpServlet {
         MessageDAO msgDao = (MessageDAO) req.getServletContext().getAttribute(C.MSG_DAO);
         final MessageFilter.Builder mBuilder = MessageFilter.newBuilder();
 
-        mBuilder.setOffset(parseOrNull(req.getParameter(MSG_OFFSET)));
-        mBuilder.setLimit(parseOrNull(req.getParameter(MSG_LIMIT)));
+        mBuilder.setOffset(withinRangeOrMin(parseOrNull(req.getParameter(MSG_OFFSET)), 0, Integer.MAX_VALUE));
+        mBuilder.setLimit(withinRangeOrMax(parseOrNull(req.getParameter(MSG_LIMIT)), 0, MAX_MESSAGES_RETURNED));
 
         if (msgTypes != null) {
             if (msgTypes.contains("from")) mBuilder.setFrom(cUserName);
-            if (msgTypes.contains("to")) mBuilder.setFrom(cUserName);
+            if (msgTypes.contains("to")) mBuilder.setTo(cUserName);
         }
 
         TreeSet<Message> messagesByTimestamp = new TreeSet<>(Message.byTime);
@@ -79,18 +80,6 @@ public class MessageProviderServlet extends HttpServlet {
                 .writeEnd()
         );
         gen.writeEnd().writeEnd().close();
-    }
-
-    private static @Nullable Integer parseOrNull(String s) {
-        if (s == null || s.equals("")) return null;
-        char[] chars = s.toCharArray();
-        int result = 0;
-        for (char c: chars) {
-            int v = (int) c - 48;
-            if (v >= 0 && v <= 9) result = result * 10 + v;
-            else return null;
-        }
-        return result;
     }
 }
 
