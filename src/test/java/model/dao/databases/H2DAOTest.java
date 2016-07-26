@@ -80,24 +80,24 @@ public class H2DAOTest {
     @Test
     public void testGetMessages() throws Exception {
         System.out.println("- from вася");
-        MessageFilter.Builder bld = MessageFilter.newBuilder().setFrom("вася");
-        List<Message> messages = msg.getMessages(bld);
+        MessageFilter.Builder bldr = MessageFilter.newBuilder().setFrom("вася");
+        List<Message> messages = msg.getMessages(bldr);
         assertThat(messages.size(), is(3));
         messages.stream().forEach(System.out::println);
         System.out.println("---offset 1");
-        bld.setOffset(1);
-        messages = msg.getMessages(bld);
+        bldr.setOffset(1);
+        messages = msg.getMessages(bldr);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2");
-        bld.setOffset(0);
-        bld.setLimit(2);
-        messages = msg.getMessages(bld);
+        bldr.setOffset(0);
+        bldr.setLimit(2);
+        messages = msg.getMessages(bldr);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2, offset 2");
-        bld.setOffset(2);
-        messages = msg.getMessages(bld);
+        bldr.setOffset(2);
+        messages = msg.getMessages(bldr);
         messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(1));
     }
@@ -106,7 +106,9 @@ public class H2DAOTest {
     public void testCountMessages() throws Exception {
         MessageFilter.Builder bld = MessageFilter.newBuilder().setFrom("вася");
         assertThat(msg.countMessages(bld), is(3));
-        bld.setFrom(null);
+        bld.setTo("вася");
+        assertThat(msg.countMessages(bld), is(4));
+        bld = MessageFilter.newBuilder();
         bld.setMinTime(Timestamp.valueOf("2015-01-01 12:05:00"));
         bld.setMaxTime(Timestamp.valueOf("2015-01-02 12:00:00"));
         assertThat(msg.countMessages(bld), is(3));

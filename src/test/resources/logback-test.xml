@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>myApp.log</file>
+        <file>${CATALINA_HOME}/logs/MyServlet.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
         </encoder>
@@ -19,18 +19,22 @@
 
     <logger name="controller" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="model.dao.databases" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="model.dao.databases.dbconnecton" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="model" level="trace" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <!-- Strictly speaking, the level attribute is not necessary since -->

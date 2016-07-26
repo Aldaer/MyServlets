@@ -14,9 +14,12 @@ public interface MessageDAO {
     /**
      * Returns all messages corresponding to the provided criteria
      * @param constraint Message filtering criteria
-     * @return List of messages from database
+     * @return List of messages from database, ordered as per SQL result set
      */
     List<Message> getMessages(MessageFilter constraint);
+
+// TODO: implement optimized get-and-count in one query:
+//    int getAndCountMessages(MessageFilter constraint, List<Message> destination);
 
     /**
      * Counts all messages corresponding to the provided criteria.
@@ -129,6 +132,4 @@ public interface MessageDAO {
             }
         }
     }
-
-
 }

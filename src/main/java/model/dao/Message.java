@@ -8,6 +8,7 @@ import model.dao.databases.Stored;
 import model.dao.databases.StoredField;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 
 /**
  * Message from one user to another or into community
@@ -61,4 +62,6 @@ public class Message implements Stored {
     public String toString() {
         return "#" + getId() + ". " + getFrom() + " => " + getTo() + ": '" + getText() + "'";
     }
+
+    public static Comparator<Message> byTime = (m1, m2) -> m1.getUtcTimestamp().compareTo(m2.getUtcTimestamp());
 }

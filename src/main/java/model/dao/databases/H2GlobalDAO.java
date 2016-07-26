@@ -316,12 +316,20 @@ class H2MessageDAO implements MessageDAO {
         List<String> constraintList = new ArrayList<>(10);
         ofNullable(constraint.getId()).map(id -> getColumnForField(Message.class, "id") + "=" + id).ifPresent(constraintList::add);
         ofNullable(constraint.getRefId()).map(refid -> getColumnForField(Message.class, "refId") + "=" + refid).ifPresent(constraintList::add);
-        ofNullable(constraint.getFrom()).map(from -> getColumnForField(Message.class, "from") + "='" + from + "'").ifPresent(constraintList::add);
-        ofNullable(constraint.getTo()).map(to -> getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
         ofNullable(constraint.getConvId()).map(convid -> getColumnForField(Message.class, "conversationId") + "=" + convid).ifPresent(constraintList::add);
         ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
+
+        // FROM user1 TO user1 means FROM OR TO, not FROM AND TO
+        if (constraint.getFrom() != null && constraint.getTo() != null && constraint.getFrom().equals(constraint.getTo())) {
+            constraintList.add("(" + getColumnForField(Message.class, "from") + "='" + constraint.getFrom() + "' OR " +
+                    getColumnForField(Message.class, "to") + "='" + constraint.getTo() + "')");
+        } else {
+            ofNullable(constraint.getFrom()).map(from -> getColumnForField(Message.class, "from") + "='" + from + "'").ifPresent(constraintList::add);
+            ofNullable(constraint.getTo()).map(to -> getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(constraintList::add);
+        }
+
         if (constraintList.size() > 0) {
             sqlB.append(" WHERE ").append(constraintList.get(0));
             for (int i = 1; i < constraintList.size(); i++)

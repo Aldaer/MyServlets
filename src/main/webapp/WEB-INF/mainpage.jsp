@@ -27,7 +27,7 @@
     <fmt:message key="main.selectedlocale"/> = "${language}"
 </p>
 
-<p class="messagedata">
+<p id="messagedata">
     <c:if test="${unreadPM > 0}">
         You have unread messages! [${unreadPM}] <button class="smallbutton" id="showmsg">Read now...</button>
     </c:if>
