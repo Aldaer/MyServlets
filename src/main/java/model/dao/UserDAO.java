@@ -20,7 +20,7 @@ public interface UserDAO {
      * @param username User name
      * @return User object loaded from the database
      */
-    @Nullable User getUser(String username);
+    @Nullable User getUser(@Nullable String username);
 
     /**
      * Updates info for user with name == {@code user.username } in the database.

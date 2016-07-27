@@ -1,6 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
-.bigform {
+.bigpanel {
     position: relative;
     z-index: 1;
     background: #FCFCFC;
@@ -9,22 +9,35 @@
     padding: 20px;
     text-align: left;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    overflow: hidden;
 }
 
-.bigform input {
+.bigpanel input {
     font-family: "Roboto", sans-serif;
     outline: 0;
     background: #f2f2f2;
-    width: 100%;
+    width: 75%;
     border: 0;
     margin: 0 0 10px;
     padding: 10px;
     box-sizing: border-box;
     font-size: 12px;
+    display: inline-block;
+}
+
+label {
+    display: inline-block;
+    text-align: right;
+    width: 20%;
+
+}
+
+.strikeout {
+    text-decoration: line-through;
+    color: red;
 }
 
 button {
-    font-family: "Roboto", sans-serif;
     outline: 0;
     background: #4CAF50;
     border: 0;
@@ -40,7 +53,8 @@ button {
     color: #FF8000;
 }
 
-.bigform .smallbutton, a.smallbutton {
+.bigpanel .smallbutton, a.smallbutton {
+    font-family: "Roboto", sans-serif;
     -webkit-appearance: button;
     -moz-appearance: button;
 
@@ -48,6 +62,8 @@ button {
     text-decoration: none;
     display: inline-block;
     box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
     padding: 5px;
     font-size: 12px;
     line-height: normal;
@@ -59,8 +75,23 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     padding: 0;
 }
 
-.bigform button:hover,a.smallbutton:hover {
+.bigpanel button:hover, a.smallbutton:hover {
     background: #43A047;
+}
+
+#slideout {
+    position: absolute;
+    left: -1000px;
+
+    -webkit-transition-duration: 0.3s;
+    -moz-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+}
+
+#slideout.on {
+    position: relative;
+    left: 0;
 }
 
 body {

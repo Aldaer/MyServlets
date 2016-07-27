@@ -15,12 +15,22 @@ function outputMessage(i, msg) {
     var mdiv = $('#bubbleprototype').clone();
     mdiv.removeAttr("id");
     if (msg.from == user) {
-        mdiv.append('==> ', msg.to, ':<br>');
+        var userlink = $("<a />", {
+            href:"/main/userdetails?user=" + encodeURIComponent(msg.to),
+            text: msg.to
+        });
         mdiv.addClass("messageout");
     } else {
-        mdiv.append('<== ', msg.from, ':<br>');
+        var userlink = $("<a />", {
+            href:"/main/userdetails?user=" + encodeURIComponent(msg.from),
+            text: msg.from
+        });
         mdiv.addClass("messagein");
+        if (msg.conversationId == 0) {
+            mdiv.addClass("unread");
+        }
     }
+    mdiv.append(userlink, ':<br>');
     mdiv.append(msg.text);
     mdiv.css("display", "block");
     $('#messagebox').append(mdiv);

@@ -19,7 +19,7 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
 </head>
 <body>
-<div class="bigform">
+<div class="bigpanel">
     <h1><fmt:message key="main.header"/></h1>
 
     <p><fmt:message key="main.currentlogin"/> <a href="/main/userdetails">${currentUser.fullName}
@@ -54,8 +54,7 @@
     <a href="/main/logout" class="smallbutton"><fmt:message key="main.logout"/></a>
 </div>
 
-
-<div class="bigform" id="slideout">
+<div class="bigpanel" id="slideout">
     <div style="width: 20%; float: left">
         buttons<br>
         more buttons

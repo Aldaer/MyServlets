@@ -9,33 +9,47 @@
 <head>
     <fmt:setLocale value="${language}"/>
     <fmt:setBundle basename="jsp"/>
-    <title><fmt:message key="details.title"/></title>
-    <link href="/images/clock_icon.png" rel="icon" type="image/png" />
+    <link href="/images/clock_icon.png" rel="icon" type="image/png"/>
     <link rel="stylesheet" type="text/css" href="/extras/green-common.css">
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+    <c:set var="displayedName" value="${empty param.user? currentUser.username : param.user}"/>
+    <c:set var="displayedProfile" value="${applicationScope['userDAO'].getUser(displayedName)}"/>
+    <c:set var="ownProfile" value="${displayedName eq currentUser.username}"/>
+
+    <title><fmt:message key="${ownProfile ? 'yourdetails.header' : 'details.header'}"/></title>
 </head>
 <body>
-<div class="bigform">
-<h1><fmt:message key="details.header"/></h1>
-<c:if test="${not currentUser.regComplete}"><p class="warning"><fmt:message key="details.unconfirmed"/></p></c:if>
-
-<form class="details-form" method="post" action="/main/updateUser" accept-charset="UTF-8">
-<p class="login">${currentUser.username}</p>
-<table width="100%"><tr><td>
-    <fmt:message key="details.fullname"/>:
-</td>
-<td width="80%">
-    <input type="text" class="details" name="fullname" value="${currentUser.fullName}"/>
-</td></tr><tr><td>
-    <fmt:message key="details.email"/>:
-</td><td>
-    <input type="text" class="details" name="email" value="${currentUser.email}"/>
-</td></tr></table>
-<button class="smallbutton" type="submit"><fmt:message key="details.update"/></button>
-<a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
-</form>
+<div class="bigpanel">
+    <h1 ><fmt:message key="details.header"/></h1>
+    <div style="width: 60%; float:left">
+        <c:if test="${ownProfile and not currentUser.regComplete}"><p class="warning"><fmt:message
+                key="details.unconfirmed"/></p></c:if>
+        <form class="details-form" method="post" action="/main/updateUser" accept-charset="UTF-8">
+            <p id="login">${displayedName}</p>
+            <div class="block">
+                <label><fmt:message key="details.fullname"/></label>
+                <input type="text" class="details" name="fullname" value="${displayedProfile.fullName}"/>
+            </div>
+            <div class="block">
+                <label><fmt:message key="details.email"/></label>
+                <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
+            </div>
+            <c:if test="${ownProfile}">
+                <button class="smallbutton" type="submit"><fmt:message key="details.update"/></button>
+            </c:if>
+            <a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
+        </form>
+    </div>
+    <div style="width: 40%; float:right">
+        <p>Search</p>
+        <input type="text" name="spattern"/><br>
+        <button class="smallbutton" id="find">Find user...</button>
+    </div>
 </div>
-
+<script>
+    var own = ${ownProfile};
+    var exists = ${not empty displayedProfile};
+</script>
 <script src="/extras/details.js"></script>
 </body>
 </html>

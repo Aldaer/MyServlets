@@ -1,21 +1,5 @@
 @import url(/extras/green-common.css);
 
-#slideout {
-    position: absolute;
-    left: -1000px;
-    overflow: hidden;
-
-    -webkit-transition-duration: 0.3s;
-    -moz-transition-duration: 0.3s;
-    -o-transition-duration: 0.3s;
-    transition-duration: 0.3s;
-}
-
-#slideout.on {
-    position: relative;
-    left: 0px;
-}
-
 #messagebox {
     background: white;
     border-style: groove;
@@ -28,7 +12,7 @@
     padding: 3px;
     border-style: solid;
     border-width: 1px;
-    border-radius: 5 px;
+    border-radius: 5px;
     margin: 5px;
     display: none;
 }
@@ -49,4 +33,8 @@
 
 .messageout:hover {
     background: #F3F3F3;
+}
+
+.unread {
+    font-weight: bold;
 }

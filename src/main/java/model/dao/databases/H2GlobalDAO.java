@@ -108,7 +108,7 @@ class H2UserDAO implements UserDAO {
 
     @Override
     public @Nullable User getUser(String username) {
-        return getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
+        return (username == null)? null : getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
     }
 
     private User getUserByAnyKey(String sql, Object key) {

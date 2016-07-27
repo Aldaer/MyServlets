@@ -31,7 +31,7 @@ public class H2DAOTest {
         H2GlobalDAO glob = new H2GlobalDAO();
         glob.useConnectionSource(() -> {
             try {
-                return DriverManager.getConnection("jdbc:h2:file:E:/Programming/Java/MyServlets/src/test/userdatabase;SCHEMA=TESTDATA", "sa", "123");
+                return DriverManager.getConnection("jdbc:h2:file:E:/Programming/Java/MyServlets/info/userdatabase;SCHEMA=TESTDATA", "sa", "123");
             } catch (SQLException e) {
                 e.printStackTrace();
                 return null;

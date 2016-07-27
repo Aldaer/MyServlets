@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Wrapper for JsonGenerator by glassfish. Instead of generating exception
+ * on null objects when writing JSON, just skips them.
+ */
 public class JsonNullableGenerator implements JsonGenerator {
     private final JsonGenerator jg;
 

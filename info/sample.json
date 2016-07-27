@@ -1,0 +1,40 @@
+{
+  "totalCount": 4,
+  "messages": [
+    {
+      "id": 1,
+      "refId": 0,
+      "from": "вася",
+      "to": "петя",
+      "utcTimestamp": 1469376034178,
+      "conversationId": 0,
+      "text": "Привет, Петя!"
+    },
+    {
+      "id": 2,
+      "refId": 0,
+      "from": "петя",
+      "to": "вася",
+      "utcTimestamp": 1469376034208,
+      "conversationId": 0,
+      "text": "И тебе привет!"
+    },
+    {
+      "id": 3,
+      "refId": 0,
+      "from": "вася",
+      "to": "non existing user",
+      "utcTimestamp": 1469376034234,
+      "conversationId": 0,
+      "text": "Письмо никому"
+    },
+    {
+      "id": 4,
+      "refId": 0,
+      "from": "вася",
+      "utcTimestamp": 1469376034254,
+      "conversationId": 1,
+      "text": "Письмо в сообщество"
+    }
+  ]
+}

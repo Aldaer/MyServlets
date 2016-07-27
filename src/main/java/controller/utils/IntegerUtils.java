@@ -5,20 +5,28 @@ import org.jetbrains.annotations.Nullable;
 public class IntegerUtils {
 
     /**
-     * Parses decimal string, returns null on any error
-     * @param s
-     * @return
+     * Parses decimal string, returns null on any error.
+     * Valid strings are '\-?\d+'
+     * @param s String to parse
+     * @return Parsed int, null on error
      */
     public static @Nullable Integer parseOrNull(@Nullable String s) {
         if (s == null || s.equals("")) return null;
         char[] chars = s.toCharArray();
         int result = 0;
-        for (char c: chars) {
+        int sti = 0;
+        boolean minus = false;
+        if (chars[0] == '-') {
+            minus = true;
+            sti = 1;
+        }
+        for (; sti < chars.length; sti++) {
+            char c = chars[sti];
             int v = (int) c - 48;
             if (v >= 0 && v <= 9) result = result * 10 + v;
             else return null;
         }
-        return result;
+        return minus? -result : result;
     }
 
     /**

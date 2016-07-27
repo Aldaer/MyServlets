@@ -62,7 +62,7 @@ public class MessageProviderServlet extends HttpServlet {
 
         res.setContentType(JSON_TYPE);
 
-        JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
+        final JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
 
         log.debug("Outputting {} messages out of {}", messagesByTimestamp.size(), totalCount);
         gen.writeStartObject();
