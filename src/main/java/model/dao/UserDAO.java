@@ -3,6 +3,8 @@ package model.dao;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * Common interface to support user DAO functionality
  */
@@ -27,4 +29,12 @@ public interface UserDAO {
      * @param user User object with updated fields. Users with unknown {@code username} are ignored.
      */
     void updateUserInfo(@NotNull User user);
+
+    /**
+     * Outputs a collection of user data finding users by 'LIKE %partialName%" clause
+     * @param partialName Part of the user's full name
+     * @param limit Maximum number of users o output
+     * @return Map of "username"-"full name" pairs
+     */
+    Map<String, String> listUsers(@Nullable String partialName, int limit);
 }

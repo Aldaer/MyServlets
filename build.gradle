@@ -16,6 +16,7 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:+'
     compileOnly 'org.jetbrains:annotations:+'
+    testCompile 'org.jetbrains:annotations:+'
 
     compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
     compile 'javax.servlet:javax.servlet-api:+'
@@ -26,7 +27,9 @@ dependencies {
     compile 'ch.qos.logback:logback-core:+'
 
     testCompile 'junit:junit:+'
+
     compile 'com.h2database:h2:+'       //    testCompile 'com.h2database:h2:+'
+    compile 'com.ibm.icu:icu4j:+'       // Collation component for h2
 }
 
 task testWar(type: War) {

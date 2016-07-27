@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -53,7 +54,7 @@ public class H2DAOTest {
 
     @Test
     public void checkIfUserExistsTest() throws Exception {
-        assertThat(creds.checkIfLoginOccupied("AdmiN"), is(true));
+        assertThat(creds.checkIfLoginOccupied("вася"), is(true));
         assertThat(creds.checkIfLoginOccupied("AdmiNN"), is(false));
         assertThat(creds.checkIfLoginOccupied("_perm_user"), is(true));
         assertThat(creds.checkIfLoginOccupied("петя"), is(true));
@@ -132,5 +133,15 @@ public class H2DAOTest {
         List<Message> messages = msg.getMessages(bld);
         assertThat(messages.size(), is(1));
         messages.stream().forEach(System.out::println);
+    }
+
+    @Test
+    public void testListUsersLike() throws Exception {
+        Map<String, String> list1 = usr.listUsers("ася", 20);
+        assertThat(list1.size(), is(1));
+        list1.forEach((s, s2) -> System.out.println(s + " -- " + s2));
+        list1 = usr.listUsers("вас", 20);
+        assertThat(list1.size(), is(2));
+        list1.forEach((s, s2) -> System.out.println(s + " -- " + s2));
     }
 }

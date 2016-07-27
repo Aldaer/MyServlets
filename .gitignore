@@ -37,5 +37,4 @@ gen
 /src/test/userdatabase.*
 /classes/
 /resourse_chest
-/info/userdatabase.trace.db
-/info/userdatabase.h2.db
+*.db

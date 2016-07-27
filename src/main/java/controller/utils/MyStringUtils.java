@@ -2,7 +2,7 @@ package controller.utils;
 
 import org.jetbrains.annotations.Nullable;
 
-public class IntegerUtils {
+public class MyStringUtils {
 
     /**
      * Parses decimal string, returns null on any error.
@@ -49,5 +49,25 @@ public class IntegerUtils {
         if (x == null) return max;
         int v = x;
         return (v < min)? min : (v > max)? max : v;
+    }
+
+    private static final char[] ESCAPED_SQL = {'\'', '"', '\\', '%', '_'};
+    private static final char ESCAPE_CHAR = '\\';
+
+    public static String escapeSql(String sql) {
+        if (sql == null) return null;
+        final int sqlen = sql.length();
+        char[] cbufIn = sql.toCharArray();
+        char[] cbufOut = new char[sqlen * 2];
+        int px = 0;
+        for (int i = 0; i < sqlen; i++) {
+            for (char sc : ESCAPED_SQL)
+                if (cbufIn[i] == sc) {
+                    cbufOut[px++] = ESCAPE_CHAR;
+                    break;
+                }
+            cbufOut[px++] = cbufIn[i];
+        }
+        return new String(cbufOut, 0, px);
     }
 }

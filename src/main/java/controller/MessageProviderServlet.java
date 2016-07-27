@@ -21,7 +21,7 @@ import java.util.TreeSet;
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
 import static controller.PageURLs.MESSAGE_SERVLET;
-import static controller.utils.IntegerUtils.*;
+import static controller.utils.MyStringUtils.*;
 
 /**
  * Answers JSON requests, such as getting message lists

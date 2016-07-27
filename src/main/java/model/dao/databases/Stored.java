@@ -4,7 +4,10 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -105,7 +108,7 @@ public interface Stored {
          * @param <T>         Object type
          * @throws SQLException
          */
-        static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination) throws SQLException {
+        static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination, boolean ignoreMissing) throws SQLException {
             if (rs.isClosed() || !rs.next()) return;
 
             T obj = objSource.get();
@@ -113,7 +116,7 @@ public interface Stored {
             int[] resultColumns = getRSColumns(rs, fieldData);
 
             do {
-                fillFields(rs, obj, fieldData, resultColumns, false);
+                fillFields(rs, obj, fieldData, resultColumns, true);
                 destination.add(obj);
                 if (rs.next())
                     obj = objSource.get();
@@ -128,11 +131,11 @@ public interface Stored {
             fillFields(rs, obj, fieldData, resultColumns, true);
         }
 
-        private static <T extends Stored> void fillFields(ResultSet rs, T obj, DbFieldData[] fieldData, int[] columns, boolean ignoreAbsent) throws SQLException {
+        private static <T extends Stored> void fillFields(ResultSet rs, T obj, DbFieldData[] fieldData, int[] columns, boolean ignoreMissing) throws SQLException {
             try {
                 for (int i = 0; i < fieldData.length; i++) {
                     if (columns[i] < 0)
-                        if (ignoreAbsent)
+                        if (ignoreMissing)
                             continue;
                         else
                             throw new RuntimeException("Column [" + fieldData[i].columnName + "] not present in result set");
@@ -326,9 +329,6 @@ public interface Stored {
                 throw new RuntimeException("Error putting field value from object " + obj + " [" + obj.getClass() + "] into result set");
             }
         }
-
-        // TODO: add java.util.date conversion to/from UTC
-        private static final Calendar UTC_CALENDAR = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH);
     }
 
 }

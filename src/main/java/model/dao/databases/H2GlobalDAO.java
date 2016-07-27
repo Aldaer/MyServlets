@@ -10,8 +10,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.sql.ResultSet.*;
 import static java.util.Optional.ofNullable;
@@ -38,6 +41,9 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM " + TABLE_CREDENTIALS + " WHERE (username=?);";
     static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?);";
     static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (id=?);";
+
+    static final String GET_USER_BY_PARTIAL_NAME = "SELECT username, fullname FROM " + TABLE_USERS + " WHERE (username LIKE ? OR fullname LIKE ?) LIMIT ";
+    static final int MIN_PARTIAL_LEN = 2;
 
     static final String CHECK_IF_USER_EXISTS = "SELECT TOP 1 1 FROM " + TABLE_CREDENTIALS
             + " AS C WHERE (C.username=?) UNION SELECT TOP 1 1 FROM "
@@ -142,6 +148,28 @@ class H2UserDAO implements UserDAO {
             rs.close();
         } catch (SQLException e) {
             log.error("Error updating data for user [{}]: {}", user.getUsername(), e);
+        }
+    }
+
+    @Override
+    public Map<String, String> listUsers(@Nullable String partialName, int limit) {
+        Map<String, String> emptyMap = new HashMap<>(0);
+        if (partialName == null || partialName.length() < MIN_PARTIAL_LEN) return emptyMap;
+        String sql = GET_USER_BY_PARTIAL_NAME + limit + ";";
+
+        try (Connection conn = cSource.get();
+            PreparedStatement pst = conn.prepareStatement(sql)) {
+            partialName = "%" + partialName + "%";
+            pst.setString(1, partialName);
+            pst.setString(2, partialName);
+            log.trace("Executing query: {} <== ({})", GET_USER_BY_PARTIAL_NAME, partialName);
+            ResultSet rs = pst.executeQuery();
+            List<User> tmpList = new ArrayList<>();
+            Stored.Processor.reconstructAllObjects(rs, () -> new User("", "", "", true), tmpList, true);
+            return tmpList.stream().collect(Collectors.toMap(User::getUsername, User::getFullName));
+        } catch (SQLException e) {
+            log.error("Error getting list of users: {}", e);
+            return emptyMap;
         }
     }
 }
@@ -284,7 +312,7 @@ class H2MessageDAO implements MessageDAO {
             log.trace("Executing query: {}", query);
             ResultSet rs = pst.executeQuery();
             List<Message> lm = new ArrayList<>();
-            Stored.Processor.reconstructAllObjects(rs, Message::new, lm);
+            Stored.Processor.reconstructAllObjects(rs, Message::new, lm, false);
             return lm;
         } catch (SQLException e) {
             log.error("Error getting data from table '{}': {}", TABLE_MESSAGES, e);

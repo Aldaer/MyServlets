@@ -31,7 +31,7 @@
             <p class="message"><fmt:message key="login.registered"/> <a href="#"><fmt:message key="login.signIn"/></a></p>
             <input type="hidden" name="language" value="${locale}">
         </form>
-        <form class="login-form" name="login" method="post" action="${authByContainer? "j_security_check" : "/doLogin"}" accept-charset="UTF-8">
+        <form class="login-form" name="login" method="post" action="${authByContainer? 'j_security_check' : '/doLogin'}" accept-charset="UTF-8">
             <input type="text" placeholder="<fmt:message key="login.username"/>" name="j_username" />
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password" />
             <button type="submit"><fmt:message key="login.enter"/></button>

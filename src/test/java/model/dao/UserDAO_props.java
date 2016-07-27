@@ -1,8 +1,11 @@
 package model.dao;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * User data access object
@@ -32,7 +35,14 @@ class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public void updateUserInfo(User user) {
+    public void updateUserInfo(@NotNull User user) {
         userData.put(user.id, user.username + "," + user.fullName + "," + user.email);
+    }
+
+    @Override
+    public Map<String, String> listUsers(String partialName, int limit) {
+        return userData.entrySet().stream().filter(idname -> idname.getValue().contains(partialName))
+                .map(idname -> getUser(idname.getKey()))
+                .collect(Collectors.toMap(user -> user.username, user -> user.fullName));
     }
 }

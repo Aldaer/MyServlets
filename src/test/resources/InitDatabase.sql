@@ -2,9 +2,8 @@ CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 CREATE SCHEMA IF NOT EXISTS testdata AUTHORIZATION SA;
 
 SET SCHEMA userdata;
-/*
 SET SCHEMA testdata;
- */
+set COLLATION russian;
 
 CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
 import java.sql.Timestamp;
@@ -33,7 +32,7 @@ INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 410235840
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  fullname VARCHAR(255),
+  fullname VARCHAR_IGNORECASE,
   email VARCHAR(100),
   username VARCHAR_IGNORECASE(50),
   regcomplete BOOLEAN DEFAULT FALSE,

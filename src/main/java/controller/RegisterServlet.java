@@ -28,7 +28,7 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @WebServlet(REGISTER_SERVLET)
 public class RegisterServlet extends HttpServlet {
-    private static Pattern validLogin = Pattern.compile("[a-zA-Zа-яА-Я][\\-\\.\\wа-яА-Я]{3,49}");
+    private static final Pattern validLogin = Pattern.compile("\\pL[\\-\\.\\w]{3,49}", Pattern.UNICODE_CHARACTER_CLASS);
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("Processing request...");
@@ -68,7 +68,7 @@ public class RegisterServlet extends HttpServlet {
         request.getRequestDispatcher(LOGIN_SERVLET).forward(request, response);
     }
 
-    private boolean userLoginValid(String login) {
+    static boolean userLoginValid(String login) {
         return validLogin.matcher(login).matches();
     }
 

@@ -21,7 +21,7 @@ public class User implements Stored {
     String username = "";
 
     @Setter
-    @StoredField(column = "fullname", maxLength = 255)
+    @StoredField("fullname")
     String fullName = "";
 
     @Setter

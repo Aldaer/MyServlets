@@ -16,7 +16,7 @@
     </servlet-mapping>
 
     <!-- Container-managed security. Comment out to disable. -->
-<!--
+
     <security-role>
         <role-name>authenticated-user</role-name>
     </security-role>
@@ -46,5 +46,5 @@
             <form-error-page>/WEB-INF/login-error.jsp</form-error-page>
         </form-login-config>
     </login-config>
--->
+
 </web-app>
