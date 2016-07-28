@@ -5,10 +5,7 @@ import model.dao.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +94,45 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
             cSource = src;
         }
     }
+
+    public void executeScript(String[] script) {
+        try (Connection connection = cSource.get();
+            Statement statement = connection.createStatement()) {
+
+            StringBuilder currentCmd = new StringBuilder();
+            boolean literalMode = false;
+            for (String line: script) {
+                line = line.trim();
+                if (line.startsWith("//")) continue;
+                int pos = 0;
+                int semiC;
+                while ((semiC = line.indexOf(";", pos)) >= 0) {
+                    String fragment = line.substring(pos, semiC + 1);
+                    currentCmd.append(fragment);
+                    pos = semiC + 1;
+                    literalMode = literalMode ^ fragment.contains("$$");
+                    if (! literalMode) try {
+                        String cmd = currentCmd.toString();
+                        statement.addBatch(cmd);
+                        log.trace("Added command to batch: {}", cmd);
+                    } catch (SQLException e) {
+                        log.error("Error adding SQL command {} to batch: {}", currentCmd.toString(), e);
+                    } finally {
+                        currentCmd.setLength(0);
+                    }
+                }
+                if (pos < line.length()) {
+                    String tail = line.substring(pos);
+                    literalMode = literalMode ^ tail.contains("$$");
+                    currentCmd.append(tail).append(" ");
+                }
+            }
+            int[] results = statement.executeBatch();
+            log.trace("Executed batch of {} commands", results.length);
+        } catch (SQLException e) {
+            log.error("Error executing SQL script: {}", e);
+        }
+    }
 }
 
 @Slf4j
@@ -162,7 +198,7 @@ class H2UserDAO implements UserDAO {
             partialName = "%" + partialName + "%";
             pst.setString(1, partialName);
             pst.setString(2, partialName);
-            log.trace("Executing query: {} <== ({})", GET_USER_BY_PARTIAL_NAME, partialName);
+            log.trace("Executing query: {}{} <== ({})", GET_USER_BY_PARTIAL_NAME, limit, partialName);
             ResultSet rs = pst.executeQuery();
             List<User> tmpList = new ArrayList<>();
             Stored.Processor.reconstructAllObjects(rs, () -> new User("", "", "", true), tmpList, true);

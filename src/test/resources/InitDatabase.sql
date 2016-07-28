@@ -1,15 +1,12 @@
-CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
-//CREATE SCHEMA IF NOT EXISTS testdata AUTHORIZATION SA;
+//CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 
-SET SCHEMA userdata;
-//SET SCHEMA testdata;
+//SET SCHEMA userdata;
 //set COLLATION russian;
 
 CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-
 @CODE
 Timestamp ts() {
 return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));
@@ -27,7 +24,7 @@ CREATE TABLE temp_credentials (
   created BIGINT
 );
 
-INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 4102358400);
+INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 4102444799000);
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (

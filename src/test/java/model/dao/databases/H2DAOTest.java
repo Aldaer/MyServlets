@@ -5,14 +5,20 @@ import model.dao.Message;
 import model.dao.MessageDAO;
 import model.dao.MessageDAO.MessageFilter;
 import model.dao.UserDAO;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -21,6 +27,7 @@ public class H2DAOTest {
     private static CredentialsDAO creds;
     private static UserDAO usr;
     private static MessageDAO msg;
+    private static Connection keepalive;
 
     @BeforeClass
     public static void createDAO() {
@@ -30,14 +37,27 @@ public class H2DAOTest {
             throw new RuntimeException(e);
         }
         H2GlobalDAO glob = new H2GlobalDAO();
-        glob.useConnectionSource(() -> {
+
+        Supplier<Connection> cs = () -> {
             try {
-                return DriverManager.getConnection("jdbc:h2:file:E:/Programming/Java/MyServlets/info/userdatabase;SCHEMA=TESTDATA", "sa", "123");
+                return DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", null, null);
             } catch (SQLException e) {
                 e.printStackTrace();
                 return null;
             }
-        });
+        };
+
+        keepalive = cs.get();
+        glob.useConnectionSource(cs);
+
+        String[] script = {};
+        try {
+            script = Files.readAllLines(Paths.get("src/test/resources/InitDatabase.sql")).toArray(script);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        glob.executeScript(script);
+
         creds = glob.getCredentialsDAO();
         creds.useSaltedHash(true);
         creds.purgeTemporaryUsers(System.currentTimeMillis());
@@ -45,6 +65,10 @@ public class H2DAOTest {
         msg = glob.getMessageDAO();
     }
 
+    @AfterClass
+    public static void tearDown() throws Exception {
+        keepalive.close();
+    }
 
     @Test
     public void getCredentialsVerifyTest() throws Exception {
