@@ -8,10 +8,10 @@ $('#showmsg').click(function () {
 function onLoadMessages(data) {
 /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     $('#messagebox').html('');
-    $.each(data.messages, outputMessage)
+    $.each(data.messages, outputMessage);
 }
 
-function outputMessage(i, msg) {
+function outputUser(i, msg) {
     var mdiv = $('#bubbleprototype').clone();
     mdiv.removeAttr("id");
     if (msg.from == user) {

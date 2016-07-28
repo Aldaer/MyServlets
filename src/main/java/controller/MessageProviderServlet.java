@@ -20,6 +20,7 @@ import java.util.TreeSet;
 
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
+import static controller.MiscConstants.JSON_TYPE;
 import static controller.PageURLs.MESSAGE_SERVLET;
 import static controller.utils.MyStringUtils.*;
 
@@ -29,9 +30,6 @@ import static controller.utils.MyStringUtils.*;
 @Slf4j
 @WebServlet(MESSAGE_SERVLET)
 public class MessageProviderServlet extends HttpServlet {
-    private static final String JSON_TYPE = "application/json";
-    private static final String JSON_TIME_FORMAT = "yyyy-MM-dd’T'HH:mm:ss.SSSZ";
-
     private static final String MSG_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add "conv" etc.
     private static final String MSG_OFFSET = "offset"; // # of messages to skip
     private static final String MSG_LIMIT = "limit";   // # of messages to send

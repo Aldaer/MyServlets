@@ -42,10 +42,23 @@
     </div>
     <div style="width: 40%; float:right">
         <p>Search</p>
-        <input type="text" name="spattern"/><br>
+        <input type="text" id="query"/><br>
         <button class="smallbutton" id="find">Find user...</button>
     </div>
 </div>
+
+<div class="bigpanel" id="slideout">
+    <div style="width: 20%; float: left">
+        buttons<br>
+        more buttons
+    </div>
+    <div style="width: 80%; float:right">
+        <div id = "userfindbox"></div>
+    </div>
+</div>
+
+<div class="userbubble" id="bubbleprototype"></div>
+
 <script>
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};

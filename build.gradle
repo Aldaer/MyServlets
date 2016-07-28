@@ -29,7 +29,7 @@ dependencies {
     testCompile 'junit:junit:+'
 
     compile 'com.h2database:h2:+'       //    testCompile 'com.h2database:h2:+'
-    compile 'com.ibm.icu:icu4j:+'       // Collation component for h2
+    //compile 'com.ibm.icu:icu4j:+'       // Collation component for h2
 }
 
 task testWar(type: War) {

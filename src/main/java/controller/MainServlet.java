@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static controller.AttributeNames.*;
-import static controller.MiscConstants.DEFAULT_LOCALE;
-import static controller.MiscConstants.UNREAD_PRIVATE;
+import static controller.MiscConstants.*;
 import static controller.PageURLs.*;
 import static java.util.Optional.ofNullable;
 
@@ -29,27 +28,31 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET})
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, USER_SEARCH_SERVLET})
 public class MainServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         log.debug("Processing request...");
 
-        switch (request.getRequestURI()) {
+        switch (req.getRequestURI()) {
             case USER_UPDATE_SERVLET:
-                processUserUpdate(request, response);
+                processUserUpdate(req, res);
+                break;
+            case USER_SEARCH_SERVLET:
+                processUserSearch(req, res);
                 break;
             case MAIN_SERVLET:
             default:
-                processMainRequest(request, response);
+                processMainRequest(req, res);
         }
     }
 
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doPost(request, response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        doPost(req, res);
     }
 
     @Override
@@ -64,9 +67,9 @@ public class MainServlet extends HttpServlet {
 
 
     @SuppressWarnings("UnnecessaryReturnStatement")
-    private void processMainRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String tz = ofNullable(request.getParameter("timezone")).orElse("GMT");
+    private void processMainRequest(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        String tz = ofNullable(req.getParameter("timezone")).orElse("GMT");
         String lang = ofNullable((String) session.getAttribute(C.LANGUAGE)).orElse(DEFAULT_LOCALE);
         MyTimer t = (MyTimer) session.getAttribute("timer");
 
@@ -74,8 +77,8 @@ public class MainServlet extends HttpServlet {
             t = new MyTimer(lang, tz);
             session.setAttribute("timer", t);
         }
-        request.setAttribute("lastTZ", tz);
-        request.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
+        req.setAttribute("lastTZ", tz);
+        req.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
 
         User user = (User) session.getAttribute(S.USER);
         MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
@@ -84,18 +87,18 @@ public class MainServlet extends HttpServlet {
                 .setTo(user.getUsername())
                 .setConvId(UNREAD_PRIVATE);
         Integer unreadPrivateMessages = mDao.countMessages(privateUnread);
-        request.setAttribute(R.UNREAD_PM, unreadPrivateMessages);
+        req.setAttribute(R.UNREAD_PM, unreadPrivateMessages);
 
-        RequestDispatcher respJSP = request.getRequestDispatcher(MAIN_PAGE);
-        respJSP.forward(request, response);
+        RequestDispatcher respJSP = req.getRequestDispatcher(MAIN_PAGE);
+        respJSP.forward(req, res);
         return;
     }
 
-    private void processUserUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession();
+    private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession();
         User user = (User) session.getAttribute(S.USER);
-        String newName = request.getParameter(ParameterNames.U.FULLNAME);
-        String newEmail = request.getParameter(ParameterNames.U.EMAIL);
+        String newName = req.getParameter(ParameterNames.U.FULLNAME);
+        String newEmail = req.getParameter(ParameterNames.U.EMAIL);
         if (newName == null || newName.equals("")) newName = user.getUsername();
         if (newEmail == null) newEmail = "";
         user.setFullName(newName);
@@ -104,7 +107,15 @@ public class MainServlet extends HttpServlet {
         UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         log.info("Updating user info for user '{}'", user.getUsername());
         userDAO.updateUserInfo(user);
-        response.sendRedirect(DETAILS_PAGE);
+        res.sendRedirect(DETAILS_PAGE);
+    }
+
+
+    private void processUserSearch(HttpServletRequest req, HttpServletResponse res) {
+        log.debug("Processing search request: {}", req.getParameter("query"));
+
+        res.setContentType(JSON_TYPE);
+
     }
 
 }

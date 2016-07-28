@@ -9,6 +9,10 @@ public interface MiscConstants {
     int MIN_PASSWORD_LENGTH = 3;
 
     Long UNREAD_PRIVATE = 0L;
+
+    String JSON_TYPE = "application/json";
+    String JSON_TIME_FORMAT = "yyyy-MM-dd’T'HH:mm:ss.SSSZ";
+
 }
 
 /**
@@ -69,4 +73,5 @@ interface PageURLs {
     String REGISTER_SERVLET = "/doRegister";
     String USER_UPDATE_SERVLET = "/main/updateUser";
     String MESSAGE_SERVLET = "/main/messages";
+    String USER_SEARCH_SERVLET = "/main/userSearch";
 }
