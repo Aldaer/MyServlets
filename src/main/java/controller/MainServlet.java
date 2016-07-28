@@ -100,6 +100,7 @@ public class MainServlet extends HttpServlet {
         if (newEmail == null) newEmail = "";
         user.setFullName(newName);
         user.setEmail(newEmail);
+        user.setRegComplete(true);
         UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         log.info("Updating user info for user '{}'", user.getUsername());
         userDAO.updateUserInfo(user);
