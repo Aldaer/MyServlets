@@ -35,6 +35,7 @@ import static controller.utils.MyStringUtils.*;
 public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add "conv" etc.
     private static final String USR_QUERY = "query";         // Partial name of a user to find
+    private static final String USR_DETAILS = "details";       // Exact username of a user to get details
 
     private static final String QUERY_OFFSET = "offset"; // # of messages to skip
     private static final String QUERY_LIMIT = "limit";   // # of messages to send
@@ -54,7 +55,7 @@ public class JsonProviderServlet extends HttpServlet {
                 processMessageRequest(req, res);
                 break;
             case USER_SEARCH_SERVLET:
-                processUserSearch(req, res);
+                processUserQuery(req, res);
                 break;
         }
     }
@@ -99,29 +100,40 @@ public class JsonProviderServlet extends HttpServlet {
         gen.writeEnd().writeEnd().close();
     }
 
-    private void processUserSearch(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        String userLike = req.getParameter(USR_QUERY);
-        log.debug("uquery: {}", userLike);
-        if (userLike == null || userLike.length() < MIN_QUERY_LENGTH ) return;
-        UserDAO uDao = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
-        int limit = withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
-
-        Map<String, String> userMap = uDao.listUsers(userLike, limit);
-
+    private void processUserQuery(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        final UserDAO uDao = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         final JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
 
-        log.debug("Outputting {} found users", userMap.size());
-        gen.writeStartObject();
-        gen.writeStartArray("users");
-        userMap.entrySet().stream().sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
-                .forEachOrdered(usr ->  gen
-                        .writeStartObject()
-                        .write("username", usr.getKey())
-                        .write("fullName", usr.getValue())
-                        .writeEnd()
-                );
-        gen.writeEnd().writeEnd().close();
-    }
+        String reqName = req.getParameter(USR_DETAILS);
+        if (reqName != null) {                                  // Specific user requested
+            User reqUser = uDao.getUser(reqName);
+            gen.writeStartObject();
+            if (reqUser != null) gen
+                    .write("exists", true)
+                    .write("fullName", reqUser.getFullName())
+                    .write("email", reqUser.getEmail());
+            else gen.write("exists", false);
+            gen.writeEnd().close();
+        } else {                                                // User search requested
+            String userLike = req.getParameter(USR_QUERY);
+            if (userLike == null || userLike.length() < MIN_QUERY_LENGTH) return;
+            int limit = withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
+            Map<String, String> userMap = uDao.listUsers(userLike, limit);
+
+
+            log.debug("Outputting {} found users", userMap.size());
+            gen.writeStartObject();
+            gen.writeStartArray("users");
+            userMap.entrySet().stream().sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+                    .forEachOrdered(usr -> gen
+                            .writeStartObject()
+                            .write("username", usr.getKey())
+                            .write("fullName", usr.getValue())
+                            .writeEnd()
+                    );
+            gen.writeEnd().writeEnd().close();
+        }
+    }
 }
 

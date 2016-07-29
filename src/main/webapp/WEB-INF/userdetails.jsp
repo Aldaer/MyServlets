@@ -10,13 +10,13 @@
     <fmt:setLocale value="${language}"/>
     <fmt:setBundle basename="jsp"/>
     <link href="/images/clock_icon.png" rel="icon" type="image/png"/>
-    <link rel="stylesheet" type="text/css" href="/extras/green-common.css">
+    <link rel="stylesheet" type="text/css" href="/extras/green-details.css">
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
     <c:set var="displayedName" value="${empty param.user? currentUser.username : param.user}"/>
     <c:set var="displayedProfile" value="${applicationScope['userDAO'].getUser(displayedName)}"/>
     <c:set var="ownProfile" value="${displayedName eq currentUser.username}"/>
 
-    <title><fmt:message key="${ownProfile ? 'yourdetails.header' : 'details.header'}"/></title>
+    <title><fmt:message key="details.header"/></title>
 </head>
 <body>
 <div class="bigpanel">
@@ -34,9 +34,7 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-            <c:if test="${ownProfile}">
-                <button class="smallbutton" type="submit"><fmt:message key="details.update"/></button>
-            </c:if>
+                <button class="smallbutton details" id="update" type="submit"><fmt:message key="details.update"/></button>
             <a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
         </form>
     </div>
@@ -60,6 +58,7 @@
 <div class="userbubble" id="bubbleprototype"></div>
 
 <script>
+    var currUser = "${currentUser.username}";
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};
 </script>

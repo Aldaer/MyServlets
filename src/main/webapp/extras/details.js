@@ -1,15 +1,40 @@
 var details = $('.details');
 
-if (own) {
+$(document).ready( function() {
+    updateElements();
+    
     details.change(function () {
-        $(this).css("color", "green");
+        $(this).addClass("edited");
+        $('#update').css("display", "inline");        
     });
-} else {
-    details.prop("disabled", true);
+});
+
+function updateElements() {
+    if (own) {
+        details.prop("disabled", false);
+    } else {
+        $('#update').css("display", "none");
+        details.prop("disabled", true);
+        $('.warning').css("display", "none");
+    }
+    details.removeClass("edited");
+
+    if (exists) {
+        $('#login').removeClass("strikeout");
+    } else {
+        $('#login').addClass("strikeout");
+    }
 }
 
-if (! exists) {
-    $('#login').addClass("strikeout");
+function reloadUser(name) {
+    own = (currUser == name);
+    $('#login').text(name);
+    $.getJSON("/main/userSearch?details=" + encodeURIComponent(name), function(usr) {
+        exists = usr.exists;
+        $('input[name="fullname"]').val(usr.fullName);
+        $('input[name="email"]').val(usr.email);
+    });
+    updateElements();
 }
 
 $('.details-form').submit(function () {
@@ -35,7 +60,7 @@ function onLoadUsers(data) {
     $.each(data.users, outputUser);
     
     $('.userlink').on("click", function() {
-        alert(this.text);
+        reloadUser(this.text);
     });
 }
 

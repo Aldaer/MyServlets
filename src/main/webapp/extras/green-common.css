@@ -15,7 +15,7 @@
 .bigpanel input {
     font-family: "Roboto", sans-serif;
     outline: 0;
-    background: #f2f2f2;
+    background: #F2F2F2;
     width: 75%;
     border: 0;
     margin: 0 0 10px;
@@ -29,7 +29,6 @@ label {
     display: inline-block;
     text-align: right;
     width: 20%;
-
 }
 
 .strikeout {
