@@ -53,7 +53,7 @@
         more buttons
     </div>
     <div style="width: 80%; float:right">
-        <div id = "userfindbox"></div>
+        <div class="databox" id = "userfindbox">Loading users...</div>
     </div>
 </div>
 

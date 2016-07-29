@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import static controller.AttributeNames.*;
-import static controller.MiscConstants.*;
+import static controller.MiscConstants.DEFAULT_LOCALE;
+import static controller.MiscConstants.UNREAD_PRIVATE;
 import static controller.PageURLs.*;
 import static java.util.Optional.ofNullable;
 
@@ -28,7 +29,7 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, USER_SEARCH_SERVLET})
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET})
 public class MainServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
@@ -40,15 +41,11 @@ public class MainServlet extends HttpServlet {
             case USER_UPDATE_SERVLET:
                 processUserUpdate(req, res);
                 break;
-            case USER_SEARCH_SERVLET:
-                processUserSearch(req, res);
-                break;
             case MAIN_SERVLET:
             default:
                 processMainRequest(req, res);
         }
     }
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -109,13 +106,4 @@ public class MainServlet extends HttpServlet {
         userDAO.updateUserInfo(user);
         res.sendRedirect(DETAILS_PAGE);
     }
-
-
-    private void processUserSearch(HttpServletRequest req, HttpServletResponse res) {
-        log.debug("Processing search request: {}", req.getParameter("query"));
-
-        res.setContentType(JSON_TYPE);
-
-    }
-
 }
