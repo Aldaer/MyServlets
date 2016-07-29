@@ -42,7 +42,7 @@ interface AttributeNames {
 
 /**
  * Request parameter names: general, as well as
- * specific for (L)ogin/Register and (U)pdateUser forms
+ * specific for (L)ogin/Register, (U)pdateUser and Update(M)essage requests
  */
 interface ParameterNames {
     String LANGUAGE = "language";
@@ -54,6 +54,11 @@ interface ParameterNames {
     class U {
         static final String FULLNAME = "fullname";
         static final String EMAIL = "email";
+    }
+    class M {
+        static final String ID = "id";
+        static final String UNREAD = "unread";         // true/false
+        static final String NEW_TEXT = "newtext";      // new text for the message
     }
 }
 
@@ -73,5 +78,6 @@ interface PageURLs {
     String REGISTER_SERVLET = "/doRegister";
     String USER_UPDATE_SERVLET = "/main/updateUser";
     String MESSAGE_SERVLET = "/main/messages";
+    String MESSAGE_UPDATE_SERVLET = "/main/updateMessage";
     String USER_SEARCH_SERVLET = "/main/userSearch";
 }

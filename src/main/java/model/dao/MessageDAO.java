@@ -30,6 +30,11 @@ public interface MessageDAO {
     int countMessages(MessageFilter constraint);
 
     /**
+     * Updates message with a given id, null arguments are ignored
+     */
+    void updateMessage(long id, String newText, Boolean unread);
+
+    /**
      *
      */
     interface MessageFilter {
@@ -77,7 +82,7 @@ public interface MessageDAO {
         /**
          * Skip first N messages
          */
-        Integer getOffset();
+        Long getOffset();
 
         /**
          * Return no more than M messages
@@ -112,7 +117,7 @@ public interface MessageDAO {
             private Timestamp maxTime;
             private Long convId;
             private String textLike;
-            private Integer offset;
+            private Long offset;
             private Integer limit;
             private String sortField;
 

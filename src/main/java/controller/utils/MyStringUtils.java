@@ -10,15 +10,18 @@ public class MyStringUtils {
      * @param s String to parse
      * @return Parsed int, null on error
      */
-    public static @Nullable Integer parseOrNull(@Nullable String s) {
+    public static @Nullable Long parseOrNull(@Nullable String s) {
         if (s == null || s.equals("")) return null;
         char[] chars = s.toCharArray();
-        int result = 0;
-        int sti = 0;
-        boolean minus = false;
+        Long result = 0L;
+        boolean minus;
+        int sti;
         if (chars[0] == '-') {
             minus = true;
             sti = 1;
+        } else {
+            minus = false;
+            sti = 0;
         }
         for (; sti < chars.length; sti++) {
             char c = chars[sti];
@@ -34,9 +37,9 @@ public class MyStringUtils {
      * If x == null, min is returned.
      * @return int value within bounds
      */
-    public static int withinRangeOrMin(@Nullable Integer x, int min, int max) {
+    public static long withinRangeOrMin(@Nullable Long x, long min, long max) {
         if (x == null) return min;
-        int v = x;
+        long v = x;
         return (v < min)? min : (v > max)? max : v;
     }
 
@@ -45,9 +48,9 @@ public class MyStringUtils {
      * If x == null, max is returned.
      * @return int value within bounds
      */
-    public static int withinRangeOrMax(@Nullable Integer x, int min, int max) {
+    public static long withinRangeOrMax(@Nullable Long x, long min, long max) {
         if (x == null) return max;
-        int v = x;
+        long v = x;
         return (v < min)? min : (v > max)? max : v;
     }
 

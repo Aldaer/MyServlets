@@ -22,6 +22,9 @@ import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.MiscConstants.UNREAD_PRIVATE;
 import static controller.PageURLs.*;
+import static controller.ParameterNames.M;
+import static controller.ParameterNames.U;
+import static controller.utils.MyStringUtils.parseOrNull;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -29,7 +32,7 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET})
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_UPDATE_SERVLET})
 public class MainServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
@@ -40,6 +43,9 @@ public class MainServlet extends HttpServlet {
         switch (req.getRequestURI()) {
             case USER_UPDATE_SERVLET:
                 processUserUpdate(req, res);
+                break;
+            case MESSAGE_UPDATE_SERVLET:
+                processMessageUpdate(req, res);
                 break;
             case MAIN_SERVLET:
             default:
@@ -94,11 +100,11 @@ public class MainServlet extends HttpServlet {
     private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute(S.USER);
-        String newName = req.getParameter(ParameterNames.U.FULLNAME);
-        String newEmail = req.getParameter(ParameterNames.U.EMAIL);
-        if (newName == null || newName.equals("")) newName = user.getUsername();
+        String newFullName = req.getParameter(U.FULLNAME);
+        String newEmail = req.getParameter(U.EMAIL);
+        if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
         if (newEmail == null) newEmail = "";
-        user.setFullName(newName);
+        user.setFullName(newFullName);
         user.setEmail(newEmail);
         user.setRegComplete(true);
         UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
@@ -106,4 +112,15 @@ public class MainServlet extends HttpServlet {
         userDAO.updateUserInfo(user);
         res.sendRedirect(DETAILS_PAGE);
     }
+
+    private void processMessageUpdate(HttpServletRequest req, HttpServletResponse res) {
+        Long id = parseOrNull(req.getParameter(M.ID));
+        if (id == null) return;
+        Boolean unread = ofNullable(req.getParameter(M.UNREAD)).map(String::toLowerCase).map("true"::equals).orElse(null);
+        String newText = req.getParameter(M.NEW_TEXT);
+
+        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
+        mDao.updateMessage(id, newText, unread);            // TODO: message update authorization, update timestamp
+    }
+
 }

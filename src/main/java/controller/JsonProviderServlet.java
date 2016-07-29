@@ -35,7 +35,7 @@ import static controller.utils.MyStringUtils.*;
 public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add "conv" etc.
     private static final String USR_QUERY = "query";         // Partial name of a user to find
-    private static final String USR_DETAILS = "details";       // Exact username of a user to get details
+    private static final String USR_DETAILS = "details";     // Exact username of a user to get details
 
     private static final String QUERY_OFFSET = "offset"; // # of messages to skip
     private static final String QUERY_LIMIT = "limit";   // # of messages to send
@@ -69,7 +69,7 @@ public class JsonProviderServlet extends HttpServlet {
         final MessageFilter.Builder mBuilder = MessageFilter.newBuilder();
 
         mBuilder.setOffset(withinRangeOrMin(parseOrNull(req.getParameter(QUERY_OFFSET)), 0, Integer.MAX_VALUE));
-        mBuilder.setLimit(withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED));
+        mBuilder.setLimit((int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED));
 
         if (msgTypes != null) {
             if (msgTypes.contains("from")) mBuilder.setFrom(cUserName);
@@ -117,10 +117,9 @@ public class JsonProviderServlet extends HttpServlet {
         } else {                                                // User search requested
             String userLike = req.getParameter(USR_QUERY);
             if (userLike == null || userLike.length() < MIN_QUERY_LENGTH) return;
-            int limit = withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
+            int limit = (int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
             Map<String, String> userMap = uDao.listUsers(userLike, limit);
-
 
             log.debug("Outputting {} found users", userMap.size());
             gen.writeStartObject();

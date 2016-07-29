@@ -50,8 +50,6 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 
     // Default ResultSet behaviour: ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
 
-    // private static final String CREATE_USER_CREDS = "INSERT INTO credentials (username, dpassword) VALUES (?, ?)"; // Auto-generated
-    // private static final String CREATE_EMPTY_USER = "INSERT INTO " + TABLE_USERS + " (username, fullname, email) VALUES (?, '', '')"; // Auto-generated
     static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "');";
 
     static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
@@ -370,6 +368,46 @@ class H2MessageDAO implements MessageDAO {
         } catch (SQLException e) {
             log.error("Error counting rows in table '{}': {}", TABLE_MESSAGES, e);
             return -1;
+        }
+    }
+
+    @Override
+    public void updateMessage(long id, String newText, Boolean unread) {
+        StringBuilder sqlB = new StringBuilder(250);
+        sqlB.append("UPDATE ").append(TABLE_MESSAGES).append(" SET ");
+        Object[] params = new Object[2];
+        int nPar = 0;
+        if (newText != null) {
+            sqlB.append(getColumnForField(Message.class, "text")).append("=?,");
+            params[nPar++] = newText;
+        }
+        if (unread != null) {
+            sqlB.append(getColumnForField(Message.class, "conversationId")).append("=?,");
+            params[nPar++] = unread ? 0 : -1;
+        }
+        if (nPar > 0) sqlB.setLength(sqlB.length() - 1);
+        else return;
+
+        sqlB.append(" WHERE ")
+                .append(getColumnForField(Message.class, "id"))
+                .append("=")
+                .append(id)
+                .append(';');
+
+        String stmt = sqlB.toString();
+
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(stmt,
+                     TYPE_FORWARD_ONLY, CONCUR_UPDATABLE, CLOSE_CURSORS_AT_COMMIT)) {
+
+            for (int j = 0; j < nPar; j++)
+                pst.setObject(j + 1, params[j]);
+
+            log.trace("Executing query: {}", stmt);
+
+            if (pst.executeUpdate() != 1) throw new SQLException("Invalid update count");
+        } catch (SQLException e) {
+            log.error("Error updating data for message [{}]: {}", id, e);
         }
     }
 
