@@ -29,8 +29,7 @@
 
     <p id="messagealert">
         <c:if test="${unreadPM > 0}">
-            You have unread messages! [${unreadPM}]
-            <button class="smallbutton" id="showmsg">Read now...</button>
+            ###You have unread messages! [${unreadPM}]
         </c:if>
     </p>
 
@@ -51,7 +50,8 @@
         <fmt:message key="main.through"/> getDate(): <i>${timer.date}</i><br>
         <fmt:message key="main.through"/> toString(): <i>${timer}</i>
     </p>
-    <a href="/main/logout" class="smallbutton"><fmt:message key="main.logout"/></a>
+    <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
+    <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>
 
 <div class="bigpanel" id="slideout">

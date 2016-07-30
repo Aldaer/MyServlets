@@ -58,6 +58,7 @@ button {
     -moz-appearance: button;
 
     color: #FFFFFF;
+    background: #60AF50;
     text-decoration: none;
     display: inline-block;
     box-sizing: border-box;
@@ -65,7 +66,10 @@ button {
     padding: 5px;
     font-size: 12px;
     line-height: normal;
-    background: #60AF50;
+}
+
+.amber {
+    background: #ffc251 !important;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {

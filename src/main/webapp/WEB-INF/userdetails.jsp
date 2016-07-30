@@ -39,9 +39,9 @@
         </form>
     </div>
     <div style="width: 40%; float:right">
-        <p>Search</p>
+        <p><fmt:message key="details.search"/></p>
         <input type="text" id="query"/><br>
-        <button class="smallbutton" id="find">Find user...</button>
+        <button class="smallbutton" id="find"><fmt:message key="details.find.user"/></button>
     </div>
 </div>
 

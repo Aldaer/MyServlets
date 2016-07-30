@@ -1,6 +1,7 @@
 package controller;
 
 import controller.utils.JsonNullableGenerator;
+import controller.utils.MyStringUtils;
 import lombok.extern.slf4j.Slf4j;
 import model.dao.Message;
 import model.dao.MessageDAO;
@@ -18,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
@@ -33,7 +36,9 @@ import static controller.utils.MyStringUtils.*;
 @Slf4j
 @WebServlet({MESSAGE_SERVLET, USER_SEARCH_SERVLET})
 public class JsonProviderServlet extends HttpServlet {
-    private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add "conv" etc.
+    private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add more filters as required
+    private static final String MSG_QUERY_CONV = "convId";   // Comma-delimited conversation id's
+
     private static final String USR_QUERY = "query";         // Partial name of a user to find
     private static final String USR_DETAILS = "details";     // Exact username of a user to get details
 
@@ -61,7 +66,6 @@ public class JsonProviderServlet extends HttpServlet {
     }
 
     private void processMessageRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        String msgTypes = req.getParameter(MSG_QUERY_TYPE);
 
         String cUserName = ((User) req.getSession().getAttribute(S.USER)).getUsername();
 
@@ -71,9 +75,15 @@ public class JsonProviderServlet extends HttpServlet {
         mBuilder.setOffset(withinRangeOrMin(parseOrNull(req.getParameter(QUERY_OFFSET)), 0, Integer.MAX_VALUE));
         mBuilder.setLimit((int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED));
 
+        String msgTypes = req.getParameter(MSG_QUERY_TYPE);
         if (msgTypes != null) {
             if (msgTypes.contains("from")) mBuilder.setFrom(cUserName);
             if (msgTypes.contains("to")) mBuilder.setTo(cUserName);
+        }
+
+        String convIds = req.getParameter(MSG_QUERY_CONV);
+        if (convIds != null) {
+            mBuilder.setConvId(Stream.of(convIds.split(",")).map(MyStringUtils::parseOrNull).filter(Objects::nonNull).toArray(Long[]::new));
         }
 
         TreeSet<Message> messagesByTimestamp = new TreeSet<>(Message.byTime);

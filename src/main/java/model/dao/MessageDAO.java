@@ -70,9 +70,9 @@ public interface MessageDAO {
         Timestamp getMaxTime();
 
         /**
-         * Conversation id. 0 for unread private messages, -1 for read private messages
+         * Conversation id. 0 for unread private messages, -1 for read private messages, >0 for conversations
          */
-        Long getConvId();
+        Long[] getConvId();
 
         /**
          *  SQL text pattern, e.g. '%unday%'
@@ -115,7 +115,7 @@ public interface MessageDAO {
             private String to;
             private Timestamp minTime;
             private Timestamp maxTime;
-            private Long convId;
+            private Long[] convId;
             private String textLike;
             private Long offset;
             private Integer limit;

@@ -8,7 +8,9 @@ public interface MiscConstants {
     int MAX_USERNAME_LENGTH = 50;
     int MIN_PASSWORD_LENGTH = 3;
 
-    Long UNREAD_PRIVATE = 0L;
+    Long[] UNREAD_PRIVATE = { 0L };
+    Long[] READ_PRIVATE = { -1L };
+    Long[] ALL_PRIVATE = {-1L, 0L };
 
     String JSON_TYPE = "application/json";
     String JSON_TIME_FORMAT = "yyyy-MM-dd’T'HH:mm:ss.SSSZ";

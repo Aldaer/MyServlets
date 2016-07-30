@@ -1,7 +1,7 @@
 $('#showmsg').click(function () {
     $('#slideout').toggleClass('on');
 
-    $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=0", onLoadMessages);
+    $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=0,-1", onLoadMessages);
 });
 
 function onLoadMessages(data) {
