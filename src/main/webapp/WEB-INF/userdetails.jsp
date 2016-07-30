@@ -51,6 +51,7 @@
         more buttons
     </div>
     <div style="width: 80%; float:right">
+        <p id="usersFoundHeader"></p>
         <div class="databox" id = "userfindbox">Loading users...</div>
     </div>
 </div>
@@ -61,6 +62,8 @@
     var currUser = "${currentUser.username}";
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};
+
+    var usersFounsMsg='<fmt:message key="details.users.found"/> ';
 </script>
 <script src="/extras/details.js"></script>
 </body>

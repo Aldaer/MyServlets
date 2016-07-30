@@ -57,6 +57,7 @@ $('#find').click(function () {
 
 function onLoadUsers(data) {
 //    alert("Displaying " + data.users.length + " found users.");
+    $('#usersFoundHeader').text(usersFounsMsg + data.users.length);
     $('#userfindbox').empty();
     $.each(data.users, outputUser);
     

@@ -1,12 +1,5 @@
 @import url(/extras/green-common.css);
 
-.msgbox {
-    background: white;
-    border: 2px groove;
-    max-height: 500px;
-    overflow: auto;
-}
-
 .messagebubble {
     padding: 3px;
     border: 1px solid;
