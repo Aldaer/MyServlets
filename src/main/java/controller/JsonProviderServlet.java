@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
 import static controller.MiscConstants.JSON_TYPE;
-import static controller.PageURLs.MESSAGE_SERVLET;
+import static controller.PageURLs.MESSAGE_PROVIDER_SERVLET;
 import static controller.PageURLs.USER_SEARCH_SERVLET;
 import static controller.utils.MyStringUtils.*;
 
@@ -34,7 +34,7 @@ import static controller.utils.MyStringUtils.*;
  * Answers JSON requests, such as getting message or user lists
  */
 @Slf4j
-@WebServlet({MESSAGE_SERVLET, USER_SEARCH_SERVLET})
+@WebServlet({MESSAGE_PROVIDER_SERVLET, USER_SEARCH_SERVLET})
 public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add more filters as required
     private static final String MSG_QUERY_CONV = "convId";   // Comma-delimited conversation id's
@@ -56,7 +56,7 @@ public class JsonProviderServlet extends HttpServlet {
         res.setContentType(JSON_TYPE);
 
         switch (req.getRequestURI()) {
-            case MESSAGE_SERVLET:
+            case MESSAGE_PROVIDER_SERVLET:
                 processMessageRequest(req, res);
                 break;
             case USER_SEARCH_SERVLET:

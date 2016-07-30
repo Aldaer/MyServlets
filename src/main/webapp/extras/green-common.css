@@ -91,6 +91,7 @@ textarea {
 .slideout {
     position: absolute;
     left: -1000px;
+    top: 0;
 
     -webkit-transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;

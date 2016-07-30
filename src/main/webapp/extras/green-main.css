@@ -1,6 +1,6 @@
 @import url(/extras/green-common.css);
 
-.databox {
+.msgbox {
     background: white;
     border: 2px groove;
     max-height: 500px;

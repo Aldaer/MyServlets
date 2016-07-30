@@ -63,7 +63,7 @@
         more buttons
     </div>
     <div style="width: 80%; float:right">
-        <div class="databox">
+        <div class="databox" id="msgbox">
             Loading messages...
         </div>
     </div>

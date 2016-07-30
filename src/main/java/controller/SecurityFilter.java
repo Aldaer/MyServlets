@@ -32,7 +32,8 @@ public class SecurityFilter extends HttpFilter {
         req.setCharacterEncoding("UTF-8");
 
         final String uri = req.getRequestURI();
-        log.trace("Filtering request {}: uri {}", ++n, uri);
+
+        log.trace("Filtering request {}: uri {}, query {}", ++n, uri, req.getQueryString());
 
         if (uri.equals(LOGOUT)) {
             if (req.getUserPrincipal() != null) try {
@@ -55,7 +56,7 @@ public class SecurityFilter extends HttpFilter {
         User user = (User) req.getSession(true).getAttribute(USER);
         if (user == null) {
             switch(uri) {
-                case MESSAGE_SERVLET:
+                case MESSAGE_PROVIDER_SERVLET:
                     res.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not logged in.");
                     return;
             }

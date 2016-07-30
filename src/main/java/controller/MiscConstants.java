@@ -67,8 +67,7 @@ interface PageURLs {
     String LOGIN_SERVLET = "/doLogin";
     String REGISTER_SERVLET = "/doRegister";
     String USER_UPDATE_SERVLET = "/main/updateUser";
-    String MESSAGE_SERVLET = "/main/messages";
-    String MESSAGE_UPDATE_SERVLET = "/main/updateMessage";
-    String MESSAGE_SEND_SERVLET = "/main/sendMessage";
+    String MESSAGE_PROVIDER_SERVLET = "/main/messages";
+    String MESSAGE_ACTION_SERVLET = "/main/messageAction";
     String USER_SEARCH_SERVLET = "/main/userSearch";
 }

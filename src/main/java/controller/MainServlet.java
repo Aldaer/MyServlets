@@ -32,7 +32,7 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_UPDATE_SERVLET, MESSAGE_SEND_SERVLET})
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_ACTION_SERVLET})
 public class MainServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
@@ -43,13 +43,17 @@ public class MainServlet extends HttpServlet {
         switch (req.getRequestURI()) {
             case USER_UPDATE_SERVLET:
                 processUserUpdate(req, res);
-                break;
-            case MESSAGE_UPDATE_SERVLET:
-                processMessageUpdate(req, res);
-                break;
-            case MESSAGE_SEND_SERVLET:
-                processMessageSend(req, res);
-                break;
+                return;
+            case MESSAGE_ACTION_SERVLET:
+                switch(req.getParameter("action")) {
+                    case "update":
+                        processMessageUpdate(req, res);
+                        return;
+                    case "send":
+                        processMessageSend(req, res);
+                        return;
+                }
+                return;
             case MAIN_SERVLET:
             default:
                 processMainRequest(req, res);

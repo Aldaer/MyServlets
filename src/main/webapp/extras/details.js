@@ -5,7 +5,7 @@ $(document).ready( function() {
     
     details.change(function () {
         $(this).addClass("edited");
-        $('#update').css("display", "inline");        
+        $('#update').css("display", "inline-block");        
     });
 });
 
@@ -57,7 +57,7 @@ $('#find').click(function () {
 
 function onLoadUsers(data) {
 //    alert("Displaying " + data.users.length + " found users.");
-    $('.databox').html('');
+    $('#userfindbox').empty();
     $.each(data.users, outputUser);
     
     $('.userlink').on("click", function() {
@@ -77,5 +77,5 @@ function outputUser(i, usr) {
     mdiv.append(userlink, ':<br>');
     mdiv.append(usr.fullName);
     mdiv.css("display", "block");
-    $('.databox').append(mdiv);
+    $('#userfindbox').append(mdiv);
 }
