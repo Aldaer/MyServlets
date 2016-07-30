@@ -74,10 +74,11 @@
 <div class="bigpanel slideout" id="msgview">
     <h2>Message view</h2>
     <p id="msgheader"></p>
-        <p id="msgtext" rows="6">TEXT</p>
-        <textarea id="msgreply" rows="10">REPLY</textarea>
-        <button class="smallbutton" id="reply">Reply</button>
-        <button class="smallbutton amber" id="closeview">Close</button>
+    <p id="msgtext" rows="6">TEXT</p>
+    <textarea id="msgreply" rows="10">REPLY</textarea>
+    <button class="smallbutton" id="reply">Reply</button>
+    <button class="smallbutton ruby" id="delete">Delete</button>
+    <button class="smallbutton amber" id="closeview">Close</button>
 </div>
 
 <script>

@@ -77,7 +77,11 @@ button {
 }
 
 .amber {
-    background: #ffc251 !important;
+    background: #FFC251 !important;
+}
+
+.ruby {
+    background: #EF3B3A !important;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {

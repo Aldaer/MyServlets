@@ -47,10 +47,13 @@ public class MainServlet extends HttpServlet {
             case MESSAGE_ACTION_SERVLET:
                 switch(req.getParameter("action")) {
                     case "update":
-                        processMessageUpdate(req, res);
+                        processMessageUpdate(req);
                         return;
                     case "send":
-                        processMessageSend(req, res);
+                        processMessageSend(req);
+                        return;
+                    case "delete":
+                        processMessageDelete(req);
                         return;
                 }
                 return;
@@ -120,7 +123,7 @@ public class MainServlet extends HttpServlet {
         res.sendRedirect(DETAILS_PAGE);
     }
 
-    private void processMessageUpdate(HttpServletRequest req, HttpServletResponse res) {
+    private void processMessageUpdate(HttpServletRequest req) {
         Long id = parseOrNull(req.getParameter("id"));
         if (id == null) return;
         Boolean unread = ofNullable(req.getParameter("unread")).map(String::toLowerCase).map("true"::equals).orElse(null);
@@ -131,7 +134,7 @@ public class MainServlet extends HttpServlet {
         mDao.updateMessage(id, newText, unread);            // TODO: message update authorization, update timestamp
     }
 
-    private void processMessageSend(HttpServletRequest req, HttpServletResponse res) {
+    private void processMessageSend(HttpServletRequest req) {
         MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
         User user = (User) req.getSession().getAttribute(S.USER);
 
@@ -147,4 +150,12 @@ public class MainServlet extends HttpServlet {
         mDao.sendMessage(newMsg);
     }
 
+
+    private void processMessageDelete(HttpServletRequest req) {
+        Long id = parseOrNull(req.getParameter("msgId"));
+        if (id == null) return;
+
+        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
+        mDao.deleteMessage(id);              // TODO: message delete authorization
+    }
 }

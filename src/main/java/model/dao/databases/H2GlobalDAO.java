@@ -27,7 +27,7 @@ import static model.dao.databases.Stored.Processor.getColumnForField;
  */
 @SuppressWarnings("WeakerAccess")
 @Slf4j
-public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
+public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // TODO: replace column name constants with static init variables
     static final String TABLE_USERS = "users";
     static final String TABLE_CREDENTIALS = "credentials";
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
@@ -422,6 +422,17 @@ class H2MessageDAO implements MessageDAO {
             if (pst.executeUpdate() != 1) throw new SQLException("Invalid update count");
         } catch (SQLException e) {
             log.error("Error updating data for message [{}]: {}", id, e);
+        }
+    }
+
+    @Override
+    public void deleteMessage(long id) {
+        final String query = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + Stored.Processor.getColumnForField(Message.class, "id") + "=" + id + ";";
+        try (Connection conn = cSource.get(); Statement st = conn.createStatement()) {
+            int nDeleted = st.executeUpdate(query);
+            log.trace("Deleted {} message(s)", nDeleted);
+        } catch (SQLException e) {
+            log.error("Error deleting message #{}: {}", id, e);
         }
     }
 

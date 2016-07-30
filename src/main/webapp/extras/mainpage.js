@@ -23,6 +23,15 @@ $('#reply').click(function () {
     loadAllMessages();
 });
 
+$('#delete').click(function () {
+    var msgData = {
+        action: "delete",
+        msgId: replyingTo.data("msgId")
+    };
+    $.post("/main/messageAction", msgData, closeReply());
+    replyingTo.remove();
+});
+
 $('#closeview').click(function () {
     closeReply();
 });

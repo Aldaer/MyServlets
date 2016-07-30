@@ -41,6 +41,12 @@ public interface MessageDAO {
     void sendMessage(Message message);
 
     /**
+     * Deletes indicated message
+     * @param id Message id
+     */
+    void deleteMessage(long id);
+
+    /**
      *
      */
     interface MessageFilter {
