@@ -95,11 +95,11 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 
     public void executeScript(String[] script) {
         try (Connection connection = cSource.get();
-            Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
 
             StringBuilder currentCmd = new StringBuilder();
             boolean literalMode = false;
-            for (String line: script) {
+            for (String line : script) {
                 line = line.trim();
                 if (line.startsWith("//")) continue;
                 int pos = 0;
@@ -109,7 +109,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
                     currentCmd.append(fragment);
                     pos = semiC + 1;
                     literalMode = literalMode ^ fragment.contains("$$");
-                    if (! literalMode) try {
+                    if (!literalMode) try {
                         String cmd = currentCmd.toString();
                         statement.addBatch(cmd);
                         log.trace("Added command to batch: {}", cmd);
@@ -148,7 +148,7 @@ class H2UserDAO implements UserDAO {
 
     @Override
     public @Nullable User getUser(String username) {
-        return (username == null)? null : getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
+        return (username == null) ? null : getUserByAnyKey(GET_USER_BY_LOGIN_NAME, username);
     }
 
     private User getUserByAnyKey(String sql, Object key) {
@@ -192,7 +192,7 @@ class H2UserDAO implements UserDAO {
         String sql = GET_USER_BY_PARTIAL_NAME + limit + ";";
 
         try (Connection conn = cSource.get();
-            PreparedStatement pst = conn.prepareStatement(sql)) {
+             PreparedStatement pst = conn.prepareStatement(sql)) {
             partialName = "%" + partialName + "%";
             pst.setString(1, partialName);
             pst.setString(2, partialName);
@@ -372,6 +372,20 @@ class H2MessageDAO implements MessageDAO {
     }
 
     @Override
+    public void sendMessage(Message message) {
+        String query = message.generateInsertSQL(TABLE_MESSAGES);
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+            message.packIntoPreparedStatement(pst);
+            log.trace("Sending new message from {}", message.getFrom());
+            if (pst.executeUpdate() != 1)
+                throw new SQLException("Wrong update count");
+        } catch (SQLException e) {
+            log.error("Error sending message from '{}' [{}]: {}", message.getFrom(), message.getText(), e);
+        }
+    }
+
+    @Override
     public void updateMessage(long id, String newText, Boolean unread) {
         StringBuilder sqlB = new StringBuilder(250);
         sqlB.append("UPDATE ").append(TABLE_MESSAGES).append(" SET ");
@@ -430,7 +444,7 @@ class H2MessageDAO implements MessageDAO {
                     .append("=").append(convId[0]);
             for (int i = 1; i < convId.length; i++)
                 convs.append(" OR ").append(col)
-                    .append("=").append(convId[i]);
+                        .append("=").append(convId[i]);
             convs.append(")");
             constraintList.add(convs.toString());
         }
@@ -450,7 +464,7 @@ class H2MessageDAO implements MessageDAO {
                 sqlB.append(" AND ").append(constraintList.get(i));
         }
 
-        if (! countOnly) {
+        if (!countOnly) {
             ofNullable(constraint.getLimit()).map(lim -> " LIMIT " + lim).ifPresent(sqlB::append);
             ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).ifPresent(sqlB::append);
             ofNullable(constraint.getSortField()).map(srtf -> " ORDER BY " + getColumnForField(Message.class, srtf)).ifPresent(constraintList::add);

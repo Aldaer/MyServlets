@@ -35,6 +35,12 @@ public interface MessageDAO {
     void updateMessage(long id, String newText, Boolean unread);
 
     /**
+     * Sends the provided message. Auto-generated fields, such as id and timestamp, are ignored.
+     * @param message Message to send
+     */
+    void sendMessage(Message message);
+
+    /**
      *
      */
     interface MessageFilter {

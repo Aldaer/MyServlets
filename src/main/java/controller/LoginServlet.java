@@ -18,8 +18,7 @@ import java.util.Arrays;
 import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.PageURLs.*;
-import static controller.ParameterNames.L;
-import static controller.ParameterNames.LANGUAGE;
+import static controller.ParameterNames.*;
 
 /**
  * Login servlet. Accepts only POST requests
@@ -44,8 +43,8 @@ public class LoginServlet extends HttpServlet {
         if (authUser == null) {                     // Not authenticated by container
             CredentialsDAO credsDao = (CredentialsDAO) srvContext.getAttribute(C.CREDS_DAO);
 
-            String userName = request.getParameter(L.USERNAME);
-            String userPassword = request.getParameter(L.PASSWORD);
+            String userName = request.getParameter(USERNAME);
+            String userPassword = request.getParameter(PASSWORD);
 
             Credentials creds = credsDao.getCredentials(userName);
             if (creds == null) {

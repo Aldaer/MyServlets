@@ -6,12 +6,11 @@ $('#showmsg').click(function () {
 
 $('#reply').click(function() {
     var msgData = {
-        to: replyingTo.msgFrom,
-        refId: replyingTo.msgId,
+        to: replyingTo.data("msgFrom"),
+        refId: replyingTo.data("msgId"),
         convId: 0,
         text: $('#msgreply').val()
     }
-    alert(msgData);
     $.post("/main/sendMessage", msgData, closeReply());
 });
 

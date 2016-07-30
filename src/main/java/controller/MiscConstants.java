@@ -8,9 +8,9 @@ public interface MiscConstants {
     int MAX_USERNAME_LENGTH = 50;
     int MIN_PASSWORD_LENGTH = 3;
 
-    Long[] UNREAD_PRIVATE = { 0L };
-    Long[] READ_PRIVATE = { -1L };
-    Long[] ALL_PRIVATE = {-1L, 0L };
+    Long[] UNREAD_PRIVATE = {0L};
+    Long[] READ_PRIVATE = {-1L};
+    Long[] ALL_PRIVATE = {-1L, 0L};
 
     String JSON_TYPE = "application/json";
     String JSON_TIME_FORMAT = "yyyy-MM-dd’T'HH:mm:ss.SSSZ";
@@ -43,25 +43,13 @@ interface AttributeNames {
 }
 
 /**
- * Request parameter names: general, as well as
- * specific for (L)ogin/Register, (U)pdateUser and Update(M)essage requests
+ * Request parameter names for (L)ogin/Register form
  */
 interface ParameterNames {
     String LANGUAGE = "language";
-    class L {
-        static final String USERNAME = "j_username";
-        static final String PASSWORD = "j_password";
-        static final String PASSWORD2 = "j_password2";
-    }
-    class U {
-        static final String FULLNAME = "fullname";
-        static final String EMAIL = "email";
-    }
-    class M {
-        static final String ID = "id";
-        static final String UNREAD = "unread";         // true/false
-        static final String NEW_TEXT = "newtext";      // new text for the message
-    }
+    static final String USERNAME = "j_username";
+    static final String PASSWORD = "j_password";
+    static final String PASSWORD2 = "j_password2";
 }
 
 /**

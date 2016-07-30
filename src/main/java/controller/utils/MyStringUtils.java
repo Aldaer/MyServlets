@@ -8,7 +8,7 @@ public class MyStringUtils {
      * Parses decimal string, returns null on any error.
      * Valid strings are '\-?\d+'
      * @param s String to parse
-     * @return Parsed int, null on error
+     * @return Parsed int, {@code null} on error
      */
     public static @Nullable Long parseOrNull(@Nullable String s) {
         if (s == null || s.equals("")) return null;
@@ -30,6 +30,17 @@ public class MyStringUtils {
             else return null;
         }
         return minus? -result : result;
+    }
+
+    /**
+     * Parses decimal string, returns defValue on any error.
+     * Valid strings are '\-?\d+'
+     * @param s String to parse
+     * @return Parsed int, or {@code defValue} on error
+     */
+    public static long parseOrDefault(@Nullable String s, long defValue) {
+        Long p = parseOrNull(s);
+        return p == null? defValue : p;
     }
 
     /**

@@ -2,6 +2,7 @@ package controller;
 
 import lombok.extern.slf4j.Slf4j;
 import model.MyTimer;
+import model.dao.Message;
 import model.dao.MessageDAO;
 import model.dao.User;
 import model.dao.UserDAO;
@@ -22,8 +23,7 @@ import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
 import static controller.MiscConstants.UNREAD_PRIVATE;
 import static controller.PageURLs.*;
-import static controller.ParameterNames.M;
-import static controller.ParameterNames.U;
+import static controller.utils.MyStringUtils.parseOrDefault;
 import static controller.utils.MyStringUtils.parseOrNull;
 import static java.util.Optional.ofNullable;
 
@@ -103,8 +103,8 @@ public class MainServlet extends HttpServlet {
     private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute(S.USER);
-        String newFullName = req.getParameter(U.FULLNAME);
-        String newEmail = req.getParameter(U.EMAIL);
+        String newFullName = req.getParameter("fullname");
+        String newEmail = req.getParameter("email");
         if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
         if (newEmail == null) newEmail = "";
         user.setFullName(newFullName);
@@ -117,17 +117,30 @@ public class MainServlet extends HttpServlet {
     }
 
     private void processMessageUpdate(HttpServletRequest req, HttpServletResponse res) {
-        Long id = parseOrNull(req.getParameter(M.ID));
+        Long id = parseOrNull(req.getParameter("id"));
         if (id == null) return;
-        Boolean unread = ofNullable(req.getParameter(M.UNREAD)).map(String::toLowerCase).map("true"::equals).orElse(null);
-        String newText = req.getParameter(M.NEW_TEXT);
+        Boolean unread = ofNullable(req.getParameter("unread")).map(String::toLowerCase).map("true"::equals).orElse(null);
+        String newText = req.getParameter("newText");
 
         MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
+        // Null parameters are ignored
         mDao.updateMessage(id, newText, unread);            // TODO: message update authorization, update timestamp
     }
 
     private void processMessageSend(HttpServletRequest req, HttpServletResponse res) {
+        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
+        User user = (User) req.getSession().getAttribute(S.USER);
 
+        long refId = parseOrDefault(req.getParameter("refId"), 0);
+        long convId = parseOrDefault(req.getParameter("convId"), 0);
+        Message newMsg = new Message(0,
+                refId,
+                user.getUsername(),
+                req.getParameter("to"),
+                null,
+                convId,
+                req.getParameter("text"));
+        mDao.sendMessage(newMsg);
     }
 
 }
