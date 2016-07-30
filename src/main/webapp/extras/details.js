@@ -12,6 +12,7 @@ $(document).ready( function() {
 function updateElements() {
     if (own) {
         details.prop("disabled", false);
+        $('#update').css("display", "inline-block");
     } else {
         $('#update').css("display", "none");
         details.prop("disabled", true);
@@ -44,11 +45,11 @@ $('.details-form').submit(function () {
 $('#find').click(function () {
     var querybox =$('#query');
     if(querybox.val().length < 2) {
-        $('#slideout').removeClass('on');
+        $('.slideout').removeClass('on');
         querybox.css("color", "red");
         querybox.focus();
     } else {
-        $('#slideout').addClass('on');
+        $('.slideout').addClass('on');
         querybox.css("color", "initial");
         $.getJSON("/main/userSearch?query=" + encodeURIComponent(querybox.val()), onLoadUsers);
     }

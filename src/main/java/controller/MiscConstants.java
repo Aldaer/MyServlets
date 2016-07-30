@@ -81,5 +81,6 @@ interface PageURLs {
     String USER_UPDATE_SERVLET = "/main/updateUser";
     String MESSAGE_SERVLET = "/main/messages";
     String MESSAGE_UPDATE_SERVLET = "/main/updateMessage";
+    String MESSAGE_SEND_SERVLET = "/main/sendMessage";
     String USER_SEARCH_SERVLET = "/main/userSearch";
 }

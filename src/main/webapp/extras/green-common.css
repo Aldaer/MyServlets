@@ -4,6 +4,7 @@
     position: relative;
     z-index: 1;
     background: #FCFCFC;
+    min-width: 500px;
     max-width: 900px;
     margin: 0 auto 20px;
     padding: 20px;
@@ -81,7 +82,13 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     background: #43A047;
 }
 
-#slideout {
+textarea {
+    display: block;
+    width: 100%;
+}
+
+
+.slideout {
     position: absolute;
     left: -1000px;
 
@@ -91,7 +98,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     transition-duration: 0.3s;
 }
 
-#slideout.on {
+.slideout.on {
     position: relative;
     left: 0;
 }
@@ -105,4 +112,13 @@ body {
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.centered {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
 }

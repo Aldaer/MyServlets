@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<div class="bigpanel" id="slideout">
+<div class="bigpanel slideout">
     <div style="width: 20%; float: left">
         buttons<br>
         more buttons

@@ -1,8 +1,28 @@
 $('#showmsg').click(function () {
-    $('#slideout').toggleClass('on');
+    $('#msglist').addClass('on');
 
     $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=0,-1", onLoadMessages);
 });
+
+$('#reply').click(function() {
+    var msgData = {
+        to: replyingTo.msgFrom,
+        refId: replyingTo.msgId,
+        convId: 0,
+        text: $('#msgreply').val()
+    }
+    alert(msgData);
+    $.post("/main/sendMessage", msgData, closeReply());
+});
+
+$('#closeview').click(function() {
+    closeReply();
+});
+
+
+function closeReply() {
+    $('#msgview').removeClass("centered");
+}
 
 function onLoadMessages(data) {
 /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
@@ -33,18 +53,26 @@ function outputMessage(i, msg) {
     mdiv.append(userlink, ':<br>');
     mdiv.append(msg.text);
     mdiv.data("msgId", msg.id);
+    mdiv.data("msgFrom", msg.from);
     mdiv.data("msgTo", msg.to);
     mdiv.css("display", "block");
-    mdiv.on("click", msg.id, markAsRead);
+    mdiv.on("click", msg.id, messageClicked);
     $('.databox').append(mdiv);
 }
 
-function markAsRead(event) {
-    var thisM = $(event.currentTarget);
-    var to = thisM.data("msgTo");
-    var id = thisM.data("msgId");
-    if (to == user && thisM.hasClass("unread")) {
-        thisM.removeClass("unread");
+function messageClicked(event) {
+    replyingTo = $(event.currentTarget);
+    var to = replyingTo.data("msgTo");
+    var id = replyingTo.data("msgId");
+    if (to == user && replyingTo.hasClass("unread")) {
+        replyingTo.removeClass("unread");
         $.post("/main/updateMessage?id=" + id + "&unread=false");
     }
+    $('#msgview').addClass("centered");
+    $('#msgreply').val("");
+    var msgPlace = $('#msgtext');
+    msgPlace.empty();
+    var mClone = replyingTo.clone();
+    mClone.css("margin", "3px");
+    msgPlace.append(mClone);
 }

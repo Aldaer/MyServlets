@@ -32,7 +32,7 @@ import static java.util.Optional.ofNullable;
  */
 
 @Slf4j
-@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_UPDATE_SERVLET})
+@WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_UPDATE_SERVLET, MESSAGE_SEND_SERVLET})
 public class MainServlet extends HttpServlet {
     @SuppressWarnings("UnnecessaryReturnStatement")
     @Override
@@ -46,6 +46,9 @@ public class MainServlet extends HttpServlet {
                 break;
             case MESSAGE_UPDATE_SERVLET:
                 processMessageUpdate(req, res);
+                break;
+            case MESSAGE_SEND_SERVLET:
+                processMessageSend(req, res);
                 break;
             case MAIN_SERVLET:
             default:
@@ -121,6 +124,10 @@ public class MainServlet extends HttpServlet {
 
         MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
         mDao.updateMessage(id, newText, unread);            // TODO: message update authorization, update timestamp
+    }
+
+    private void processMessageSend(HttpServletRequest req, HttpServletResponse res) {
+
     }
 
 }
