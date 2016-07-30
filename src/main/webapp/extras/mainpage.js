@@ -40,8 +40,11 @@ function closeReply() {
     $('#msgview').removeClass("centered");
 }
 
+var tzOffsetMillis;
+
 function onLoadMessages(data) {
     /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
+    tzOffsetMillis = new Date().getTimezoneOffset() * 60000;
     $('#msgbox').empty();
     $.each(data.messages, displayMessage);
 }
@@ -74,7 +77,9 @@ function displayMessage(i, msg) {
         }
     }
 
-    mdiv.append(userlink, ':<br>');
+    var msgTime = new Date(msg.utcTimestamp - tzOffsetMillis);
+
+    mdiv.append(userlink, ' [', msgTime.toLocaleString(jsLocale), ']:<br>');
     mdiv.append(msg.text);
     mdiv.data("msgId", msg.id);
     mdiv.data("msgFrom", msg.from);

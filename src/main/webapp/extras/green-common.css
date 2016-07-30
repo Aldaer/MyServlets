@@ -46,7 +46,6 @@ label {
 
 button {
     outline: 0;
-    background: #4CAF50;
     border: 0;
     padding: 5px;
     color: #FFFFFF;
@@ -66,7 +65,6 @@ button {
     -moz-appearance: button;
 
     color: #FFFFFF;
-    background: #60AF50;
     text-decoration: none;
     display: inline-block;
     box-sizing: border-box;
@@ -76,12 +74,29 @@ button {
     line-height: normal;
 }
 
+.green {
+    background: #60AF50;
+}
+
+.green:hover {
+    background: #43A047;
+}
+
+
 .amber {
-    background: #FFC251 !important;
+    background: #FFC251;
+}
+
+.amber:hover {
+    background: #EFA231;
 }
 
 .ruby {
-    background: #EF3B3A !important;
+    background: #FF6B6A;
+}
+
+.ruby:hover {
+    background: #EF3B3A;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {
@@ -89,15 +104,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     padding: 0;
 }
 
-.bigpanel button:hover, a.smallbutton:hover {
-    background: #43A047;
-}
-
 textarea {
     display: block;
     width: 100%;
 }
-
 
 .slideout {
     position: absolute;

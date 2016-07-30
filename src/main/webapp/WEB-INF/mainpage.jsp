@@ -53,7 +53,7 @@
         <fmt:message key="main.through"/> getDate(): <i>${timer.date}</i><br>
         <fmt:message key="main.through"/> toString(): <i>${timer}</i>
     </p>
-    <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
+    <button class="smallbutton green" id="showmsg"><fmt:message key="main.mymessages"/></button>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>
 
@@ -76,13 +76,14 @@
     <p id="msgheader"></p>
     <p id="msgtext" rows="6">TEXT</p>
     <textarea id="msgreply" rows="10">REPLY</textarea>
-    <button class="smallbutton" id="reply">Reply</button>
+    <button class="smallbutton green" id="reply">Reply</button>
     <button class="smallbutton ruby" id="delete">Delete</button>
     <button class="smallbutton amber" id="closeview">Close</button>
 </div>
 
 <script>
     var user = '${currentUser.username}';
+    var jsLocale = "${language}";
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

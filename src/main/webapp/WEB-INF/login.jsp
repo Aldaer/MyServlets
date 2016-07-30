@@ -26,7 +26,7 @@
             <input type="text" placeholder="<fmt:message key="register.username"/>" name="j_username" id="r_name"/>
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password"/>
             <input type="password" placeholder="<fmt:message key="register.repeatPassword"/>" name="j_password2"/>
-            <button type="submit"><fmt:message key="register.do"/></button>
+            <button type="submit" class="green"><fmt:message key="register.do"/></button>
             <p class="failcause"></p>
             <p class="message"><fmt:message key="login.registered"/> <a href="#"><fmt:message key="login.signIn"/></a></p>
             <input type="hidden" name="language" value="${locale}">
@@ -34,7 +34,7 @@
         <form class="login-form" name="login" method="post" action="${authByContainer? 'j_security_check' : '/doLogin'}" accept-charset="UTF-8">
             <input type="text" placeholder="<fmt:message key="login.username"/>" name="j_username" />
             <input type="password" placeholder="<fmt:message key="login.password"/>" name="j_password" />
-            <button type="submit"><fmt:message key="login.enter"/></button>
+            <button type="submit" class="green"><fmt:message key="login.enter"/></button>
 
             <p class="failcause"><c:choose>
             <c:when test="${empty userFound}"></c:when>
@@ -46,8 +46,8 @@
             <input type="hidden" name="language" value="${locale}">
         </form>
     <table width="100%"><tr>
-      <td><button class="smallbutton" onclick="location.href='/main/serv?language=en'">English</button></td>
-      <td><button class="smallbutton" onclick="location.href='/main/serv?language=ru'">Русский</button></td>
+      <td><button class="smallbutton green" onclick="location.href='/main/serv?language=en'">English</button></td>
+      <td><button class="smallbutton green" onclick="location.href='/main/serv?language=ru'">Русский</button></td>
     </tr></table>
     </div>
 </div>

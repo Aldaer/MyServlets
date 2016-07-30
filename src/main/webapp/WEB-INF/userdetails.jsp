@@ -34,14 +34,14 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-                <button class="smallbutton details" id="update" type="submit"><fmt:message key="details.update"/></button>
-            <a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
+                <button class="smallbutton green details" id="update" type="submit"><fmt:message key="details.update"/></button>
+            <a href="/main/serv" class="smallbutton green"><fmt:message key="details.gotomain"/></a>
         </form>
     </div>
     <div style="width: 40%; float:right">
         <p><fmt:message key="details.search"/></p>
         <input type="text" id="query"/><br>
-        <button class="smallbutton" id="find"><fmt:message key="details.find.user"/></button>
+        <button class="smallbutton green" id="find"><fmt:message key="details.find.user"/></button>
     </div>
 </div>
 
