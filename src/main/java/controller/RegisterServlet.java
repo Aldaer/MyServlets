@@ -65,6 +65,12 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         log.info("Successfully created user '{}'", newName);
+
+        try {                   // Also preform container based authentication
+            if ((Boolean) srvContext.getAttribute(AttributeNames.C.CONTAINER_AUTH))
+                request.login(newName, newPassword);
+        } catch (ServletException ignored) {}
+
         request.getRequestDispatcher(LOGIN_SERVLET).forward(request, response);
     }
 
@@ -85,4 +91,5 @@ public class RegisterServlet extends HttpServlet {
                         .getServletRegistration(config.getServletName())
                         .getMappings().stream().toArray(String[]::new)));
     }
+
 }

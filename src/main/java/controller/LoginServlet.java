@@ -72,9 +72,13 @@ public class LoginServlet extends HttpServlet {
             request.getSession().invalidate();
 
         final User user = userDao.getUser(login);
-        assert user != null;
-        request.getSession(true).setAttribute(S.USER, user);
+        if (user == null) {             // User deleted while still authorized by container
+            request.logout();
+            response.sendRedirect(MAIN_SERVLET);
+            return;
+        }
 
+        request.getSession(true).setAttribute(S.USER, user);
         String lang = request.getParameter(ParameterNames.LANGUAGE);
         if (lang == null || lang.equals("")) lang = DEFAULT_LOCALE;
         request.getSession(false).setAttribute(LANGUAGE, lang);

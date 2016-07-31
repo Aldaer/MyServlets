@@ -47,9 +47,9 @@ interface AttributeNames {
  */
 interface ParameterNames {
     String LANGUAGE = "language";
-    static final String USERNAME = "j_username";
-    static final String PASSWORD = "j_password";
-    static final String PASSWORD2 = "j_password2";
+    String USERNAME = "j_username";
+    String PASSWORD = "j_password";
+    String PASSWORD2 = "j_password2";
 }
 
 /**
