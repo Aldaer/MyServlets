@@ -1,10 +1,7 @@
 package model.dao.databases;
 
-import model.dao.CredentialsDAO;
-import model.dao.Message;
-import model.dao.MessageDAO;
+import model.dao.*;
 import model.dao.MessageDAO.MessageFilter;
-import model.dao.UserDAO;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,8 +13,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.hamcrest.core.Is.is;
@@ -161,11 +158,11 @@ public class H2DAOTest {
 
     @Test
     public void testListUsersLike() throws Exception {
-        Map<String, String> list1 = usr.listUsers("ася", 20);
+        Collection<ShortUserInfo> list1 = usr.listUsers("ася", 20);
         assertThat(list1.size(), is(1));
-        list1.forEach((s, s2) -> System.out.println(s + " -- " + s2));
+        list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
         list1 = usr.listUsers("вас", 20);
         assertThat(list1.size(), is(2));
-        list1.forEach((s, s2) -> System.out.println(s + " -- " + s2));
+        list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
     }
 }

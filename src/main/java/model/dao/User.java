@@ -39,6 +39,11 @@ public class User implements Stored {
         this.regComplete = regComplete;
     }
 
+    public ShortUserInfo shortInfo() {
+        return new ShortUserInfo(id, username, fullName);
+    }
+
 }
+
 
 

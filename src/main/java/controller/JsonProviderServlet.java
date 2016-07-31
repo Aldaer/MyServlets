@@ -3,11 +3,8 @@ package controller;
 import controller.utils.JsonNullableGenerator;
 import controller.utils.MyStringUtils;
 import lombok.extern.slf4j.Slf4j;
-import model.dao.Message;
-import model.dao.MessageDAO;
+import model.dao.*;
 import model.dao.MessageDAO.MessageFilter;
-import model.dao.User;
-import model.dao.UserDAO;
 
 import javax.json.Json;
 import javax.json.stream.JsonGenerator;
@@ -18,7 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -120,6 +117,7 @@ public class JsonProviderServlet extends HttpServlet {
             gen.writeStartObject();
             if (reqUser != null) gen
                     .write("exists", true)
+                    .write("id", reqUser.getId())
                     .write("fullName", reqUser.getFullName())
                     .write("email", reqUser.getEmail());
             else gen.write("exists", false);
@@ -129,16 +127,17 @@ public class JsonProviderServlet extends HttpServlet {
             if (userLike == null || userLike.length() < MIN_QUERY_LENGTH) return;
             int limit = (int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
-            Map<String, String> userMap = uDao.listUsers(userLike, limit);
+            Collection<ShortUserInfo> userList = uDao.listUsers(userLike, limit);
 
-            log.debug("Outputting {} found users", userMap.size());
+            log.debug("Outputting {} found users", userList.size());
             gen.writeStartObject();
             gen.writeStartArray("users");
-            userMap.entrySet().stream().sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+            userList.stream().sorted((u1, u2) -> u1.getUsername().compareTo(u2.getUsername()))
                     .forEachOrdered(usr -> gen
                             .writeStartObject()
-                            .write("username", usr.getKey())
-                            .write("fullName", usr.getValue())
+                            .write("id", usr.getId())
+                            .write("username", usr.getUsername())
+                            .write("fullName", usr.getFullName())
                             .writeEnd()
                     );
             gen.writeEnd().writeEnd().close();

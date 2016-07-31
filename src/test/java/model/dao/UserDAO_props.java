@@ -2,20 +2,27 @@ package model.dao;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * User data access object
  */
 class UserDAO_props implements UserDAO {
     private static Map<Long, String> userData = new HashMap<>();
+    private static Map<Long, long[]> userFriends = new HashMap<>();
 
     static {
         ResourceBundle userN = ResourceBundle.getBundle("users");
         userN.keySet().forEach(key -> userData.put(Long.decode(key), userN.getString(key)));
+        ResourceBundle friends = ResourceBundle.getBundle("friends");
+
+        friends.keySet().forEach(key -> userFriends.put(
+                Long.decode(key), Stream.of(friends.getString(key).split(",")).mapToLong(Long::parseLong).toArray()));
+
     }
 
     @Override
@@ -40,9 +47,15 @@ class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public Map<String, String> listUsers(String partialName, int limit) {
+    public Collection<ShortUserInfo> listUsers(String partialName, int limit) {
         return userData.entrySet().stream().filter(idname -> idname.getValue().contains(partialName))
                 .map(idname -> getUser(idname.getKey()))
-                .collect(Collectors.toMap(user -> user.username, user -> user.fullName));
+                .map(User::shortInfo)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    @Override
+    public @NotNull long[] getFriends(long id) {
+        return ofNullable(userFriends.get(id)).orElse(new long[0]);
     }
 }

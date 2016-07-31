@@ -3,7 +3,7 @@ package model.dao;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * Common interface to support user DAO functionality
@@ -25,6 +25,13 @@ public interface UserDAO {
     @Nullable User getUser(@Nullable String username);
 
     /**
+     * Returns a set of user's friends from database
+     * @param id User id
+     * @return id's of user's friends, or empty array if none
+     */
+    @NotNull long[] getFriends(long id);
+
+    /**
      * Updates info for user with name == {@code user.username } in the database.
      * @param user User object with updated fields. Users with unknown {@code username} are ignored.
      */
@@ -36,5 +43,5 @@ public interface UserDAO {
      * @param limit Maximum number of users o output
      * @return Map of "username"-"full name" pairs
      */
-    Map<String, String> listUsers(@Nullable String partialName, int limit);
+    Collection<ShortUserInfo> listUsers(@Nullable String partialName, int limit);
 }

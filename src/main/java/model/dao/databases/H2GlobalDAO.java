@@ -6,10 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -27,32 +24,37 @@ import static model.dao.databases.Stored.Processor.getColumnForField;
  */
 @SuppressWarnings("WeakerAccess")
 @Slf4j
-public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // TODO: replace column name constants with static init variables
+public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // TODO: replace column name constants with getColumnForField() calls
     static final String TABLE_USERS = "users";
     static final String TABLE_CREDENTIALS = "credentials";
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
     static final String TABLE_ROLES = "user_roles";
     static final String DEFAULT_ROLE = "authenticated-user";
     static final String TABLE_MESSAGES = "messages";
+    static final String TABLE_FRIENDS = "friends";
 
     static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM " + TABLE_CREDENTIALS + " WHERE (username=?);";
     static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?);";
     static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (id=?);";
 
-    static final String GET_USER_BY_PARTIAL_NAME = "SELECT username, fullname FROM " + TABLE_USERS + " WHERE (username LIKE ? OR fullname LIKE ?) LIMIT ";
+    static final String GET_USER_BY_PARTIAL_NAME = "SELECT id, username, fullname FROM " + TABLE_USERS + " WHERE (username LIKE ? OR fullname LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
     static final String CHECK_IF_USER_EXISTS = "SELECT TOP 1 1 FROM " + TABLE_CREDENTIALS
             + " AS C WHERE (C.username=?) UNION SELECT TOP 1 1 FROM "
             + TABLE_TEMP_CREDENTIALS + " AS tc WHERE (TC.username=?);";
+
     static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS + " (username, created) VALUES (?, ?);";
     static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS + " WHERE (created < ?);";
 
     // Default ResultSet behaviour: ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
-
     static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "');";
-
     static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
+
+    static final String GET_USERS_FRIENDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (uid=?);";
+
+    static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + getColumnForField(Message.class, "id") + "=";
+
 
     private Supplier<Connection> cSource;
     private UserDAO userDAO;
@@ -186,9 +188,8 @@ class H2UserDAO implements UserDAO {
     }
 
     @Override
-    public Map<String, String> listUsers(@Nullable String partialName, int limit) {
-        Map<String, String> emptyMap = new HashMap<>(0);
-        if (partialName == null || partialName.length() < MIN_PARTIAL_LEN) return emptyMap;
+    public Collection<ShortUserInfo> listUsers(@Nullable String partialName, int limit) {
+        if (partialName == null || partialName.length() < MIN_PARTIAL_LEN) return Collections.emptyList();
         String sql = GET_USER_BY_PARTIAL_NAME + limit + ";";
 
         try (Connection conn = cSource.get();
@@ -200,11 +201,35 @@ class H2UserDAO implements UserDAO {
             ResultSet rs = pst.executeQuery();
             List<User> tmpList = new ArrayList<>();
             Stored.Processor.reconstructAllObjects(rs, () -> new User("", "", "", true), tmpList, true);
-            return tmpList.stream().collect(Collectors.toMap(User::getUsername, User::getFullName));
+            return tmpList.stream().map(User::shortInfo).collect(Collectors.toCollection(ArrayList::new));
         } catch (SQLException e) {
             log.error("Error getting list of users: {}", e);
-            return emptyMap;
+            return Collections.emptyList();
         }
+    }
+
+    @Override
+    public @NotNull long[] getFriends(long id) {
+        int currSize = 20;
+        long[] result = new long[currSize];
+        int n = 0;
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(GET_USERS_FRIENDS)) {
+            pst.setLong(1, id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                long fid = rs.getLong(1);
+                if (++n > currSize) {
+                    currSize *= 2;
+                    result = Arrays.copyOf(result, currSize);
+                }
+                result[n] = fid;
+            }
+
+        } catch (SQLException e) {
+            log.error("Error getting list of friends for user id={}: {}", id, e);
+        }
+        return Arrays.copyOf(result, n);
     }
 }
 
@@ -326,6 +351,7 @@ class H2CredentialsDAO implements CredentialsDAO {
             return null;
         }
     }
+
 }
 
 @Slf4j
@@ -427,9 +453,8 @@ class H2MessageDAO implements MessageDAO {
 
     @Override
     public void deleteMessage(long id) {
-        final String query = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + Stored.Processor.getColumnForField(Message.class, "id") + "=" + id + ";";
         try (Connection conn = cSource.get(); Statement st = conn.createStatement()) {
-            int nDeleted = st.executeUpdate(query);
+            int nDeleted = st.executeUpdate(DELETE_MESSAGE_QUERY + id + ";");
             log.trace("Deleted {} message(s)", nDeleted);
         } catch (SQLException e) {
             log.error("Error deleting message #{}: {}", id, e);
