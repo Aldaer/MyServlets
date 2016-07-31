@@ -1,5 +1,6 @@
-//CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
+// Uncomment lines when creating embedded database instead of in-memory
 
+//CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 //SET SCHEMA userdata;
 //set COLLATION russian;
 
@@ -70,7 +71,7 @@ CREATE TABLE messages (
   u_to VARCHAR_IGNORECASE(50),
   m_time TIMESTAMP NOT NULL DEFAULT CURRENT_UTC_TIMESTAMP(),
   conversation_id BIGINT NOT NULL DEFAULT 0,
-  text VARCHAR default ''
+  text VARCHAR DEFAULT ''
 );
 
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
@@ -79,3 +80,15 @@ INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non exist
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
 INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, identity(), 'А я прочитал!', '2015-01-03 12:00:00');
+
+DROP TABLE IF EXISTS friends;
+CREATE TABLE friends (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  uid BIGINT,
+  fid BIGINT,
+  FOREIGN KEY (uid) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (fid) REFERENCES users (id) ON DELETE CASCADE
+);
+
+INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='вася'), (SELECT TOP 1 id FROM users WHERE username='петя'));
+INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='петя'), (SELECT TOP 1 id FROM users WHERE username='вася'));
