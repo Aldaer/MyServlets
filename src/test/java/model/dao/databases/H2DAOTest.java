@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@SuppressWarnings("ConstantConditions")
 public class H2DAOTest {
     private static CredentialsDAO creds;
     private static UserDAO usr;
@@ -180,6 +181,9 @@ public class H2DAOTest {
         usr.addFriend(id1, id2);
         long[] flist2 = usr.getFriendIds(id1);
         assertThat(flist2.length - flist1.length, is(1));
+        usr.addFriend(id1, id2);                // Test idempotency
+        long[] flist2a = usr.getFriendIds(id1);
+        assertThat(flist2a.length - flist1.length, is(1));
         usr.removeFriend(id1, id2);
         long[] flist3 = usr.getFriendIds(id1);
         assertThat(flist3.length, is(flist1.length));

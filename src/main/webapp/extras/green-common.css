@@ -80,7 +80,6 @@ button {
     background: #43A047;
 }
 
-
 .smallbutton.amber {
     background: #FFC251;
 }
@@ -95,6 +94,14 @@ button {
 
 .smallbutton.ruby:hover {
     background: #EF3B3A;
+}
+
+.smallbutton.blue {
+    background: #277cff;
+}
+
+.smallbutton.blue:hover {
+    background: #175cdf;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {

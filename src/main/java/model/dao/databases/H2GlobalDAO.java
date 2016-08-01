@@ -55,7 +55,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // T
     static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS + " ON "
             + TABLE_USERS + ".id = " + TABLE_FRIENDS + ".fid WHERE " + TABLE_FRIENDS + ".uid=";
 
-    static final String ADD_FRIEND = "INSERT INTO " + TABLE_FRIENDS + " (uid, fid) VALUES (?,?);";
+    static final String ADD_FRIEND = "MERGE INTO " + TABLE_FRIENDS + " (uid, fid) VALUES (?,?);";
     static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (uid=? AND fid=?);";
 
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + getColumnForField(Message.class, "id") + "=";
