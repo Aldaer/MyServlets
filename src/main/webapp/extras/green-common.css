@@ -142,3 +142,11 @@ body {
     transform: translate(-50%, -50%);
     z-index: 10;
 }
+
+.waiting {
+    cursor: progress !important;
+}
+
+.hidden {
+    display: none;
+}

@@ -63,4 +63,36 @@ class UserDAO_props implements UserDAO {
     public Collection<ShortUserInfo> listFriends(long currentUserId) {
         return Arrays.stream(getFriendIds(currentUserId)).mapToObj(this::getUser).map(User::shortInfo).collect(Collectors.toCollection(ArrayList::new));
     }
+
+    @Override
+    public void addFriend(long id, Long friendId) {
+        if (friendId == null) return;
+        userFriends.put(id, arrayWithElement(userFriends.get(id), friendId));
+    }
+
+    @Override
+    public void removeFriend(long id, Long friendId) {
+        if (friendId == null) return;
+        userFriends.put(id, arrayWithoutElement(userFriends.get(id), friendId));
+    }
+
+    private long[] arrayWithElement(long[] src, long el) {
+        for (long l: src) if (l == el) return src;
+
+        long[] newarr = Arrays.copyOf(src, src.length + 1);
+        newarr[src.length] = el;
+        return newarr;
+    }
+
+    private long[] arrayWithoutElement(long[] src, long el) {
+        int srcl = src.length;
+        for (int i = 0; i < srcl; i++) if (src[i] == el) {
+            long[] newarr = new long[srcl - 1];
+            System.arraycopy(src, 0, newarr, 0, i);
+            System.arraycopy(src, i + 1, newarr, i, srcl - i - 1);
+            return newarr;
+        }
+        return src;
+    }
+
 }

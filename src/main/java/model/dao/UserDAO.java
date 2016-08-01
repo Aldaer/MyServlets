@@ -48,8 +48,21 @@ public interface UserDAO {
     /**
      * Outputs a collection of user data finding users through {@code friends} table
      * @param currentUserId Id of user to find friends
-     * @param limit Maximum number of users to output
      * @return Collection of user info
      */
     Collection<ShortUserInfo> listFriends(long currentUserId);
+
+    /**
+     * Adds new friend to user's friend list
+     * @param id User to add friend to
+     * @param friendId User being added to friend list
+     */
+    void addFriend(long id, Long friendId);
+
+    /**
+     * Removes user from another user's friend list
+     * @param id User to remove friend from
+     * @param friendId User being removed from friend list
+     */
+    void removeFriend(long id, Long friendId);
 }

@@ -55,7 +55,12 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // T
     static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS + " ON "
             + TABLE_USERS + ".id = " + TABLE_FRIENDS + ".fid WHERE " + TABLE_FRIENDS + ".uid=";
 
+    static final String ADD_FRIEND = "INSERT INTO " + TABLE_FRIENDS + " (uid, fid) VALUES (?,?);";
+    static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (uid=? AND fid=?);";
+
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + getColumnForField(Message.class, "id") + "=";
+
+    static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
 
     private Supplier<Connection> cSource;
@@ -252,6 +257,35 @@ class H2UserDAO implements UserDAO {
         }
         return Arrays.copyOf(result, n);
     }
+
+    @Override
+    public void addFriend(long id, Long friendId) {
+        if (friendId == null) return;
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(ADD_FRIEND)) {
+            pst.setLong(1, id);
+            pst.setLong(2, friendId);
+            log.trace("Executing query: {} <== ({},{})", ADD_FRIEND, id, friendId);
+            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
+        } catch (SQLException e) {
+            log.error("Error adding friend #{} to user #{}'s list: {}", friendId, id, e);
+        }
+    }
+
+    @Override
+    public void removeFriend(long id, Long friendId) {
+        if (friendId == null) return;
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(REMOVE_FRIEND)) {
+            pst.setLong(1, id);
+            pst.setLong(2, friendId);
+            log.trace("Executing query: {} <== ({},{})", REMOVE_FRIEND, id, friendId);
+            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
+        } catch (SQLException e) {
+            log.error("Error removing friend #{} from user #{}'s list: {}", friendId, id, e);
+        }
+
+    }
 }
 
 @Slf4j
@@ -312,7 +346,7 @@ class H2CredentialsDAO implements CredentialsDAO {
             pst.setString(1, lcName);
             pst.setLong(2, System.currentTimeMillis());
             log.trace("Executing query: {} <== ({})", CREATE_TEMPORARY_ACCOUNT, login);
-            if (pst.executeUpdate() != 1) throw new SQLException("Wrong affected row count");
+            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {
             log.error("Error creating temporary account for user: {}", login);
             return false;

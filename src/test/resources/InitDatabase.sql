@@ -2,7 +2,6 @@
 
 //CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 //SET SCHEMA userdata;
-//set COLLATION russian;
 
 CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
 import java.sql.Timestamp;
@@ -83,11 +82,11 @@ INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('п�
 
 DROP TABLE IF EXISTS friends;
 CREATE TABLE friends (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
   uid BIGINT,
   fid BIGINT,
   FOREIGN KEY (uid) REFERENCES users (id) ON DELETE CASCADE,
-  FOREIGN KEY (fid) REFERENCES users (id) ON DELETE CASCADE
+  FOREIGN KEY (fid) REFERENCES users (id) ON DELETE CASCADE,
+  CONSTRAINT fkey PRIMARY KEY (uid, fid)
 );
 
 INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='вася'), (SELECT TOP 1 id FROM users WHERE username='петя'));

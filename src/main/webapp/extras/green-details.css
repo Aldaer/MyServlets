@@ -9,8 +9,9 @@
     background: #ffffc2;
 }
 
-.userbubble.friend, input.friend, .colorbox.friend {
+.userbubble.friend, input.friend, .colorbox.friend, .smallbutton.friend {
     background: #dcff3a;
+    color: initial;
 }
 
 .colorbox.nonfriend {

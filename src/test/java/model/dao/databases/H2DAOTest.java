@@ -165,4 +165,23 @@ public class H2DAOTest {
         assertThat(list1.size(), is(2));
         list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
     }
+
+    @Test
+    public void testExistingFriends() throws Exception {
+        long[] flist1 = usr.getFriendIds(usr.getUser("Вася").getId());
+        assertThat(usr.getUser(flist1[0]).getUsername().toLowerCase(), is("петя"));
+    }
+
+    @Test
+    public void testAddRemoveFriends() throws Exception {
+        long id1 = usr.getUser("вася").getId();
+        long[] flist1 = usr.getFriendIds(id1);
+        long id2 = usr.getUser("admin").getId();
+        usr.addFriend(id1, id2);
+        long[] flist2 = usr.getFriendIds(id1);
+        assertThat(flist2.length - flist1.length, is(1));
+        usr.removeFriend(id1, id2);
+        long[] flist3 = usr.getFriendIds(id1);
+        assertThat(flist3.length, is(flist1.length));
+    }
 }

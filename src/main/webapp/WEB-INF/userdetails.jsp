@@ -20,7 +20,7 @@
 </head>
 <body>
 <div class="bigpanel">
-    <h1 ><fmt:message key="details.header"/></h1>
+    <h1><fmt:message key="details.header"/></h1>
     <div style="width: 60%; float:left">
         <c:if test="${ownProfile and not currentUser.regComplete}"><p class="warning"><fmt:message
                 key="details.unconfirmed"/></p></c:if>
@@ -34,7 +34,9 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-                <button class="smallbutton details" id="update" type="submit"><fmt:message key="details.update"/></button>
+            <button class="smallbutton details hidden" id="update" type="submit"><fmt:message key="details.update"/></button>
+            <button class="smallbutton friend hidden" id="addfriend" ><fmt:message key="details.addfriend"/></button>
+            <button class="smallbutton ruby hidden" id="remfriend" ><fmt:message key="details.remfriend"/></button>
             <a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
         </form>
     </div>
@@ -49,24 +51,38 @@
 <div class="bigpanel slideout">
     <div style="width: 20%; float: left">
         <p>Filter</p>
-        <div class="colorbox"><input name="ufilter" type="radio" class="radio" onclick=displayFilteredUsers(0) checked="">All</div>
-        <div class="colorbox friend"><input name="ufilter" type="radio" class="radio friend" onclick=displayFilteredUsers(1)>Friends</div>
-        <div class="colorbox nonfriend"><input name="ufilter" type="radio" class="radio" onclick=displayFilteredUsers(2)>Non-friends</div>
+        <div class="colorbox"><input name="ufilter" type="radio" class="radio" onclick=displayFilteredUsers(0)
+                                     checked="">All
+        </div>
+        <div class="colorbox friend"><input name="ufilter" type="radio" class="radio friend"
+                                            onclick=displayFilteredUsers(1)>Friends
+        </div>
+        <div class="colorbox nonfriend"><input name="ufilter" type="radio" class="radio"
+                                               onclick=displayFilteredUsers(2)>Non-friends
+        </div>
     </div>
     <div style="width: 80%; float:right">
         <p id="usersFoundHeader"></p>
-        <div class="databox" id = "userfindbox">Loading users...</div>
+        <div class="databox" id="userfindbox">Loading users...</div>
     </div>
 </div>
 
 <div class="userbubble" id="bubbleprototype"></div>
+
+<div class="bigpanel slideout" id="newmsg">
+    <h2>Private message</h2>
+    <p id="recipient"></p>
+    <textarea id="msgreply" rows="10"></textarea>
+    <button class="smallbutton" id="send">Send</button>
+    <button class="smallbutton amber" id="cancel">Cancel</button>
+</div>
 
 <script>
     var currUser = "${currentUser.username}";
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};
 
-    var usersFoundMsg='<fmt:message key="details.users.found"/> ';
+    var usersFoundMsg = '<fmt:message key="details.users.found"/> ';
 </script>
 <script src="/extras/details.js"></script>
 </body>

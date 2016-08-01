@@ -110,6 +110,19 @@ public class MainServlet extends HttpServlet {
     private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute(S.USER);
+        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
+
+        switch (req.getParameter("action")) {
+            case "addfriend":
+                log.info("Adding friend to user '{}'", user.getUsername());
+                userDAO.addFriend(user.getId(), parseOrNull(req.getParameter("id")));
+                return;
+            case "remfriend":
+                log.info("Removing friend from user '{}'", user.getUsername());
+                userDAO.removeFriend(user.getId(), parseOrNull(req.getParameter("id")));
+                return;
+        }
+
         String newFullName = req.getParameter("fullname");
         String newEmail = req.getParameter("email");
         if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
@@ -117,7 +130,6 @@ public class MainServlet extends HttpServlet {
         user.setFullName(newFullName);
         user.setEmail(newEmail);
         user.setRegComplete(true);
-        UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         log.info("Updating user info for user '{}'", user.getUsername());
         userDAO.updateUserInfo(user);
         res.sendRedirect(DETAILS_PAGE);

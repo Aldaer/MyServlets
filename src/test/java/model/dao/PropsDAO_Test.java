@@ -62,4 +62,23 @@ public class PropsDAO_Test {
         assertThat(creds.verify("123321"), is(true));
         assertThat(creds.verify("123322"), is(false));
     }
+
+    @Test
+    public void testExistingFriends() throws Exception {
+        long[] flist1 = udao.getFriendIds(udao.getUser("Вася").getId());
+        assertThat(udao.getUser(flist1[0]).getUsername().toLowerCase(), is("петя"));
+    }
+
+    @Test
+    public void testAddRemoveFriends() throws Exception {
+        long id1 = udao.getUser("петя").getId();
+        long[] flist1 = udao.getFriendIds(id1);
+        long id2 = udao.getUser("миша").getId();
+        udao.addFriend(id1, id2);
+        long[] flist2 = udao.getFriendIds(id1);
+        assertThat(flist2.length - flist1.length, is(1));
+        udao.removeFriend(id1, id2);
+        long[] flist3 = udao.getFriendIds(id1);
+        assertThat(flist3.length, is(flist1.length));
+    }
 }

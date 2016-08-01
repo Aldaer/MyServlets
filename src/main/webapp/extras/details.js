@@ -4,26 +4,42 @@ var displayedList;
 var filterMode = 0;
 var displayedId;
 
+var body = $("body");
+
 $(document).ready(function () {
-    updateElements();
 
     details.change(function () {
         $(this).addClass("edited");
-        $('#update').css("display", "inline-block");
+        $('#update').removeClass("hidden");
     });
 
-    $('#userfindbox').on("click", ".userlink", function () {
+    $('#userfindbox').click(".userlink", function () {
         reloadUser(this.text);
     });
 
-    $('#allfriends').on("click", function () {
+    $('#allfriends').click(function () {
         showFriends();
     });
 
-    $.getJSON("/main/userSearch?friends=ids", function (flist) {
-        friendList = flist;
+    $('#addfriend').click(function () {
+        addToFriends(displayedId);
     });
+
+    $('#remfriend').click(function () {
+        removeFromFriends(displayedId);
+    });
+
+    getFriendList();
 });
+
+function getFriendList() {
+    body.addClass("waiting");
+    $.getJSON("/main/userSearch?friends=ids", function (flist) {
+        body.removeClass("waiting");        
+        friendList = flist;
+        updateElements();
+    });
+}
 
 function isFriend(id) {
     return friendList.includes(id);
@@ -32,15 +48,19 @@ function isFriend(id) {
 function updateElements() {
     if (own) {
         details.prop("disabled", false);
-        $('#update').css("display", "inline-block");
+        $('#update').removeClass("hidden");
+        $('#addfriend').addClass("hidden");
+        $('#remfriend').addClass("hidden");
     } else {
-        $('#update').css("display", "none");
+        $('#update').addClass("hidden");
         details.prop("disabled", true);
-        $('.warning').css("display", "none");
+        $('.warning').addClass("hidden");
         if (isFriend(displayedId)) {
-
+            $('#addfriend').addClass("hidden");
+            $('#remfriend').removeClass("hidden");
         } else {
-
+            $('#addfriend').removeClass("hidden");
+            $('#remfriend').addClass("hidden");
         }
     }
     details.removeClass("edited");
@@ -60,8 +80,8 @@ function reloadUser(name) {
         $('input[name="fullname"]').val(usr.fullName);
         $('input[name="email"]').val(usr.email);
         displayedId = usr.id;
+        updateElements();
     });
-    updateElements();
 }
 
 $('.details-form').submit(function () {
@@ -77,11 +97,13 @@ $('#find').click(function () {
     } else {
         $('.slideout').addClass('on');
         querybox.css("color", "initial");
+        body.addClass("waiting");
         $.getJSON("/main/userSearch?query=" + encodeURIComponent(querybox.val()), onLoadUsers);
     }
 });
 
 function onLoadUsers(data) {
+    body.removeClass("waiting");
     $('#usersFoundHeader').text(usersFoundMsg + data.users.length);
     $('#userfindbox').empty();
     displayedList = data.users;
@@ -119,4 +141,20 @@ function displayFilteredUsers(mode) {
 function showFriends() {
     $('.slideout').addClass('on');
     $.getJSON("/main/userSearch?friends=all", onLoadUsers);
+}
+
+function addToFriends(id) {
+    var msgData = {
+        action: "addfriend",
+        id: id
+    };
+    $.post("/main/messageAction", msgData, getFriendList());
+}
+
+function removeFromFriends(id) {
+    var msgData = {
+        action: "remfriend",
+        id: id
+    };
+    $.post("/main/messageAction", msgData, getFriendList());
 }

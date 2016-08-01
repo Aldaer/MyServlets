@@ -1,3 +1,5 @@
+var body = $('body');
+
 $('#showmsg').click(function () {
     $('#msglist').addClass('on');
 
@@ -71,7 +73,6 @@ function displayMessage(i, msg) {
     if (msg.conversationId == 0) {
         mdiv.addClass("unread");
         if (msg.to == user) {
-            mdiv.css("cursor", "pointer");
             mdiv.on("mouseenter", startTimer);
             mdiv.on("mouseleave", stopTimer);
         }
@@ -85,7 +86,7 @@ function displayMessage(i, msg) {
     mdiv.data("msgFrom", msg.from);
     mdiv.data("msgTo", msg.to);
     mdiv.css("display", "block");
-    mdiv.on("click", msg.id, messageClicked);
+    mdiv.click(msg.id, messageClicked);
     $('#msgbox').append(mdiv);
 }
 
@@ -96,13 +97,16 @@ var nowReading;
 function startTimer(event) {
     readTimer = setTimeout(markAsRead, 2000);
     nowReading = $(event.currentTarget);
+    body.addClass("waiting");
 }
 
 function stopTimer() {
     clearTimeout(readTimer);
+    body.removeClass("waiting");
 }
 
 function markAsRead() {
+    body.removeClass("waiting");
     if (nowReading.hasClass("unread")) {
         nowReading.removeClass("unread");
         nowReading.css("cursor", "");
