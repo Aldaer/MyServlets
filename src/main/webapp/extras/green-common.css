@@ -53,17 +53,19 @@ button {
     -webkit-transition: all;
     transition: all;
     cursor: pointer;
+    background: #60AF50;
 }
 
 .warning {
     color: #FF8000;
 }
 
-.bigpanel .smallbutton, a.smallbutton {
+.smallbutton, a.smallbutton {
     font-family: "Roboto", sans-serif;
     -webkit-appearance: button;
     -moz-appearance: button;
 
+    background: #60AF50;
     color: #FFFFFF;
     text-decoration: none;
     display: inline-block;
@@ -74,28 +76,24 @@ button {
     line-height: normal;
 }
 
-.green {
-    background: #60AF50;
-}
-
-.green:hover {
+.smallbutton:hover {
     background: #43A047;
 }
 
 
-.amber {
+.smallbutton.amber {
     background: #FFC251;
 }
 
-.amber:hover {
+.smallbutton.amber:hover {
     background: #EFA231;
 }
 
-.ruby {
+.smallbutton.ruby {
     background: #FF6B6A;
 }
 
-.ruby:hover {
+.smallbutton.ruby:hover {
     background: #EF3B3A;
 }
 

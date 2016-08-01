@@ -51,7 +51,9 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // T
     static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "');";
     static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
 
-    static final String GET_USERS_FRIENDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (uid=?);";
+    static final String GET_USERS_FRIEND_IDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (uid=?);";
+    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS + " ON "
+            + TABLE_USERS + ".id = " + TABLE_FRIENDS + ".fid WHERE " + TABLE_FRIENDS + ".uid=";
 
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + getColumnForField(Message.class, "id") + "=";
 
@@ -199,9 +201,7 @@ class H2UserDAO implements UserDAO {
             pst.setString(2, partialName);
             log.trace("Executing query: {}{} <== ({})", GET_USER_BY_PARTIAL_NAME, limit, partialName);
             ResultSet rs = pst.executeQuery();
-            List<User> tmpList = new ArrayList<>();
-            Stored.Processor.reconstructAllObjects(rs, () -> new User("", "", "", true), tmpList, true);
-            return tmpList.stream().map(User::shortInfo).collect(Collectors.toCollection(ArrayList::new));
+            return reconstructShortUserInfo(rs);
         } catch (SQLException e) {
             log.error("Error getting list of users: {}", e);
             return Collections.emptyList();
@@ -209,21 +209,42 @@ class H2UserDAO implements UserDAO {
     }
 
     @Override
-    public @NotNull long[] getFriends(long id) {
+    public Collection<ShortUserInfo> listFriends(long userId) {
+        String sql = GET_USERS_FRIEND_DETAILS + userId + ";";
+        try (Connection conn = cSource.get();
+             Statement st = conn.createStatement()) {
+            log.trace("Executing query: {}", sql);
+            ResultSet rs = st.executeQuery(sql);
+            return reconstructShortUserInfo(rs);
+        } catch (SQLException e) {
+            log.error("Error getting list of friends for user #{}: {}", userId, e);
+            return Collections.emptyList();
+        }
+    }
+
+    private Collection<ShortUserInfo> reconstructShortUserInfo(ResultSet rs) throws SQLException {
+        List<User> tmpList = new ArrayList<>();
+        Stored.Processor.reconstructAllObjects(rs, () -> new User("", "", "", true), tmpList, true);
+        return tmpList.stream().map(User::shortInfo).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+
+    @Override
+    public @NotNull long[] getFriendIds(long id) {
         int currSize = 20;
         long[] result = new long[currSize];
         int n = 0;
         try (Connection conn = cSource.get();
-             PreparedStatement pst = conn.prepareStatement(GET_USERS_FRIENDS)) {
+             PreparedStatement pst = conn.prepareStatement(GET_USERS_FRIEND_IDS)) {
             pst.setLong(1, id);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 long fid = rs.getLong(1);
-                if (++n > currSize) {
+                if (n >= currSize) {
                     currSize *= 2;
                     result = Arrays.copyOf(result, currSize);
                 }
-                result[n] = fid;
+                result[n++] = fid;
             }
 
         } catch (SQLException e) {

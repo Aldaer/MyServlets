@@ -38,6 +38,7 @@ public class JsonProviderServlet extends HttpServlet {
 
     private static final String USR_QUERY = "query";         // Partial name of a user to find
     private static final String USR_DETAILS = "details";     // Exact username of a user to get details
+    private static final String USR_FRIENDS = "friends";     // Send a list of current user's friends
 
     private static final String QUERY_OFFSET = "offset"; // # of messages to skip
     private static final String QUERY_LIMIT = "limit";   // # of messages to send
@@ -111,6 +112,21 @@ public class JsonProviderServlet extends HttpServlet {
         final UserDAO uDao = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
         final JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
 
+        boolean allFriendsRq;
+        String friendsRequest = req.getParameter(USR_FRIENDS);
+        long currentUserId = ((User) req.getSession(false).getAttribute(S.USER)).getId();
+
+        if ("ids".equals(friendsRequest)) {   // Friend list requested, ids only
+            long[] friends = uDao.getFriendIds(currentUserId);
+            log.trace("Found friends: {}", friends.length);
+            gen.writeStartArray();
+            for (long frId: friends)
+                gen.write(frId);
+            gen.writeEnd().close();
+            return;
+        } else
+            allFriendsRq = "all".equals(friendsRequest);
+
         String reqName = req.getParameter(USR_DETAILS);
         if (reqName != null) {                                  // Specific user requested
             User reqUser = uDao.getUser(reqName);
@@ -122,12 +138,13 @@ public class JsonProviderServlet extends HttpServlet {
                     .write("email", reqUser.getEmail());
             else gen.write("exists", false);
             gen.writeEnd().close();
-        } else {                                                // User search requested
+        } else {                                                // User search requested or unknown request
             String userLike = req.getParameter(USR_QUERY);
-            if (userLike == null || userLike.length() < MIN_QUERY_LENGTH) return;
+            if ((userLike == null || userLike.length() < MIN_QUERY_LENGTH)&& !allFriendsRq) return;
             int limit = (int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
-            Collection<ShortUserInfo> userList = uDao.listUsers(userLike, limit);
+            Collection<ShortUserInfo> userList = allFriendsRq ?
+                    uDao.listFriends(currentUserId) : uDao.listUsers(userLike, limit);
 
             log.debug("Outputting {} found users", userList.size());
             gen.writeStartObject();

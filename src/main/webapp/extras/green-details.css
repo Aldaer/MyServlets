@@ -6,10 +6,31 @@
     border-radius: 5px;
     margin: 5px;
     display: none;
-    background-color: #ffffc2;
+    background: #ffffc2;
+}
+
+.userbubble.friend, input.friend, .colorbox.friend {
+    background: #dcff3a;
+}
+
+.colorbox.nonfriend {
+    background: #ffffc2;
+}
+input.radio {
+    text-align: left;
+    width: auto;
+    margin: 5px;
 }
 
 .edited {
     font-weight: bold;
     color: #FF8000;
+}
+
+.colorbox {
+    height: 25px;
+    margin: 5px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    background: white;
+    vertical-align: middle;
 }

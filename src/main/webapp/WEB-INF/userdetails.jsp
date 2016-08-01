@@ -34,21 +34,24 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-                <button class="smallbutton green details" id="update" type="submit"><fmt:message key="details.update"/></button>
-            <a href="/main/serv" class="smallbutton green"><fmt:message key="details.gotomain"/></a>
+                <button class="smallbutton details" id="update" type="submit"><fmt:message key="details.update"/></button>
+            <a href="/main/serv" class="smallbutton"><fmt:message key="details.gotomain"/></a>
         </form>
     </div>
     <div style="width: 40%; float:right">
         <p><fmt:message key="details.search"/></p>
         <input type="text" id="query"/><br>
-        <button class="smallbutton green" id="find"><fmt:message key="details.find.user"/></button>
+        <button class="smallbutton" id="find"><fmt:message key="details.find.user"/></button>
+        <button class="smallbutton friend" id="allfriends"><fmt:message key="details.show.friends"/></button>
     </div>
 </div>
 
 <div class="bigpanel slideout">
     <div style="width: 20%; float: left">
-        buttons<br>
-        more buttons
+        <p>Filter</p>
+        <div class="colorbox"><input name="ufilter" type="radio" class="radio" onclick=displayFilteredUsers(0) checked="">All</div>
+        <div class="colorbox friend"><input name="ufilter" type="radio" class="radio friend" onclick=displayFilteredUsers(1)>Friends</div>
+        <div class="colorbox nonfriend"><input name="ufilter" type="radio" class="radio" onclick=displayFilteredUsers(2)>Non-friends</div>
     </div>
     <div style="width: 80%; float:right">
         <p id="usersFoundHeader"></p>
@@ -63,7 +66,7 @@
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};
 
-    var usersFounsMsg='<fmt:message key="details.users.found"/> ';
+    var usersFoundMsg='<fmt:message key="details.users.found"/> ';
 </script>
 <script src="/extras/details.js"></script>
 </body>

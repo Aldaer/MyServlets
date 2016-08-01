@@ -55,7 +55,12 @@ class UserDAO_props implements UserDAO {
     }
 
     @Override
-    public @NotNull long[] getFriends(long id) {
+    public @NotNull long[] getFriendIds(long id) {
         return ofNullable(userFriends.get(id)).orElse(new long[0]);
+    }
+
+    @Override
+    public Collection<ShortUserInfo> listFriends(long currentUserId) {
+        return Arrays.stream(getFriendIds(currentUserId)).mapToObj(this::getUser).map(User::shortInfo).collect(Collectors.toCollection(ArrayList::new));
     }
 }

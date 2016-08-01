@@ -46,8 +46,8 @@
             <input type="hidden" name="language" value="${locale}">
         </form>
     <table width="100%"><tr>
-      <td><button class="smallbutton green" onclick="location.href='/main/serv?language=en'">English</button></td>
-      <td><button class="smallbutton green" onclick="location.href='/main/serv?language=ru'">Русский</button></td>
+      <td><button class="smallbutton" onclick="location.href='/main/serv?language=en'">English</button></td>
+      <td><button class="smallbutton" onclick="location.href='/main/serv?language=ru'">Русский</button></td>
     </tr></table>
     </div>
 </div>
