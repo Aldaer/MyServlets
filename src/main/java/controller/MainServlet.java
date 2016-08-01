@@ -45,7 +45,7 @@ public class MainServlet extends HttpServlet {
                 processUserUpdate(req, res);
                 return;
             case MESSAGE_ACTION_SERVLET:
-                switch(req.getParameter("action")) {
+                switch (req.getParameter("action")) {
                     case "update":
                         processMessageUpdate(req);
                         return;
@@ -107,35 +107,43 @@ public class MainServlet extends HttpServlet {
         return;
     }
 
-    private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    @SuppressWarnings("UnnecessaryReturnStatement")
+    private void processUserUpdate(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute(S.USER);
         UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
 
         String userAction = req.getParameter("action");
-        if (userAction != null) switch (userAction) {
-            case "addfriend":
-                log.info("Adding friend to user '{}'", user.getUsername());
-                userDAO.addFriend(user.getId(), parseOrNull(req.getParameter("id")));
-                return;
-            case "remfriend":
-                log.info("Removing friend from user '{}'", user.getUsername());
-                userDAO.removeFriend(user.getId(), parseOrNull(req.getParameter("id")));
-                return;
-            default:
-                return;
+        if (userAction != null) {
+            switch (userAction) {
+                case "addfriend":
+                    log.info("Adding friend to user '{}'", user.getUsername());
+                    userDAO.addFriend(user.getId(), parseOrNull(req.getParameter("id")));
+                    break;
+                case "remfriend":
+                    log.info("Removing friend from user '{}'", user.getUsername());
+                    userDAO.removeFriend(user.getId(), parseOrNull(req.getParameter("id")));
+                    break;
+                default:
+                    return;
+            }
+            req.getRequestDispatcher(USER_SEARCH_SERVLET).forward(req, res);        // Send back updated friend list for current user
+            return;
+        } else
+
+        {
+            String newFullName = req.getParameter("fullname");
+            String newEmail = req.getParameter("email");
+            if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
+            if (newEmail == null) newEmail = "";
+            user.setFullName(newFullName);
+            user.setEmail(newEmail);
+            user.setRegComplete(true);
+            log.info("Updating user info for user '{}'", user.getUsername());
+            userDAO.updateUserInfo(user);
+            res.sendRedirect(DETAILS_PAGE);
         }
 
-        String newFullName = req.getParameter("fullname");
-        String newEmail = req.getParameter("email");
-        if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
-        if (newEmail == null) newEmail = "";
-        user.setFullName(newFullName);
-        user.setEmail(newEmail);
-        user.setRegComplete(true);
-        log.info("Updating user info for user '{}'", user.getUsername());
-        userDAO.updateUserInfo(user);
-        res.sendRedirect(DETAILS_PAGE);
     }
 
     private void processMessageUpdate(HttpServletRequest req) {

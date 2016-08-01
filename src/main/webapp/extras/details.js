@@ -3,6 +3,7 @@ var friendList;
 var displayedList;
 var filterMode = 0;
 var displayedId;
+var andShow = false;
 
 var body = $("body");
 
@@ -29,16 +30,15 @@ $(document).ready(function () {
         removeFromFriends(displayedId);
     });
 
-    getFriendList();
+    body.addClass("waiting");
+    $.getJSON("/main/userSearch?friends=ids", updateFriendList);
 });
 
-function getFriendList() {
-    body.addClass("waiting");
-    $.getJSON("/main/userSearch?friends=ids", function (flist) {
-        body.removeClass("waiting");        
-        friendList = flist;
-        updateElements();
-    });
+function updateFriendList(flist) {
+    body.removeClass("waiting");
+    friendList = flist;
+    updateElements();
+    if (andShow) displayFilteredUsers(filterMode);    
 }
 
 function isFriend(id) {
@@ -91,11 +91,11 @@ $('.details-form').submit(function () {
 $('#find').click(function () {
     var querybox = $('#query');
     if (querybox.val().length < 2) {
-        $('.slideout').removeClass('on');
+        $('#fpanel').removeClass('on');
         querybox.css("color", "red");
         querybox.focus();
     } else {
-        $('.slideout').addClass('on');
+        $('#fpanel').addClass('on');
         querybox.css("color", "initial");
         body.addClass("waiting");
         $.getJSON("/main/userSearch?query=" + encodeURIComponent(querybox.val()), onLoadUsers);
@@ -139,22 +139,30 @@ function displayFilteredUsers(mode) {
 }
 
 function showFriends() {
-    $('.slideout').addClass('on');
+    $('#fpanel').addClass('on');
     $.getJSON("/main/userSearch?friends=all", onLoadUsers);
 }
 
 function addToFriends(id) {
     var msgData = {
         action: "addfriend",
-        id: id
+        id: id,
+        friends: "ids"
     };
-    $.post("/main/updateUser", msgData, getFriendList());
+    requestFriendUpdate(msgData);
 }
 
 function removeFromFriends(id) {
     var msgData = {
         action: "remfriend",
-        id: id
+        id: id,
+        friends: "ids"
     };
-    $.post("/main/updateUser", msgData, getFriendList());
+    requestFriendUpdate(msgData);
+}
+
+function requestFriendUpdate(data) {
+    body.addClass("waiting");
+    andShow = true;
+    $.getJSON("/main/updateUser", data, updateFriendList);    
 }
