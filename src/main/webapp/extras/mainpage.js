@@ -1,4 +1,5 @@
 var body = $('body');
+var body = $('body');
 
 $('#showmsg').click(function () {
     $('#msglist').addClass('on');

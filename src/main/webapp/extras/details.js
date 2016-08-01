@@ -13,7 +13,7 @@ $(document).ready(function () {
         $('#update').removeClass("hidden");
     });
 
-    $('#userfindbox').click(".userlink", function () {
+    $('#userlistbox').on("click", ".userlink", function () {
         reloadUser(this.text);
     });
 
@@ -57,9 +57,9 @@ function updateElements() {
         $('.warning').addClass("hidden");
         if (isFriend(displayedId)) {
             $('#addfriend').addClass("hidden");
-            $('#remfriend').removeClass("hidden");
+            if (exists) $('#remfriend').removeClass("hidden");
         } else {
-            $('#addfriend').removeClass("hidden");
+            if (exists) $('#addfriend').removeClass("hidden");
             $('#remfriend').addClass("hidden");
         }
     }
@@ -74,9 +74,9 @@ function updateElements() {
 
 function reloadUser(name) {
     own = (currUser == name);
-    $('#login').text(name);
     $.getJSON("/main/userSearch?details=" + encodeURIComponent(name), function (usr) {
         exists = usr.exists;
+        $('#login').text(usr.username);
         $('input[name="fullname"]').val(usr.fullName);
         $('input[name="email"]').val(usr.email);
         displayedId = usr.id;
@@ -105,7 +105,7 @@ $('#find').click(function () {
 function onLoadUsers(data) {
     body.removeClass("waiting");
     $('#usersFoundHeader').text(usersFoundMsg + data.users.length);
-    $('#userfindbox').empty();
+    $('#userlistbox').empty();
     displayedList = data.users;
     displayFilteredUsers(filterMode);
 }
@@ -129,12 +129,12 @@ function outputUser(i, usr) {
     mdiv.css("display", "block");
     if (isFriend(usr.id))
         mdiv.addClass("friend");
-    $('#userfindbox').append(mdiv);
+    $('#userlistbox').append(mdiv);
 }
 
 function displayFilteredUsers(mode) {
     filterMode = mode;
-    $('#userfindbox').empty();
+    $('#userlistbox').empty();
     $.each(displayedList, outputUser);
 }
 
@@ -148,7 +148,7 @@ function addToFriends(id) {
         action: "addfriend",
         id: id
     };
-    $.post("/main/messageAction", msgData, getFriendList());
+    $.post("/main/updateUser", msgData, getFriendList());
 }
 
 function removeFromFriends(id) {
@@ -156,5 +156,5 @@ function removeFromFriends(id) {
         action: "remfriend",
         id: id
     };
-    $.post("/main/messageAction", msgData, getFriendList());
+    $.post("/main/updateUser", msgData, getFriendList());
 }

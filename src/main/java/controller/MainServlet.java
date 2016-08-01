@@ -112,7 +112,8 @@ public class MainServlet extends HttpServlet {
         User user = (User) session.getAttribute(S.USER);
         UserDAO userDAO = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
 
-        switch (req.getParameter("action")) {
+        String userAction = req.getParameter("action");
+        if (userAction != null) switch (userAction) {
             case "addfriend":
                 log.info("Adding friend to user '{}'", user.getUsername());
                 userDAO.addFriend(user.getId(), parseOrNull(req.getParameter("id")));
@@ -120,6 +121,8 @@ public class MainServlet extends HttpServlet {
             case "remfriend":
                 log.info("Removing friend from user '{}'", user.getUsername());
                 userDAO.removeFriend(user.getId(), parseOrNull(req.getParameter("id")));
+                return;
+            default:
                 return;
         }
 

@@ -134,9 +134,12 @@ public class JsonProviderServlet extends HttpServlet {
             if (reqUser != null) gen
                     .write("exists", true)
                     .write("id", reqUser.getId())
+                    .write("username", reqName)
                     .write("fullName", reqUser.getFullName())
                     .write("email", reqUser.getEmail());
-            else gen.write("exists", false);
+            else gen
+                    .write("exists", false)
+                    .write("username", "???");
             gen.writeEnd().close();
         } else {                                                // User search requested or unknown request
             String userLike = req.getParameter(USR_QUERY);

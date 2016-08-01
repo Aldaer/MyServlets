@@ -63,7 +63,7 @@
     </div>
     <div style="width: 80%; float:right">
         <p id="usersFoundHeader"></p>
-        <div class="databox" id="userfindbox">Loading users...</div>
+        <div class="databox" id="userlistbox">Loading users...</div>
     </div>
 </div>
 
