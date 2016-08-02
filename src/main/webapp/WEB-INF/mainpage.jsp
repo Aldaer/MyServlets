@@ -28,9 +28,9 @@
         <fmt:message key="main.selectedlocale"/> = "${language}"
     </p>
 
-    <p id="messagealert">
+    <p id="messagealert" class="warning">
         <c:if test="${unreadPM > 0}">
-            ###You have unread messages! [${unreadPM}]
+            <fmt:message key="main.warn.unread"/> [${unreadPM}]
         </c:if>
     </p>
 
@@ -60,12 +60,12 @@
 
 <div class="bigpanel slideout" id="msglist">
     <div style="width: 20%; float: left">
-        buttons<br>
-        more buttons
+        ###buttons<br>
+        ###more buttons
     </div>
     <div style="width: 80%; float:right">
         <div class="databox" id="msgbox">
-            Loading messages...
+            <fmt:message key="loading.messages"/>
         </div>
     </div>
 </div>
@@ -73,13 +73,13 @@
 <div class="messagebubble" id="bubbleprototype"></div>
 
 <div class="bigpanel slideout" id="msgview">
-    <h2>Message view</h2>
+    <h2><fmt:message key="main.message.view"/></h2>
     <p id="msgheader"></p>
     <p id="msgtext" rows="6">TEXT</p>
     <textarea id="msgreply" rows="10">REPLY</textarea>
-    <button class="smallbutton" id="reply">Reply</button>
-    <button class="smallbutton ruby" id="delete">Delete</button>
-    <button class="smallbutton amber" id="closeview">Close</button>
+    <button class="smallbutton" id="reply"><fmt:message key="message.button.reply"/></button>
+    <button class="smallbutton ruby" id="delete"><fmt:message key="message.button.delete"/></button>
+    <button class="smallbutton amber" id="closeview"><fmt:message key="message.button.close"/></button>
 </div>
 
 <script>

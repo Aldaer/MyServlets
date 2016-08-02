@@ -6,20 +6,20 @@
     border-radius: 5px;
     margin: 5px;
     display: none;
-    background: #ffffc2;
+    background-color: #ffffc2;
 }
 
 .userbubble.friend, input.friend, .colorbox.friend, .smallbutton.friend, p.friend {
-    background: #dcff3a;
+    background-color: #dcff3a;
     color: initial;
 }
 
 .smallbutton.friend:hover {
-    background: #bcdf30;
+    background-color: #bcdf30;
 }
 
 .colorbox.nonfriend {
-    background: #ffffc2;
+    background-color: #ffffc2;
 }
 input.radio {
     text-align: left;

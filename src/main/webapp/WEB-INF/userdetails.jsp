@@ -34,7 +34,7 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-            <button class="smallbutton blue" id="createmsg" type="button">Private message</button>
+            <button class="smallbutton blue" id="createmsg" type="button"><fmt:message key="message.button.private"/></button>
             <button class="smallbutton details hidden" id="update" type="submit"><fmt:message
                     key="details.update"/></button>
             <button class="smallbutton friend hidden" id="addfriend" type="button"><fmt:message key="details.addfriend"/></button>
@@ -52,29 +52,29 @@
 
 <div class="bigpanel slideout" id="fpanel">
     <div style="width: 20%; float: left">
-        <p>Filter</p>
+        <p><fmt:message key="details.filter"/></p>
         <div class="colorbox"><input name="ufilter" type="radio" class="radio" onclick="displayFilteredUsers(0)"
-                                     checked="">All
+                                     checked=""><fmt:message key="filter.all"/>
         </div>
         <div class="colorbox friend"><input name="ufilter" type="radio" class="radio friend"
-                                            onclick="displayFilteredUsers(1)"/>Friends
+                                            onclick="displayFilteredUsers(1)"/><fmt:message key="filter.friends"/>
         </div>
         <div class="colorbox nonfriend"><input name="ufilter" type="radio" class="radio"
-                                               onclick="displayFilteredUsers(2)"/>Non-friends
+                                               onclick="displayFilteredUsers(2)"/><fmt:message key="filter.non.friends"/>
         </div>
     </div>
     <div style="width: 80%; float:right">
         <p id="usersFoundHeader"></p>
-        <div class="databox" id="userlistbox">Loading users...</div>
+        <div class="databox" id="userlistbox"><fmt:message key="loading.users"/></div>
     </div>
 </div>
 
 <div class="bigpanel slideout" id="newmsg">
-    <h2>Private message</h2>
+    <h2><fmt:message key="message.button.private"/></h2>
     <p id="recipient"> </p>
     <textarea id="msgtext" rows="10"></textarea>
-    <button class="smallbutton" id="send">Send</button>
-    <button class="smallbutton amber" id="cancel">Cancel</button>
+    <button class="smallbutton" id="send"><fmt:message key="message.button.send"/></button>
+    <button class="smallbutton amber" id="cancel"><fmt:message key="message.button.cancel"/></button>
 </div>
 
 <div class="userbubble" id="bubbleprototype"></div>

@@ -9,21 +9,21 @@
 }
 
 .messagein {
-    background: #8DC26F;
+    background-color: #8DC26F;
     margin-left: 50px;
 }
 
 .messagein:hover {
-    background: #ADE28F;
+    background-color: #ADE28F;
 }
 
 .messageout {
-    background: #D3D3D3;
+    background-color: #D3D3D3;
     margin-right: 50px;
 }
 
 .messageout:hover {
-    background: #F8F8F8;
+    background-color: #F8F8F8;
 }
 
 .unread {

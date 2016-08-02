@@ -3,7 +3,7 @@
 .bigpanel {
     position: relative;
     z-index: 1;
-    background: #FCFCFC;
+    background-color: #FCFCFC;
     min-width: 500px;
     max-width: 900px;
     margin: 0 auto 20px;
@@ -16,7 +16,7 @@
 .bigpanel input {
     font-family: "Roboto", sans-serif;
     outline: 0;
-    background: #F2F2F2;
+    background-color: #F2F2F2;
     width: 75%;
     border: 0;
     margin: 0 0 10px;
@@ -53,7 +53,7 @@ button {
     -webkit-transition: all;
     transition: all;
     cursor: pointer;
-    background: #60AF50;
+    background-color: #60AF50;
 }
 
 .warning {
@@ -65,43 +65,43 @@ button {
     -webkit-appearance: button;
     -moz-appearance: button;
 
-    background: #60AF50;
+    background-color: #60AF50;
     color: #FFFFFF;
     text-decoration: none;
     display: inline-block;
     box-sizing: border-box;
-    border: 1px solid;
+    border: 1px solid black;
     padding: 5px;
     font-size: 12px;
     line-height: normal;
 }
 
 .smallbutton:hover {
-    background: #43A047;
+    background-color: #43A047;
 }
 
 .smallbutton.amber {
-    background: #FFC251;
+    background-color: #FFC251;
 }
 
 .smallbutton.amber:hover {
-    background: #EFA231;
+    background-color: #EFA231;
 }
 
 .smallbutton.ruby {
-    background: #FF6B6A;
+    background-color: #FF6B6A;
 }
 
 .smallbutton.ruby:hover {
-    background: #EF3B3A;
+    background-color: #EF3B3A;
 }
 
 .smallbutton.blue {
-    background: #277cff;
+    background-color: #277cff;
 }
 
 .smallbutton.blue:hover {
-    background: #175cdf;
+    background-color: #175cdf;
 }
 
 button::-moz-focus-inner, input::-moz-focus-inner {
@@ -112,6 +112,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 textarea {
     display: block;
     width: 100%;
+    padding: 5px;
 }
 
 .slideout {
@@ -131,7 +132,7 @@ textarea {
 }
 
 body {
-    background: #76b852; /* fallback for old browsers */
+    background-color: #76b852; /* fallback for old browsers */
     background: -webkit-linear-gradient(right, #76b852, #8DC26F);
     background: -moz-linear-gradient(right, #76b852, #8DC26F);
     background: -o-linear-gradient(right, #76b852, #8DC26F);

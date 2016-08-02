@@ -8,7 +8,7 @@
 .wform {
     position: relative;
     z-index: 1;
-    background: #FFFFFF;
+    background-color: #FFFFFF;
     max-width: 360px;
     margin: 0 auto 100px;
     padding: 45px;
@@ -19,7 +19,7 @@
 .wform input {
     font-family: "Roboto", sans-serif;
     outline: 0;
-    background: #F2F2F2;
+    background-color: #F2F2F2;
     width: 100%;
     border: 0;
     margin: 0 0 15px;
@@ -36,7 +36,7 @@
 }
 
 .wform button:hover,.wform button:active,.wform button:focus {
-    background: #43A047;
+    background-color: #43A047;
 }
 .wform .message {
     margin: 15px 0 0;
@@ -50,10 +50,10 @@
 .wform .smallbutton {
     padding: 3px;
     font-size: 10px;
-    background: #60AF50;
+    background-color: #60AF50;
 }
 .wform button:active, .wform button:focus {
-    background: #43A047;
+    background-color: #43A047;
 }
 
 .failcause {
