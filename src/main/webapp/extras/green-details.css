@@ -9,7 +9,7 @@
     background: #ffffc2;
 }
 
-.userbubble.friend, input.friend, .colorbox.friend, .smallbutton.friend {
+.userbubble.friend, input.friend, .colorbox.friend, .smallbutton.friend, p.friend {
     background: #dcff3a;
     color: initial;
 }

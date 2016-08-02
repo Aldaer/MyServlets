@@ -34,7 +34,7 @@
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
-            <button class="smallbutton blue" id="sendmsg" type="button">Private message</button>
+            <button class="smallbutton blue" id="createmsg" type="button">Private message</button>
             <button class="smallbutton details hidden" id="update" type="submit"><fmt:message
                     key="details.update"/></button>
             <button class="smallbutton friend hidden" id="addfriend" type="button"><fmt:message key="details.addfriend"/></button>
@@ -69,15 +69,15 @@
     </div>
 </div>
 
-<div class="userbubble" id="bubbleprototype"></div>
-
 <div class="bigpanel slideout" id="newmsg">
     <h2>Private message</h2>
-    <p id="recipient"></p>
-    <textarea id="msgreply" rows="10"></textarea>
+    <p id="recipient"> </p>
+    <textarea id="msgtext" rows="10"></textarea>
     <button class="smallbutton" id="send">Send</button>
     <button class="smallbutton amber" id="cancel">Cancel</button>
 </div>
+
+<div class="userbubble" id="bubbleprototype"></div>
 
 <script>
     var currUser = "${currentUser.username}";

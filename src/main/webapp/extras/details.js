@@ -30,6 +30,20 @@ $(document).ready(function () {
         removeFromFriends(displayedId);
     });
 
+    $('#createmsg').click(function() {
+        var recp = $('#recipient');
+        recp.text($('#login').text());
+        if (isFriend(displayedId))
+            recp.addClass("friend");
+        else
+            recp.removeClass("friend");
+        $('#newmsg').addClass("centered");
+    });
+
+    $('#cancel').click(closeMessageBox);
+
+    $('#send').click(sendNow);
+
     body.addClass("waiting");
     $.getJSON("/main/userSearch?friends=ids", updateFriendList);
 });
@@ -165,4 +179,19 @@ function requestFriendUpdate(data) {
     body.addClass("waiting");
     andShow = true;
     $.getJSON("/main/updateUser", data, updateFriendList);    
+}
+
+function sendNow() {
+    var msgData = {
+        action: "send",
+        to: $('#recipient').text(),
+        refId: 0,
+        convId: 0,
+        text: $('#msgtext').val()
+    };
+    $.post("/main/messageAction", msgData, closeMessageBox);
+}
+
+function closeMessageBox() {
+    $('#newmsg').removeClass("centered");
 }
