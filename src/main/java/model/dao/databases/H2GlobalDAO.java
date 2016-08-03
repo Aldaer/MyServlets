@@ -24,7 +24,7 @@ import static model.dao.databases.Stored.Processor.getColumnForField;
  */
 @SuppressWarnings("WeakerAccess")
 @Slf4j
-public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // TODO: replace column name constants with getColumnForField() calls
+public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     static final String TABLE_USERS = "users";
     static final String TABLE_CREDENTIALS = "credentials";
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
@@ -33,32 +33,67 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {                // T
     static final String TABLE_MESSAGES = "messages";
     static final String TABLE_FRIENDS = "friends";
 
-    static final String GET_CREDS_BY_LOGIN_NAME = "SELECT dpassword FROM " + TABLE_CREDENTIALS + " WHERE (username=?);";
-    static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?);";
-    static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (id=?);";
 
-    static final String GET_USER_BY_PARTIAL_NAME = "SELECT id, username, fullname FROM " + TABLE_USERS + " WHERE (username LIKE ? OR fullname LIKE ?) LIMIT ";
+    // Columns in tables with their own DAO classes
+    static final String CFF_CR_UNAME = getColumnForField(Credentials.class, "uName");
+    static final String CFF_CR_PWD = getColumnForField(Credentials.class, "pwd");
+
+    static final String CFF_USR_ID = getColumnForField(User.class, "id");
+    static final String CFF_USR_UNAME = getColumnForField(User.class, "username");
+    static final String CFF_USR_FNAME = getColumnForField(User.class, "fullName");
+
+    static final String CFF_MES_ID = getColumnForField(Message.class, "id");
+    static final String CFF_MES_REF = getColumnForField(Message.class, "refId");
+    static final String CFF_MES_FROM = getColumnForField(Message.class, "from");
+    static final String CFF_MES_TO = getColumnForField(Message.class, "to");
+    static final String CFF_MES_TIME = getColumnForField(Message.class, "utcTimestamp");
+    static final String CFF_MES_TEXT = getColumnForField(Message.class, "text");
+    static final String CFF_MES_CONV = getColumnForField(Message.class, "conversationId");
+
+    // Columns in tables with no DAO classes
+    // Temporary credentials
+    static final String COL_TCR_UNAME = "username";
+    static final String COL_TCR_CRT = "created";
+    // User roles
+    static final String COL_RLS_UNAME = "username";
+    static final String COL_RLS_UROLE = "user_role";
+    // Friends
+    static final String COL_FRN_UID = "uid";
+    static final String COL_FRN_FID = "fid";
+
+
+    static final String GET_CREDS_BY_LOGIN_NAME = "SELECT " + CFF_CR_PWD + " FROM " + TABLE_CREDENTIALS + " WHERE (" + CFF_CR_UNAME + "=?);";
+    static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + "=?);";
+    static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_ID + "=?);";
+
+    static final String GET_USER_BY_PARTIAL_NAME = "SELECT " + CFF_USR_ID + "," + CFF_USR_UNAME + "," + CFF_USR_FNAME 
+            + " FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + " LIKE ? OR " + CFF_USR_FNAME + " LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
     static final String CHECK_IF_USER_EXISTS = "SELECT TOP 1 1 FROM " + TABLE_CREDENTIALS
-            + " AS C WHERE (C.username=?) UNION SELECT TOP 1 1 FROM "
-            + TABLE_TEMP_CREDENTIALS + " AS tc WHERE (TC.username=?);";
+            + " AS C WHERE (C." + CFF_CR_UNAME + "=?) UNION SELECT TOP 1 1 FROM "
+            + TABLE_TEMP_CREDENTIALS + " AS TC WHERE (TC." + COL_TCR_UNAME + "=?);";
 
-    static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS + " (username, created) VALUES (?, ?);";
-    static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS + " WHERE (created < ?);";
+    static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS 
+            + " (" + COL_TCR_UNAME + ", " + COL_TCR_CRT + ") VALUES (?, ?);";
+    static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS 
+            + " WHERE (" + COL_TCR_CRT + " < ?);";
 
     // Default ResultSet behaviour: ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
-    static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (username, user_role) VALUES (?, '" + DEFAULT_ROLE + "');";
+    static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (" + COL_RLS_UNAME + ", " 
+            + COL_RLS_UROLE + ") VALUES (?, '" + DEFAULT_ROLE + "');";
+
     static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
 
-    static final String GET_USERS_FRIEND_IDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (uid=?);";
-    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS + " ON "
-            + TABLE_USERS + ".id = " + TABLE_FRIENDS + ".fid WHERE " + TABLE_FRIENDS + ".uid=";
+    static final String GET_USERS_FRIEND_IDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=?);";
+    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS 
+            + " ON " + TABLE_USERS + "." + CFF_USR_ID + " = " + TABLE_FRIENDS + "." + COL_FRN_FID 
+            + " WHERE " + TABLE_FRIENDS + "." + COL_FRN_UID + "=";
 
-    static final String ADD_FRIEND = "MERGE INTO " + TABLE_FRIENDS + " (uid, fid) VALUES (?,?);";
-    static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (uid=? AND fid=?);";
+    static final String ADD_FRIEND = "MERGE INTO " + TABLE_FRIENDS + " (" + COL_FRN_UID + ", " + COL_FRN_FID + ") VALUES (?,?);";
+    static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=? AND " + COL_FRN_FID + "=?);";
 
-    static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + getColumnForField(Message.class, "id") + "=";
+    static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
@@ -473,18 +508,18 @@ class H2MessageDAO implements MessageDAO {
         Object[] params = new Object[2];
         int nPar = 0;
         if (newText != null) {
-            sqlB.append(getColumnForField(Message.class, "text")).append("=?,");
+            sqlB.append(CFF_MES_TEXT).append("=?,");
             params[nPar++] = newText;
         }
         if (unread != null) {
-            sqlB.append(getColumnForField(Message.class, "conversationId")).append("=?,");
+            sqlB.append(CFF_MES_CONV).append("=?,");
             params[nPar++] = unread ? 0 : -1;
         }
         if (nPar > 0) sqlB.setLength(sqlB.length() - 1);
         else return;
 
         sqlB.append(" WHERE ")
-                .append(getColumnForField(Message.class, "id"))
+                .append(CFF_MES_ID)
                 .append("=")
                 .append(id)
                 .append(';');
@@ -521,20 +556,19 @@ class H2MessageDAO implements MessageDAO {
         sqlB.append(prefix).append(TABLE_MESSAGES);
 
         List<String> constraintList = new ArrayList<>(10);
-        ofNullable(constraint.getId()).map(id -> getColumnForField(Message.class, "id") + "=" + id).ifPresent(constraintList::add);
-        ofNullable(constraint.getRefId()).map(refid -> getColumnForField(Message.class, "refId") + "=" + refid).ifPresent(constraintList::add);
-        ofNullable(constraint.getMinTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + ">='" + mt + "'").ifPresent(constraintList::add);
-        ofNullable(constraint.getMaxTime()).map(mt -> getColumnForField(Message.class, "utcTimestamp") + "<='" + mt + "'").ifPresent(constraintList::add);
-        ofNullable(constraint.getTextLike()).map(txt -> getColumnForField(Message.class, "text") + " LIKE ?").ifPresent(constraintList::add);
+        ofNullable(constraint.getId()).map(id -> CFF_MES_ID + "=" + id).ifPresent(constraintList::add);
+        ofNullable(constraint.getRefId()).map(refid -> CFF_MES_REF + "=" + refid).ifPresent(constraintList::add);
+        ofNullable(constraint.getMinTime()).map(mt -> CFF_MES_TIME + ">='" + mt + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getMaxTime()).map(mt -> CFF_MES_TIME + "<='" + mt + "'").ifPresent(constraintList::add);
+        ofNullable(constraint.getTextLike()).map(txt -> CFF_MES_TEXT + " LIKE ?").ifPresent(constraintList::add);
 
         Long[] convId = constraint.getConvId();
         if (convId != null && convId.length > 0) {
-            String col = getColumnForField(Message.class, "conversationId");
             StringBuilder convs = new StringBuilder(50)
-                    .append("(").append(col)
+                    .append("(").append(CFF_MES_CONV)
                     .append("=").append(convId[0]);
             for (int i = 1; i < convId.length; i++)
-                convs.append(" OR ").append(col)
+                convs.append(" OR ").append(CFF_MES_CONV)
                         .append("=").append(convId[i]);
             convs.append(")");
             constraintList.add(convs.toString());
@@ -542,11 +576,11 @@ class H2MessageDAO implements MessageDAO {
 
         // FROM user1 TO user1 means FROM OR TO, not FROM AND TO
         if (constraint.getFrom() != null && constraint.getTo() != null && constraint.getFrom().equals(constraint.getTo())) {
-            constraintList.add("(" + getColumnForField(Message.class, "from") + "='" + constraint.getFrom() + "' OR " +
-                    getColumnForField(Message.class, "to") + "='" + constraint.getTo() + "')");
+            constraintList.add("(" + CFF_MES_FROM + "='" + constraint.getFrom() + "' OR " +
+                    CFF_MES_TO + "='" + constraint.getTo() + "')");
         } else {
-            ofNullable(constraint.getFrom()).map(from -> getColumnForField(Message.class, "from") + "='" + from + "'").ifPresent(constraintList::add);
-            ofNullable(constraint.getTo()).map(to -> getColumnForField(Message.class, "to") + "='" + to + "'").ifPresent(constraintList::add);
+            ofNullable(constraint.getFrom()).map(from -> CFF_MES_FROM + "='" + from + "'").ifPresent(constraintList::add);
+            ofNullable(constraint.getTo()).map(to -> CFF_MES_TO + "='" + to + "'").ifPresent(constraintList::add);
         }
 
         if (constraintList.size() > 0) {
