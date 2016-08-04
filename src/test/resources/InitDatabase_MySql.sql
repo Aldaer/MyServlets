@@ -1,26 +1,16 @@
-// Uncomment lines when creating embedded database instead of in-memory
+# == MySql ==
+create database userdatabase;
+use userdatabase;
 
-//CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
-//SET SCHEMA userdata;
-
-CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-@CODE
-Timestamp ts() {
-return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));
-}
-$$;
 DROP TABLE IF EXISTS credentials;
 CREATE TABLE credentials (
-  username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
+  username VARCHAR(50) NOT NULL PRIMARY KEY,
   dpassword CHAR(80)
 );
 
 DROP TABLE IF EXISTS temp_credentials;
 CREATE TABLE temp_credentials (
-  username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
+  username VARCHAR(50) NOT NULL PRIMARY KEY,
   created BIGINT
 );
 
@@ -29,16 +19,16 @@ INSERT INTO temp_credentials (username, created) VALUES ('_perm_user', 410244479
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  fullname VARCHAR_IGNORECASE,
+  fullname VARCHAR(255),
   email VARCHAR(100),
-  username VARCHAR_IGNORECASE(50),
+  username VARCHAR(50),
   regcomplete BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (username) REFERENCES credentials(username) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS user_roles;
 CREATE TABLE user_roles (
-  username VARCHAR_IGNORECASE(50),
+  username VARCHAR(50),
   user_role VARCHAR(50),
   FOREIGN KEY (username) REFERENCES credentials (username) ON DELETE CASCADE,
   CONSTRAINT pkey PRIMARY KEY (username, user_role)
@@ -66,11 +56,11 @@ DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   refid BIGINT NOT NULL DEFAULT 0,
-  u_from VARCHAR_IGNORECASE(50) NOT NULL,
-  u_to VARCHAR_IGNORECASE(50),
-  m_time TIMESTAMP NOT NULL DEFAULT CURRENT_UTC_TIMESTAMP(),
+  u_from VARCHAR(50) NOT NULL,
+  u_to VARCHAR(50),
+  m_time TIMESTAMP NOT NULL DEFAULT UTC_TIMESTAMP(),
   conversation_id BIGINT NOT NULL DEFAULT 0,
-  text VARCHAR DEFAULT ''
+  text VARCHAR(10000) DEFAULT ''
 );
 
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
@@ -78,7 +68,7 @@ INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася'
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
-INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, identity(), 'А я прочитал!', '2015-01-03 12:00:00');
+INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, LAST_INSERT_ID(), 'А я прочитал!', '2015-01-03 12:00:00');
 
 DROP TABLE IF EXISTS friends;
 CREATE TABLE friends (
@@ -89,5 +79,5 @@ CREATE TABLE friends (
   CONSTRAINT fkey PRIMARY KEY (uid, fid)
 );
 
-INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='вася'), (SELECT TOP 1 id FROM users WHERE username='петя'));
-INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='петя'), (SELECT TOP 1 id FROM users WHERE username='вася'));
+INSERT INTO friends (uid, fid) values((SELECT id FROM users WHERE username='вася'), (SELECT id FROM users WHERE username='петя'));
+INSERT INTO friends (uid, fid) values((SELECT id FROM users WHERE username='петя'), (SELECT id FROM users WHERE username='вася'));

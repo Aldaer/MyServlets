@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
 
 import static java.sql.ResultSet.*;
 import static java.util.Optional.ofNullable;
-import static model.dao.databases.H2GlobalDAO.*;
+import static model.dao.databases.GenericSqlDAO.*;
 import static model.dao.databases.Stored.Processor.getColumnForField;
 
 /**
- * Global DAO for H2 database.
+ * Global DAO for SQL databases. H2 and MySQL modes are currently supported. Since this class has no nullary constructor,
+ * use wrappers if instantiation with newInstance() is necessary.
  * Actual User and Credentials dao returned by this Global DAO are singletons created with a connection source
  * configured in GlobalDAO at the time they are requested. Changing connection source in GlobalDAO does not affect
  * any existing instances of User and Credentials dao, but next request for User and Credentials dao will create new instances.
@@ -24,7 +25,10 @@ import static model.dao.databases.Stored.Processor.getColumnForField;
  */
 @SuppressWarnings("WeakerAccess")
 @Slf4j
-public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
+public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
+    final String upsertPrefix;
+    final String commentToken;
+    
     static final String TABLE_USERS = "users";
     static final String TABLE_CREDENTIALS = "credentials";
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
@@ -70,8 +74,8 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
             + " FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + " LIKE ? OR " + CFF_USR_FNAME + " LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
-    static final String CHECK_IF_USER_EXISTS = "SELECT TOP 1 1 FROM " + TABLE_CREDENTIALS
-            + " AS C WHERE (C." + CFF_CR_UNAME + "=?) UNION SELECT TOP 1 1 FROM "
+    static final String CHECK_IF_USER_EXISTS = "SELECT 1 FROM " + TABLE_CREDENTIALS
+            + " AS C WHERE (C." + CFF_CR_UNAME + "=?) UNION SELECT 1 FROM "
             + TABLE_TEMP_CREDENTIALS + " AS TC WHERE (TC." + COL_TCR_UNAME + "=?);";
 
     static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS 
@@ -90,23 +94,41 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
             + " ON " + TABLE_USERS + "." + CFF_USR_ID + " = " + TABLE_FRIENDS + "." + COL_FRN_FID 
             + " WHERE " + TABLE_FRIENDS + "." + COL_FRN_UID + "=";
 
-    static final String ADD_FRIEND = "MERGE INTO " + TABLE_FRIENDS + " (" + COL_FRN_UID + ", " + COL_FRN_FID + ") VALUES (?,?);";
+    static final String ADD_FRIEND_POSTFIX = " INTO " + TABLE_FRIENDS + " (" + COL_FRN_UID + ", " + COL_FRN_FID + ") VALUES (?,?);";
+
     static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=? AND " + COL_FRN_FID + "=?);";
 
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
-
     private Supplier<Connection> cSource;
     private UserDAO userDAO;
     private CredentialsDAO credsDAO;
     private MessageDAO messDAO;
 
+    public GenericSqlDAO(SqlMode compatibility) {
+        switch (compatibility) {
+            case MY_SQL:
+                upsertPrefix = "INSERT IGNORE";
+                commentToken = "#";
+                break;
+            case H2:
+                upsertPrefix = "MERGE";
+                commentToken = "//";
+                break;
+            default:
+                upsertPrefix = "*UNSUPPORTED*";
+                commentToken = "*UNSUPPORTED*";
+        }
+    }
+    
+    enum SqlMode { MY_SQL, H2 }
+    
     @Override
     public UserDAO getUserDAO() {
         synchronized (this) {
-            if (userDAO == null) userDAO = new H2UserDAO(cSource);
+            if (userDAO == null) userDAO = new SqlUserDAO(cSource, upsertPrefix);
             return userDAO;
         }
     }
@@ -114,7 +136,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public CredentialsDAO getCredentialsDAO() {
         synchronized (this) {
-            if (credsDAO == null) credsDAO = new H2CredentialsDAO(cSource);
+            if (credsDAO == null) credsDAO = new SqlCredentialsDAO(cSource);
             return credsDAO;
         }
     }
@@ -122,7 +144,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public MessageDAO getMessageDAO() {
         synchronized (this) {
-            if (messDAO == null) messDAO = new H2MessageDAO(cSource);
+            if (messDAO == null) messDAO = new SqlMessageDAO(cSource);
             return messDAO;
         }
     }
@@ -145,7 +167,7 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
             boolean literalMode = false;
             for (String line : script) {
                 line = line.trim();
-                if (line.startsWith("//")) continue;
+                if (line.startsWith(commentToken)) continue;
                 int pos = 0;
                 int semiC;
                 while ((semiC = line.indexOf(";", pos)) >= 0) {
@@ -178,11 +200,14 @@ public class H2GlobalDAO implements GlobalDAO, DatabaseDAO {
 }
 
 @Slf4j
-class H2UserDAO implements UserDAO {
+class SqlUserDAO implements UserDAO {
     private final Supplier<Connection> cSource;
 
-    H2UserDAO(Supplier<Connection> cSource) {
+    private final String addFriendQuery;
+
+    SqlUserDAO(Supplier<Connection> cSource, String upsertPrefix) {
         this.cSource = cSource;
+        addFriendQuery = upsertPrefix + ADD_FRIEND_POSTFIX;
     }
 
     @Override
@@ -297,11 +322,12 @@ class H2UserDAO implements UserDAO {
     public void addFriend(long id, Long friendId) {
         if (friendId == null) return;
         try (Connection conn = cSource.get();
-             PreparedStatement pst = conn.prepareStatement(ADD_FRIEND)) {
+             PreparedStatement pst = conn.prepareStatement(addFriendQuery)) {
             pst.setLong(1, id);
             pst.setLong(2, friendId);
-            log.trace("Executing query: {} <== ({},{})", ADD_FRIEND, id, friendId);
-            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
+            log.trace("Executing query: {} <== ({},{})", addFriendQuery, id, friendId);
+            pst.executeUpdate();
+//            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);        // H2 only
         } catch (SQLException e) {
             log.error("Error adding friend #{} to user #{}'s list: {}", friendId, id, e);
         }
@@ -324,10 +350,10 @@ class H2UserDAO implements UserDAO {
 }
 
 @Slf4j
-class H2CredentialsDAO implements CredentialsDAO {
+class SqlCredentialsDAO implements CredentialsDAO {
     private volatile boolean saltedHash = false;
 
-    H2CredentialsDAO(Supplier<Connection> cSource) {
+    SqlCredentialsDAO(Supplier<Connection> cSource) {
         this.cSource = cSource;
     }
 
@@ -445,8 +471,8 @@ class H2CredentialsDAO implements CredentialsDAO {
 }
 
 @Slf4j
-class H2MessageDAO implements MessageDAO {
-    H2MessageDAO(Supplier<Connection> cSource) {
+class SqlMessageDAO implements MessageDAO {
+    SqlMessageDAO(Supplier<Connection> cSource) {
         this.cSource = cSource;
     }
 
@@ -591,7 +617,8 @@ class H2MessageDAO implements MessageDAO {
 
         if (!countOnly) {
             ofNullable(constraint.getLimit()).map(lim -> " LIMIT " + lim).ifPresent(sqlB::append);
-            ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).ifPresent(sqlB::append);
+            ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).map(offs ->                   // MySql patch: Can't use OFFSET without LIMIT
+                constraint.getLimit()==null? " LIMIT " + Integer.MAX_VALUE + offs : offs ).ifPresent(sqlB::append);
             ofNullable(constraint.getSortField()).map(srtf -> " ORDER BY " + getColumnForField(Message.class, srtf)).ifPresent(constraintList::add);
         }
 
@@ -599,3 +626,4 @@ class H2MessageDAO implements MessageDAO {
         return sqlB.toString();
     }
 }
+
