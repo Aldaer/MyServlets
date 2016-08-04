@@ -3,6 +3,7 @@ const msgbox = $('#msgbox');
 
 var chainSort = true;
 var dispDivs;
+var messageCache;
 
 $('#showmsg').click(function () {
     $('#msglist').addClass('on');
@@ -49,6 +50,7 @@ var tzOffsetMillis;
 
 function onLoadMessages(data) {
     /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
+    messageCache = data;
     tzOffsetMillis = new Date().getTimezoneOffset() * 60000;
     msgbox.empty();
     dispDivs = [];
@@ -103,17 +105,20 @@ function displayMessage(i, msg) {
     mdiv.click(msgid, messageClicked);
 
     var attachPoint = msgbox;
+    var append = true;
     if (chainSort && msg.refId > 0)
         for (var j = 0; j < dispDivs.length; j++)
             if (dispDivs[j].data("msgId") == msg.refId) {
                 attachPoint = dispDivs[j];
+                mdiv.css("margin-left", offsetByPx(attachPoint.css("margin-left"), 20, 400));
+                append = false;
                 break;
             }
 
-    attachPoint.append(mdiv);
+    if (append) attachPoint.append(mdiv);
+    else attachPoint.after(mdiv);
     dispDivs.push(mdiv);
 }
-
 
 var readTimer;
 var nowReading;
@@ -142,7 +147,6 @@ function markAsRead() {
 function messageClicked(event) {
     replyingTo = $(event.currentTarget);
     var to = replyingTo.data("msgTo");
-    var id = replyingTo.data("msgId");
     if (to == user && replyingTo.hasClass("unread")) {
         nowReading = replyingTo;
         markAsRead();
@@ -154,4 +158,16 @@ function messageClicked(event) {
     var mClone = replyingTo.clone();
     mClone.css("margin", "3px");
     msgPlace.append(mClone);
+}
+
+function offsetByPx(pxValue, offs, maxoffs) {
+    var v = Number(pxValue.substring(0, pxValue.indexOf("px"))) + offs;
+    if (v > maxoffs) v = maxoffs;
+    return v + "px";
+}
+
+function setSortMode(mode) {
+    chainSort = (mode == 1);
+    if (messageCache == null) loadAllMessages();
+    else onLoadMessages(messageCache);
 }

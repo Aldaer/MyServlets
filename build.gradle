@@ -28,7 +28,8 @@ dependencies {
     testCompile 'junit:junit:+'
 
     testCompile 'com.h2database:h2:+'
-    providedCompile 'mysql:mysql-connector-java:+'
+    //providedCompile 'mysql:mysql-connector-java:+'
+    compile 'mysql:mysql-connector-java:+'
 }
 
 task testWar(type: War) {

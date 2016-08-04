@@ -24,12 +24,12 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @WebListener()
 public class ServletInitListener implements ServletContextListener /* , HttpSessionListener, HttpSessionAttributeListener*/ {
-    private static final String CONFIG_BUNDLE = "config";
-    private static final String CONFIG_DAO_CLASS = "dao_class";
+    public static final String CONFIG_BUNDLE = "config";
+    public static final String CONFIG_DAO_CLASS = "dao_class";
     private static final String CONFIG_DATABASE_URI = "database_uri";
-    private static final String CONFIG_DATABASE_DRIVER = "database_driver";
-    private static final String CONFIG_DATABASE_USER = "username";
-    private static final String CONFIG_DATABASE_PASSWORD = "password";
+    public static final String CONFIG_DATABASE_DRIVER = "database_driver";
+    public static final String CONFIG_DATABASE_USER = "username";
+    public static final String CONFIG_DATABASE_PASSWORD = "password";
     private static final String CONFIG_DATABASE_USE_SHA_DIGEST = "sha_digest";
     private static final String CONFIG_CONTAINER_SECURITY = "container_security";           // "true" = container-based; "false" = own
 

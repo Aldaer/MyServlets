@@ -60,8 +60,13 @@
 
 <div class="bigpanel slideout" id="msglist">
     <div style="width: 20%; float: left">
-        ###buttons<br>
-        ###more buttons
+        <h3><fmt:message key="main.message.sorting"/></h3>
+        <label>
+            <input name="msort" type="radio" class="radio" onclick="setSortMode(0)">
+        </label><fmt:message key="main.sorting.time"/><br>
+        <label>
+            <input name="msort" type="radio" class="radio" onclick="setSortMode(1)" checked>
+        </label><fmt:message key="main.sorting.chain"/><br>
     </div>
     <div style="width: 80%; float:right">
         <div class="databox" id="msgbox">
@@ -75,8 +80,8 @@
 <div class="bigpanel slideout" id="msgview">
     <h2><fmt:message key="main.message.view"/></h2>
     <p id="msgheader"></p>
-    <p id="msgtext" rows="6">TEXT</p>
-    <textarea id="msgreply" rows="10">REPLY</textarea>
+    <p id="msgtext"></p>
+    <textarea id="msgreply" rows="10"></textarea>
     <button class="smallbutton" id="reply"><fmt:message key="message.button.reply"/></button>
     <button class="smallbutton ruby" id="delete"><fmt:message key="message.button.delete"/></button>
     <button class="smallbutton amber" id="closeview"><fmt:message key="message.button.close"/></button>

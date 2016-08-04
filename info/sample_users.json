@@ -1,10 +1,12 @@
 {
   "users": [
     {
+      "id"      : 1,
       "username": "вася",
       "fullName": "Василий Петров"
     },
     {
+      "id"      : 2,
       "username": "петя",
       "fullName": "Петр Васечкин"
     }
