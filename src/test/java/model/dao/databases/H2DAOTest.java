@@ -34,7 +34,7 @@ public class H2DAOTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        H2GlobalDAO glob = new H2GlobalDAO();
+        GenericSqlDAO glob = new H2GlobalDao();
 
         Supplier<Connection> cs = () -> {
             try {
@@ -50,7 +50,7 @@ public class H2DAOTest {
 
         String[] script = {};
         try {
-            script = Files.readAllLines(Paths.get("src/test/resources/InitDatabase.sql")).toArray(script);
+            script = Files.readAllLines(Paths.get("src/test/resources/InitDatabase_H2.sql")).toArray(script);
         } catch (IOException e) {
             e.printStackTrace();
         }

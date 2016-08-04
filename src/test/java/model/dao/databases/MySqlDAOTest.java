@@ -34,8 +34,7 @@ public class MySqlDAOTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        SqlGlobalDAO glob = new SqlGlobalDAO();
-        glob.setSqlCommentToken("#");
+        GenericSqlDAO glob = new MySqlGlobalDao();
 
         Supplier<Connection> cs = () -> {
             try {

@@ -1,10 +1,10 @@
 package model.dao.databases;
 
 /**
- * Utility class to instantiate SqlGlobalDAO in MySql mode
+ * Utility class to instantiate GenericSqlDAO in MySql mode
  */
-public class MySqlGlobalDao extends SqlGlobalDAO {
-    MySqlGlobalDao() {
+public class MySqlGlobalDao extends GenericSqlDAO {
+    public MySqlGlobalDao() {
         super(SqlMode.MY_SQL);
     }
 }

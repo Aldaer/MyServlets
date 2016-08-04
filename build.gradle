@@ -28,7 +28,9 @@ dependencies {
 
     testCompile 'junit:junit:+'
 
-    compile 'com.h2database:h2:+'       //    testCompile 'com.h2database:h2:+'
+    testCompile 'com.h2database:h2:+'
+    compileOnly 'mysql:mysql-connector-java:+'
+    testCompile 'mysql:mysql-connector-java:+'
 }
 
 task testWar(type: War) {
@@ -39,11 +41,9 @@ task testWar(type: War) {
     classpath(sourceSets.test.output)
 
     exclude('**/web.xml')
+    exclude('**/context.xml')
 
-    webInf {
-        from 'src/test/resources/web-test.xml'
-        rename('web-test.xml','web.xml')
-    }
+    webXml = file('src/test/resources/web-test.xml')
 }
 
 task updateTomcatLibs(type: Copy) {

@@ -10,16 +10,22 @@
 
 .messagein {
     background-color: #8DC26F;
-    margin-left: 50px;
-}
-
-.messagein:hover {
-    background-color: #ADE28F;
 }
 
 .messageout {
     background-color: #D3D3D3;
+}
+
+.rightshift {
+    margin-left: 50px;
+}
+
+.leftshift {
     margin-right: 50px;
+}
+
+.messagein:hover {
+    background-color: #ADE28F;
 }
 
 .messageout:hover {

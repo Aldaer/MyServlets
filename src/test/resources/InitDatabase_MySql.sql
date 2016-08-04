@@ -1,6 +1,9 @@
 # == MySql ==
-create database userdatabase;
-use userdatabase;
+# CREATE DATABASE userdatabase;
+# USE userdatabase;
+DROP DATABASE IF EXISTS test;
+CREATE DATABASE test COLLATE utf8_general_ci;
+USE test;
 
 DROP TABLE IF EXISTS credentials;
 CREATE TABLE credentials (
@@ -58,14 +61,14 @@ CREATE TABLE messages (
   refid BIGINT NOT NULL DEFAULT 0,
   u_from VARCHAR(50) NOT NULL,
   u_to VARCHAR(50),
-  m_time TIMESTAMP NOT NULL DEFAULT UTC_TIMESTAMP(),
+  m_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   conversation_id BIGINT NOT NULL DEFAULT 0,
   text VARCHAR(10000) DEFAULT ''
 );
 
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00Z');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00Z');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00Z');
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
 INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, LAST_INSERT_ID(), 'А я прочитал!', '2015-01-03 12:00:00');

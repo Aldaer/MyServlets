@@ -3,8 +3,10 @@
 <Context>
     <Realm name="AppSecurity"
            className="com.aldor.jdbc.SaltedRealm"
-           driverName="org.h2.Driver"
-           connectionURL="jdbc:h2:file:E:/Programming/Java/MyServlets/info/userdatabase;SCHEMA=USERDATA;user=sa;password=123;AUTO_SERVER=TRUE"
+           driverName="com.mysql.cj.jdbc.Driver"
+           connectionURL="jdbc:mysql://localhost:3306/userdatabase?useSSL=false"
+           connectionName="epam"
+           connectionPassword="1234"
            userTable="credentials" userNameCol="username" userCredCol="dpassword"
            userRoleTable="user_roles" roleNameCol="user_role"
     />

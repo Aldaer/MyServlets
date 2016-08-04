@@ -1,5 +1,8 @@
-var body = $('body');
-var body = $('body');
+const body = $('body');
+const msgbox = $('#msgbox');
+
+var chainSort = true;
+var dispDivs;
 
 $('#showmsg').click(function () {
     $('#msglist').addClass('on');
@@ -8,7 +11,6 @@ $('#showmsg').click(function () {
 });
 
 function loadAllMessages() {
-    $('#msgbox').empty();
     $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=0,-1", onLoadMessages);
 }
 
@@ -48,7 +50,8 @@ var tzOffsetMillis;
 function onLoadMessages(data) {
     /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     tzOffsetMillis = new Date().getTimezoneOffset() * 60000;
-    $('#msgbox').empty();
+    msgbox.empty();
+    dispDivs = [];
     $.each(data.messages, displayMessage);
 }
 
@@ -70,7 +73,15 @@ function displayMessage(i, msg) {
             text: msg.from
         });
         mdiv.addClass("messagein");
+        if (!chainSort) mdiv.addClass("rightshift");
     }
+    if (chainSort) {
+
+    } else if (msg.from == user)
+        mdiv.addClass("leftshift");
+    else
+        mdiv.addClass("rightshift");
+
     if (msg.conversationId == 0) {
         mdiv.addClass("unread");
         if (msg.to == user) {
@@ -83,12 +94,24 @@ function displayMessage(i, msg) {
 
     mdiv.append(userlink, ' [', msgTime.toLocaleString(jsLocale), ']:<br>');
     mdiv.append(msg.text);
-    mdiv.data("msgId", msg.id);
+
+    var msgid = msg.id;
+    mdiv.data("msgId", msgid);
     mdiv.data("msgFrom", msg.from);
     mdiv.data("msgTo", msg.to);
     mdiv.css("display", "block");
-    mdiv.click(msg.id, messageClicked);
-    $('#msgbox').append(mdiv);
+    mdiv.click(msgid, messageClicked);
+
+    var attachPoint = msgbox;
+    if (chainSort && msg.refId > 0)
+        for (var j = 0; j < dispDivs.length; j++)
+            if (dispDivs[j].data("msgId") == msg.refId) {
+                attachPoint = dispDivs[j];
+                break;
+            }
+
+    attachPoint.append(mdiv);
+    dispDivs.push(mdiv);
 }
 
 
