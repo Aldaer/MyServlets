@@ -14,9 +14,8 @@ repositories {
 dependencies {
     compile project (':crypto')
 
-    compileOnly 'org.projectlombok:lombok:+'
-    compileOnly 'org.jetbrains:annotations:+'
-    testCompile 'org.jetbrains:annotations:+'
+    providedCompile 'org.projectlombok:lombok:+'
+    providedCompile 'org.jetbrains:annotations:+'
 
     compile 'org.glassfish.web:javax.servlet.jsp.jstl:+'
     compile 'javax.servlet:javax.servlet-api:+'
@@ -29,8 +28,7 @@ dependencies {
     testCompile 'junit:junit:+'
 
     testCompile 'com.h2database:h2:+'
-    compileOnly 'mysql:mysql-connector-java:+'
-    testCompile 'mysql:mysql-connector-java:+'
+    providedCompile 'mysql:mysql-connector-java:+'
 }
 
 task testWar(type: War) {
@@ -40,10 +38,10 @@ task testWar(type: War) {
     duplicatesStrategy = DuplicatesStrategy.WARN
     classpath(sourceSets.test.output)
 
-    exclude('**/web.xml')
-    exclude('**/context.xml')
-
-    webXml = file('src/test/resources/web-test.xml')
+    exclude '**/web.xml'
+    exclude '**/context.xml'
+    from 'src/test/testwar'
+    rename '\\$(\\w+\\.xml)', '$1'
 }
 
 task updateTomcatLibs(type: Copy) {

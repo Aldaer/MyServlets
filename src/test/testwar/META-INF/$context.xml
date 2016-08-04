@@ -4,7 +4,9 @@
     <Realm name="AppSecurity"
            className="com.aldor.jdbc.SaltedRealm"
            driverName="org.h2.Driver"
-           connectionURL="jdbc:h2:file:E:/Programming/Java/MyServlets/info/userdatabase;SCHEMA=USERDATA;user=sa;password=123;AUTO_SERVER=TRUE"
+           connectionURL="jdbc:h2:file:E:/Programming/Java/MyServlets/info/userdatabase;SCHEMA=USERDATA;AUTO_SERVER=TRUE"
+           connectionName="sa"
+           connectionPassword="123"
            userTable="credentials" userNameCol="username" userCredCol="dpassword"
            userRoleTable="user_roles" roleNameCol="user_role"
     />
