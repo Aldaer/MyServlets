@@ -117,6 +117,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             + COL_CNVP_USER_ID + ") VALUES (?,?);";
     static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
             + COL_CNVP_USER_ID + "=?);";
+    static final String DELETE_CONV = "DELETE FROM " + TABLE_CONV + " WHERE " + CFF_CNV_ID + "=?;";
+
 
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
@@ -685,6 +687,7 @@ class SqlConvDAO implements ConversationDAO {
     @Override
     public @NotNull Collection<Conversation> listConversations(long userId) {
         try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_PARTICIPANT)) {
+            pst.setLong(1, userId);
             log.trace("Executing query: {} <== ({})", GET_CONV_BY_PARTICIPANT, userId);
             ResultSet rs = pst.executeQuery();
             List<Conversation> lc = new ArrayList<>();
@@ -766,6 +769,17 @@ class SqlConvDAO implements ConversationDAO {
             if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {
             log.error("Error removing user #{} from conversation #{}: {}", convId, userId, e);
+        }
+    }
+
+    @Override
+    public void deleteConversation(long convId) {
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(DELETE_CONV)) {
+            pst.setLong(1, convId);
+            pst.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error deleting conversation #{}: {}", convId, e);
         }
     }
 }

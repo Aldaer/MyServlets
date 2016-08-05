@@ -55,4 +55,10 @@ public interface ConversationDAO {
      */
     void leaveConversation(long convId, Long userId);
 
+    /**
+     * Deletes the conversation
+     * @param convId Conversation to delete
+     */
+    void deleteConversation(long convId);
+
 }
