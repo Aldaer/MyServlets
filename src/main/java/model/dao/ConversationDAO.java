@@ -1,5 +1,6 @@
 package model.dao;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -16,18 +17,18 @@ public interface ConversationDAO {
     @Nullable Conversation getConversation(long id);
 
     /**
-     * Returns conversations in which a user participates
+     * Returns conversations in which the indicated user participates
      * @param userId Id of the participating user
-     * @return Conversation object loaded from database
+     * @return Collection of conversation objects loaded from database
      */
-    @Nullable Collection<Conversation> listConversations(long userId);
+    @NotNull Collection<Conversation> listConversations(long userId);
 
     /**
-     * Returns conversations which a user started
-     * @param userId Id of the starting user
-     * @return Conversation object loaded from database
+     * Returns conversations which the indicated user started
+     * @param username Login name of the starting user
+     * @return Collection of conversation objects loaded from database
      */
-    @Nullable Collection<Conversation> listOwnConversations(long userId);
+    @NotNull Collection<Conversation> listOwnConversations(String username);
 
     /**
      * Creates new conversation and stores in the database.
@@ -38,7 +39,7 @@ public interface ConversationDAO {
      * @param starter User who started the conversation
      * @return Conversation object
      */
-    Conversation createConversation(String name, String desc, User starter);
+    @Nullable Conversation createConversation(String name, String desc, User starter);
 
     /**
      * Indicated user joins the conversation
@@ -52,6 +53,6 @@ public interface ConversationDAO {
      * @param convId Conversation id
      * @param userId User id
      */
-    void leaveConversation(long convId, long userId);
+    void leaveConversation(long convId, Long userId);
 
 }

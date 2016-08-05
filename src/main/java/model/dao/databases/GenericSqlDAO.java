@@ -28,7 +28,7 @@ import static model.dao.databases.Stored.Processor.getColumnForField;
 public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     final String upsertPrefix;
     final String commentToken;
-    
+
     static final String TABLE_USERS = "users";
     static final String TABLE_CREDENTIALS = "credentials";
     static final String TABLE_TEMP_CREDENTIALS = "temp_credentials";
@@ -57,6 +57,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String CFF_MES_CONV = getColumnForField(Message.class, "conversationId");
 
     static final String CFF_CNV_ID = getColumnForField(Conversation.class, "id");
+    static final String CFF_CNV_OWNER = getColumnForField(Conversation.class, "starter");
 
 
     // Columns in tables with no DAO classes
@@ -69,13 +70,16 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     // Friends
     static final String COL_FRN_UID = "uid";
     static final String COL_FRN_FID = "fid";
+    // Conversation participants
+    static final String COL_CNVP_CONV_ID = "convid";
+    static final String COL_CNVP_USER_ID = "uid";
 
 
     static final String GET_CREDS_BY_LOGIN_NAME = "SELECT " + CFF_CR_PWD + " FROM " + TABLE_CREDENTIALS + " WHERE (" + CFF_CR_UNAME + "=?);";
     static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + "=?);";
     static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_ID + "=?);";
 
-    static final String GET_USER_BY_PARTIAL_NAME = "SELECT " + CFF_USR_ID + "," + CFF_USR_UNAME + "," + CFF_USR_FNAME 
+    static final String GET_USER_BY_PARTIAL_NAME = "SELECT " + CFF_USR_ID + "," + CFF_USR_UNAME + "," + CFF_USR_FNAME
             + " FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + " LIKE ? OR " + CFF_USR_FNAME + " LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
@@ -83,20 +87,20 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             + " AS C WHERE (C." + CFF_CR_UNAME + "=?) UNION SELECT 1 FROM "
             + TABLE_TEMP_CREDENTIALS + " AS TC WHERE (TC." + COL_TCR_UNAME + "=?);";
 
-    static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS 
+    static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS
             + " (" + COL_TCR_UNAME + ", " + COL_TCR_CRT + ") VALUES (?, ?);";
-    static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS 
+    static final String PURGE_TEMPORARY_ACCOUNTS = "DELETE FROM " + TABLE_TEMP_CREDENTIALS
             + " WHERE (" + COL_TCR_CRT + " < ?);";
 
     // Default ResultSet behaviour: ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
-    static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (" + COL_RLS_UNAME + ", " 
+    static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (" + COL_RLS_UNAME + ", "
             + COL_RLS_UROLE + ") VALUES (?, '" + DEFAULT_ROLE + "');";
 
-    static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (username=?) FOR UPDATE;";
+    static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + "=?) FOR UPDATE;";
 
     static final String GET_USERS_FRIEND_IDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=?);";
-    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS 
-            + " ON " + TABLE_USERS + "." + CFF_USR_ID + " = " + TABLE_FRIENDS + "." + COL_FRN_FID 
+    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS
+            + " ON " + TABLE_USERS + "." + CFF_USR_ID + " = " + TABLE_FRIENDS + "." + COL_FRN_FID
             + " WHERE " + TABLE_FRIENDS + "." + COL_FRN_UID + "=";
 
     static final String ADD_FRIEND_POSTFIX = " INTO " + TABLE_FRIENDS + " (" + COL_FRN_UID + ", " + COL_FRN_FID + ") VALUES (?,?);";
@@ -106,8 +110,13 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
     static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CNV_ID + "=?);";
-    static final String GET_CONV_BY_OWNER = "";
-    static final String GET_CONV_BY_PARTICIPANT = "";
+    static final String GET_CONV_BY_PARTICIPANT = "SELECT * FROM " + TABLE_CONV + " INNER JOIN " + TABLE_CONV_PARTS
+            + " ON " + CFF_CNV_ID + "=" + COL_CNVP_CONV_ID + " WHERE " + COL_CNVP_USER_ID + "=?;";
+    static final String GET_CONV_BY_OWNER = "SELECT * FROM " + TABLE_CONV + " WHERE " + CFF_CNV_OWNER + "=?;";
+    static final String ADD_USER_TO_CONV_POSTFIX = " INTO " + TABLE_CONV_PARTS + " (" + COL_CNVP_CONV_ID + ","
+            + COL_CNVP_USER_ID + ") VALUES (?,?);";
+    static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
+            + COL_CNVP_USER_ID + "=?);";
 
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
@@ -133,9 +142,9 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
                 commentToken = "*UNSUPPORTED*";
         }
     }
-    
-    enum SqlMode { MY_SQL, H2 }
-    
+
+    enum SqlMode {MY_SQL, H2}
+
     @Override
     public UserDAO getUserDAO() {
         synchronized (this) {
@@ -347,7 +356,6 @@ class SqlUserDAO implements UserDAO {
             pst.setLong(2, friendId);
             log.trace("Executing query: {} <== ({},{})", addFriendQuery, id, friendId);
             pst.executeUpdate();
-//            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);        // H2 only
         } catch (SQLException e) {
             log.error("Error adding friend #{} to user #{}'s list: {}", friendId, id, e);
         }
@@ -365,7 +373,6 @@ class SqlUserDAO implements UserDAO {
         } catch (SQLException e) {
             log.error("Error removing friend #{} from user #{}'s list: {}", friendId, id, e);
         }
-
     }
 }
 
@@ -541,7 +548,7 @@ class SqlMessageDAO implements MessageDAO {
             message.packIntoPreparedStatement(pst);
             log.trace("Sending new message from {}", message.getFrom());
             if (pst.executeUpdate() != 1)
-                throw new SQLException("Wrong update count");
+                throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {
             log.error("Error sending message from '{}' [{}]: {}", message.getFrom(), message.getText(), e);
         }
@@ -638,7 +645,7 @@ class SqlMessageDAO implements MessageDAO {
         if (!countOnly) {
             ofNullable(constraint.getLimit()).map(lim -> " LIMIT " + lim).ifPresent(sqlB::append);
             ofNullable(constraint.getOffset()).map(offs -> " OFFSET " + offs).map(offs ->                   // MySql patch: Can't use OFFSET without LIMIT
-                constraint.getLimit()==null? " LIMIT " + Integer.MAX_VALUE + offs : offs ).ifPresent(sqlB::append);
+                    constraint.getLimit() == null ? " LIMIT " + Integer.MAX_VALUE + offs : offs).ifPresent(sqlB::append);
             ofNullable(constraint.getSortField()).map(srtf -> " ORDER BY " + getColumnForField(Message.class, srtf)).ifPresent(constraintList::add);
         }
 
@@ -650,16 +657,17 @@ class SqlMessageDAO implements MessageDAO {
 @Slf4j
 class SqlConvDAO implements ConversationDAO {
     private final Supplier<Connection> cSource;
+    private final String addUserToConvQuery;
 
     SqlConvDAO(Supplier<Connection> cSource, String upsertPrefix) {
+        addUserToConvQuery = upsertPrefix + ADD_USER_TO_CONV_POSTFIX;
         this.cSource = cSource;
-//        addFriendQuery = upsertPrefix + ADD_FRIEND_POSTFIX;
     }
 
     @Override
     public @Nullable Conversation getConversation(long id) {
         try (Connection conn = cSource.get();
-            PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_ID)) {
+             PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_ID)) {
             pst.setLong(1, id);
             log.trace("Executing query: {} <== ({})", GET_CONV_BY_ID, id);
             ResultSet rs = pst.executeQuery();
@@ -675,27 +683,89 @@ class SqlConvDAO implements ConversationDAO {
     }
 
     @Override
-    public @Nullable Collection<Conversation> listConversations(long userId) {
-        return null;
+    public @NotNull Collection<Conversation> listConversations(long userId) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_PARTICIPANT)) {
+            log.trace("Executing query: {} <== ({})", GET_CONV_BY_PARTICIPANT, userId);
+            ResultSet rs = pst.executeQuery();
+            List<Conversation> lc = new ArrayList<>();
+            Stored.Processor.reconstructAllObjects(rs, Conversation::new, lc, false);
+            return lc;
+        } catch (SQLException e) {
+            log.error("Error getting data from table '{}': {}", TABLE_CONV, e);
+            return new ArrayList<>();
+        }
     }
 
     @Override
-    public @Nullable Collection<Conversation> listOwnConversations(long userId) {
-        return null;
+    public @NotNull Collection<Conversation> listOwnConversations(String username) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_OWNER)) {
+            log.trace("Executing query: {} <== ({})", GET_CONV_BY_OWNER, username);
+            ResultSet rs = pst.executeQuery();
+            List<Conversation> lc = new ArrayList<>();
+            Stored.Processor.reconstructAllObjects(rs, Conversation::new, lc, false);
+            return lc;
+        } catch (SQLException e) {
+            log.error("Error getting data from table '{}': {}", TABLE_CONV, e);
+            return new ArrayList<>();
+        }
     }
 
     @Override
-    public Conversation createConversation(String name, String desc, User starter) {
-        return null;
+    public @Nullable Conversation createConversation(String name, String desc, User starter) {
+        try (Connection conn = cSource.get()) {
+            conn.setAutoCommit(false);
+            try {
+                Conversation conv = new Conversation(name, desc, starter.getUsername());
+                PreparedStatement createConv = conn.prepareStatement(conv.generateInsertSQL(TABLE_CONV), Statement.RETURN_GENERATED_KEYS);
+                conv.packIntoPreparedStatement(createConv);
+                log.trace("Creating conversation: '{}' by user '{}'", name, starter.getUsername());
+                if (createConv.executeUpdate() != 1)
+                    throw new SQLException(WRONG_ROW_COUNT);
+                ResultSet convKey = createConv.getGeneratedKeys();
+                convKey.next();
+                long convId = convKey.getLong(1);
+                conv.setId(convId);
+                convKey.close();
+                joinConversation(conn, convId, starter.getId());
+                conn.commit();
+                return conv;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            log.error("Error creating conversation '{}' by '{}' : {}", name, starter.getUsername(), e);
+            return null;
+        }
     }
 
     @Override
     public void joinConversation(long convId, long userId) {
+        try (Connection conn = cSource.get()) {
+            joinConversation(conn, convId, userId);
+        } catch (SQLException e) {
+            log.error("Error adding user #{} to conversation #{} : {}", userId, convId, e);
+        }
+    }
 
+    private void joinConversation(Connection conn, long convId, long userId) throws SQLException {
+        PreparedStatement addOwner = conn.prepareStatement(addUserToConvQuery);
+        addOwner.setLong(1, convId);
+        addOwner.setLong(2, userId);
+        addOwner.executeUpdate();
     }
 
     @Override
-    public void leaveConversation(long convId, long userId) {
-
+    public void leaveConversation(long convId, Long userId) {
+        if (userId == null) return;
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(REMOVE_USER_FROM_CONV)) {
+            pst.setLong(1, convId);
+            pst.setLong(2, userId);
+            log.trace("Executing query: {} <== ({},{})", REMOVE_USER_FROM_CONV, convId, userId);
+            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
+        } catch (SQLException e) {
+            log.error("Error removing user #{} from conversation #{}: {}", convId, userId, e);
+        }
     }
 }

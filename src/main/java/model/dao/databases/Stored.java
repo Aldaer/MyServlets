@@ -106,6 +106,8 @@ public interface Stored {
          * @param objSource   Object factory
          * @param destination Collection to put objects into
          * @param <T>         Object type
+         * @param ignoreMissing If true, do not update fields missing from result set. If false,
+         *                      generate runtime exception if any of non-auto fields are missing.
          * @throws SQLException
          */
         static <T extends Stored> void reconstructAllObjects(ResultSet rs, Supplier<T> objSource, Collection<T> destination, boolean ignoreMissing) throws SQLException {
@@ -116,7 +118,7 @@ public interface Stored {
             int[] resultColumns = getRSColumns(rs, fieldData);
 
             do {
-                fillFields(rs, obj, fieldData, resultColumns, true);
+                fillFields(rs, obj, fieldData, resultColumns, ignoreMissing);
                 destination.add(obj);
                 if (rs.next())
                     obj = objSource.get();

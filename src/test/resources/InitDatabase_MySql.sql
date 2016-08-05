@@ -97,7 +97,7 @@ CREATE TABLE conversations (
   started TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
 
-INSERT INTO conversations (id, name, description) VALUES (1, 'Сообщество', 'Просто поболтать');
+INSERT INTO conversations (id, name, description, starter) VALUES (1, 'Сообщество', 'Просто поболтать', 'вася');
 
 DROP TABLE IF EXISTS conversation_participants;
 CREATE TABLE conversation_participants (
