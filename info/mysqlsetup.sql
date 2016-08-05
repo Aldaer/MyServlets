@@ -45,3 +45,19 @@ CREATE TABLE friends (
   FOREIGN KEY (fid) REFERENCES users (id) ON DELETE CASCADE,
   CONSTRAINT fkey PRIMARY KEY (uid, fid)
 );
+
+CREATE TABLE conversations (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(255),
+  starter VARCHAR(50),
+  started TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+
+CREATE TABLE conversation_participants (
+  convid BIGINT,
+  uid    BIGINT,
+  FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
+  FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT convkey PRIMARY KEY (convid, uid)
+);

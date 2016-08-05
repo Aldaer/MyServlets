@@ -96,3 +96,26 @@ CREATE TABLE friends (
 
 INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='вася'), (SELECT TOP 1 id FROM users WHERE username='петя'));
 INSERT INTO friends (uid, fid) values((SELECT TOP 1 id FROM users WHERE username='петя'), (SELECT TOP 1 id FROM users WHERE username='вася'));
+
+DROP TABLE IF EXISTS conversations;
+CREATE TABLE conversations (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR_IGNORECASE(100) NOT NULL,
+  description VARCHAR(255),
+  starter VARCHAR_IGNORECASE(50),
+  started TIMESTAMP DEFAULT CURRENT_UTC_TIMESTAMP()
+);
+
+INSERT INTO conversations (id, name, description) VALUES (1, 'Сообщество', 'Просто поболтать');
+
+DROP TABLE IF EXISTS conversation_participants;
+CREATE TABLE conversation_participants (
+  convid BIGINT,
+  uid    BIGINT,
+  FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
+  FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT convkey PRIMARY KEY (convid, uid)
+);
+
+INSERT INTO conversation_participants (convid, uid) values (1, (SELECT TOP 1 id FROM users WHERE username='вася'));
+INSERT INTO conversation_participants (convid, uid) values (1, (SELECT TOP 1 id FROM users WHERE username='петя'));
