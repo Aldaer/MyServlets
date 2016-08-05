@@ -145,6 +145,9 @@ function markAsRead() {
 }
 
 function messageClicked(event) {
+    if (event.target.nodeName.toLowerCase() == "a")
+        return;
+    
     replyingTo = $(event.currentTarget);
     var to = replyingTo.data("msgTo");
     if (to == user && replyingTo.hasClass("unread")) {
