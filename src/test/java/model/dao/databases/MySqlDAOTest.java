@@ -210,4 +210,22 @@ public class MySqlDAOTest {
         Conversation conv = convs.getConversation(1);
         assertThat(conv.getName(), is("Сообщество"));
     }
+
+    @Test
+    public void testGetConversationByParticipant() throws Exception {
+        User user = usr.getUser("петя");
+        Collection<Conversation> userConvs = convs.listConversations(user.getId());
+        assertThat(userConvs.size(), is(1));
+
+    }
+
+    @Test
+    public void testCreateConversation() throws Exception {
+        User user = usr.getUser("вася");
+        Collection<Conversation> convs1 = convs.listConversations(user.getId());
+        Conversation newConv = convs.createConversation("тема", "описание", user);
+        assertThat(newConv.getName(), is("тема"));
+        Collection<Conversation> convs2 = convs.listConversations(user.getId());
+        assertThat(convs2.size(), is(convs1.size() + 1));
+    }
 }
