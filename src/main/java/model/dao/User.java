@@ -15,7 +15,7 @@ import model.dao.databases.StoredField;
 @NoArgsConstructor
 public class User implements Stored {
     @StoredField(auto = true, column = "id")
-    long id = 0;
+    long id;
 
     @StoredField(column = "username", maxLength = 50)
     String username = "";

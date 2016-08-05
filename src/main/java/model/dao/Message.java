@@ -18,7 +18,7 @@ import java.util.Comparator;
 @NoArgsConstructor
 public class Message implements Stored {
     @StoredField(auto = true, column = "id")
-    long id = 0;
+    long id;
 
     /**
      * refId == 0 when this message is not a reply to anything

@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class Conversation implements Stored {
     @StoredField(auto = true, column = "id")
-    long id = 0;
+    long id;
 
     @StoredField(column = "name", maxLength = 100)
     String name="CONVERSATION";
@@ -25,7 +25,7 @@ public class Conversation implements Stored {
     String desc="";
 
     @StoredField(column="starter", maxLength = 50)
-    String starter;
+    String starter="";
 
     @StoredField(auto = true, column = "started")
     Timestamp started;
