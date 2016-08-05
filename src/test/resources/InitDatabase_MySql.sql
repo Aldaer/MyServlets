@@ -6,7 +6,7 @@
 # Do not change database name from 'test' without changing constant TEST_DB_NAME in MySqlDAOTest
 DROP DATABASE IF EXISTS test;
 CREATE DATABASE test COLLATE utf8_general_ci;
-USE test;
+USE `test`;
 
 DROP TABLE IF EXISTS credentials;
 CREATE TABLE credentials (

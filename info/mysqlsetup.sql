@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS userdatabase;
-CREATE DATABASE userdatabase;
+CREATE DATABASE userdatabase COLLATE utf8_general_ci;
 USE userdatabase;
 
 CREATE TABLE credentials (

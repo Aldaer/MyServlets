@@ -30,8 +30,10 @@ public interface ConversationDAO {
     @Nullable Collection<Conversation> listOwnConversations(long userId);
 
     /**
-     * Creates new conversation and stores in the database
-     * @param name Conversatino name
+     * Creates new conversation and stores in the database.
+     * Note that conversation is bound to user name, not user id, to
+     * preserve conversations started by deleted users.
+     * @param name Conversation name
      * @param desc Conversation description
      * @param starter User who started the conversation
      * @return Conversation object
@@ -39,15 +41,15 @@ public interface ConversationDAO {
     Conversation createConversation(String name, String desc, User starter);
 
     /**
-     * Indicated User joins the conversation
-     * @param convId COnversation id
+     * Indicated user joins the conversation
+     * @param convId Conversation id
      * @param userId User id
      */
     void joinConversation(long convId, long userId);
 
     /**
-     * Indicated User joins the conversation
-     * @param convId COnversation id
+     * Indicated user leaves the conversation
+     * @param convId Conversation id
      * @param userId User id
      */
     void leaveConversation(long convId, long userId);

@@ -111,7 +111,7 @@ INSERT INTO conversations (id, name, description) VALUES (1, 'Сообществ
 DROP TABLE IF EXISTS conversation_participants;
 CREATE TABLE conversation_participants (
   convid BIGINT,
-  uid    BIGINT,
+  uid BIGINT,
   FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
   FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT convkey PRIMARY KEY (convid, uid)

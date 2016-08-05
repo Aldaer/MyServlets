@@ -9,8 +9,12 @@ import java.time.ZoneOffset;
  */
 public interface GlobalDAO {
     UserDAO getUserDAO();
+
     CredentialsDAO getCredentialsDAO();
+
     MessageDAO getMessageDAO();
+
+    ConversationDAO getConversationDAO();
 
     default Timestamp currentUtcTimestamp() {
         return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));

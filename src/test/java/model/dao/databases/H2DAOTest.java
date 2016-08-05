@@ -25,6 +25,7 @@ public class H2DAOTest {
     private static CredentialsDAO creds;
     private static UserDAO usr;
     private static MessageDAO msg;
+    private static ConversationDAO convs;
     private static Connection keepalive;
 
     @BeforeClass
@@ -61,6 +62,7 @@ public class H2DAOTest {
         creds.purgeTemporaryUsers(System.currentTimeMillis());
         usr = glob.getUserDAO();
         msg = glob.getMessageDAO();
+        convs = glob.getConversationDAO();
     }
 
     @AfterClass
@@ -187,5 +189,11 @@ public class H2DAOTest {
         usr.removeFriend(id1, id2);
         long[] flist3 = usr.getFriendIds(id1);
         assertThat(flist3.length, is(flist1.length));
+    }
+
+    @Test
+    public void testGetConversation() throws Exception {
+        Conversation conv = convs.getConversation(1);
+        assertThat(conv.getName(), is("Сообщество"));
     }
 }

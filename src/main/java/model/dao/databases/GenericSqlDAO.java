@@ -36,6 +36,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String DEFAULT_ROLE = "authenticated-user";
     static final String TABLE_MESSAGES = "messages";
     static final String TABLE_FRIENDS = "friends";
+    static final String TABLE_CONV = "conversations";
+    static final String TABLE_CONV_PARTS = "conversation_participants";
 
 
     // Columns in tables with their own DAO classes
@@ -53,6 +55,9 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String CFF_MES_TIME = getColumnForField(Message.class, "utcTimestamp");
     static final String CFF_MES_TEXT = getColumnForField(Message.class, "text");
     static final String CFF_MES_CONV = getColumnForField(Message.class, "conversationId");
+
+    static final String CFF_CNV_ID = getColumnForField(Conversation.class, "id");
+
 
     // Columns in tables with no DAO classes
     // Temporary credentials
@@ -100,12 +105,18 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
+    static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CNV_ID + "=?);";
+    static final String GET_CONV_BY_OWNER = "";
+    static final String GET_CONV_BY_PARTICIPANT = "";
+
+
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
     private Supplier<Connection> cSource;
     private UserDAO userDAO;
     private CredentialsDAO credsDAO;
     private MessageDAO messDAO;
+    private ConversationDAO convDAO;
 
     public GenericSqlDAO(SqlMode compatibility) {
         switch (compatibility) {
@@ -148,6 +159,15 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             return messDAO;
         }
     }
+
+    @Override
+    public ConversationDAO getConversationDAO() {
+        synchronized (this) {
+            if (convDAO == null) convDAO = new SqlConvDAO(cSource, upsertPrefix);
+            return convDAO;
+        }
+    }
+
 
     @Override
     public void useConnectionSource(Supplier<Connection> src) {
@@ -627,3 +647,55 @@ class SqlMessageDAO implements MessageDAO {
     }
 }
 
+@Slf4j
+class SqlConvDAO implements ConversationDAO {
+    private final Supplier<Connection> cSource;
+
+    SqlConvDAO(Supplier<Connection> cSource, String upsertPrefix) {
+        this.cSource = cSource;
+//        addFriendQuery = upsertPrefix + ADD_FRIEND_POSTFIX;
+    }
+
+    @Override
+    public @Nullable Conversation getConversation(long id) {
+        try (Connection conn = cSource.get();
+            PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_ID)) {
+            pst.setLong(1, id);
+            log.trace("Executing query: {} <== ({})", GET_CONV_BY_ID, id);
+            ResultSet rs = pst.executeQuery();
+            if (!rs.next()) {
+                log.trace("Conversation #{} not found", id);
+                return null;
+            }
+            return Stored.Processor.reconstructObject(rs, Conversation::new);
+        } catch (SQLException e) {
+            log.error("Error getting data for conversation #{}: {}", id, e);
+            return null;
+        }
+    }
+
+    @Override
+    public @Nullable Collection<Conversation> listConversations(long userId) {
+        return null;
+    }
+
+    @Override
+    public @Nullable Collection<Conversation> listOwnConversations(long userId) {
+        return null;
+    }
+
+    @Override
+    public Conversation createConversation(String name, String desc, User starter) {
+        return null;
+    }
+
+    @Override
+    public void joinConversation(long convId, long userId) {
+
+    }
+
+    @Override
+    public void leaveConversation(long convId, long userId) {
+
+    }
+}

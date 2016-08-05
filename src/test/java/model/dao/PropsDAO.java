@@ -1,7 +1,7 @@
 package model.dao;
 
 /**
- * Global DAO for properties files (testing)
+ * Global DAO for properties files (testing). Does not support all DAO modes.
  */
 public class PropsDAO implements GlobalDAO {
     private final UserDAO userDAO = new UserDAO_props();
@@ -19,6 +19,11 @@ public class PropsDAO implements GlobalDAO {
 
     @Override
     public MessageDAO getMessageDAO() {
+        return null;
+    }
+
+    @Override
+    public ConversationDAO getConversationDAO() {
         return null;
     }
 }
