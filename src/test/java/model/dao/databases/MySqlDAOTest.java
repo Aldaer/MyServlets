@@ -22,6 +22,8 @@ import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("ConstantConditions")
 public class MySqlDAOTest {
+    private static final String TEST_DB_NAME = "test"; // Must be the same as DB name in InitDatabase_MySql.sql
+
     private static CredentialsDAO creds;
     private static UserDAO usr;
     private static MessageDAO msg;
@@ -36,17 +38,17 @@ public class MySqlDAOTest {
         }
         GenericSqlDAO glob = new MySqlGlobalDao();
 
-        Supplier<Connection> cs = () -> {
+        Supplier<Connection> csSetup = () -> {
             try {
-                return DriverManager.getConnection("jdbc:mysql://localhost:3306/userdatabase?useSSL=false", "epam", "1234");
+                return DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", "epam", "1234");
             } catch (SQLException e) {
                 e.printStackTrace();
                 return null;
             }
         };
 
-        keepalive = cs.get();
-        glob.useConnectionSource(cs);
+        keepalive = csSetup.get();
+        glob.useConnectionSource(csSetup);
 
         String[] script = {};
         try {
@@ -55,6 +57,16 @@ public class MySqlDAOTest {
             e.printStackTrace();
         }
         glob.executeScript(script);
+
+        Supplier<Connection> csRun = () -> {
+            try {
+                return DriverManager.getConnection("jdbc:mysql://localhost:3306/" + TEST_DB_NAME + "?useSSL=false", "epam", "1234");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+        glob.useConnectionSource(csRun);
 
         creds = glob.getCredentialsDAO();
         creds.useSaltedHash(true);
@@ -65,6 +77,7 @@ public class MySqlDAOTest {
 
     @AfterClass
     public static void tearDown() throws Exception {
+        keepalive.createStatement().executeUpdate("DROP DATABASE " + TEST_DB_NAME + ";");
         keepalive.close();
     }
 

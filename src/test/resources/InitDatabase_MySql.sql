@@ -1,6 +1,9 @@
 # == MySql ==
 # CREATE DATABASE userdatabase;
 # USE userdatabase;
+# Note that connection string for initialization differs from working connection string
+# since it doesn't include database name.
+# Do not change database name from 'test' without changing constant TEST_DB_NAME in MySqlDAOTest
 DROP DATABASE IF EXISTS test;
 CREATE DATABASE test COLLATE utf8_general_ci;
 USE test;
@@ -66,9 +69,9 @@ CREATE TABLE messages (
   text VARCHAR(10000) DEFAULT ''
 );
 
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00Z');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00Z');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00Z');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00');
+INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
 INSERT INTO messages (u_from, conversation_id, refid, text, m_time) VALUES ('петя', 1, LAST_INSERT_ID(), 'А я прочитал!', '2015-01-03 12:00:00');

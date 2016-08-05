@@ -79,7 +79,7 @@ CREATE TABLE messages (
 );
 
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00');
+INSERT INTO messages (u_from, u_to, refid, text, m_time) VALUES ('петя', 'вася', identity(), 'И тебе привет!', '2015-01-01 12:10:00');
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
