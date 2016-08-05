@@ -34,25 +34,27 @@
         </c:if>
     </p>
 
-    <p><fmt:message key="main.selecttz"/></p>
-    <form action="/main/serv" method="get">
-        <p>
-            <select name="timezone" onchange="submit()">
-                <c:forEach items="${supportedTZ}" var="tzentry">
-                    <option value="${tzentry.key}" ${lastTZ == tzentry.key ? 'selected' : ''} >${tzentry.value}</option>
-                </c:forEach>
-            </select>
-        </p>
-    </form>
+    <div class="time">
+        <p><fmt:message key="main.selecttz"/></p>
+        <form action="/main/serv" method="get">
+            <p>
+                <select name="timezone" onchange="submit()">
+                    <c:forEach items="${supportedTZ}" var="tzentry">
+                        <option value="${tzentry.key}" ${lastTZ == tzentry.key ? 'selected' : ''} >${tzentry.value}</option>
+                    </c:forEach>
+                </select>
+            </p>
+        </form>
 
-    <p>
-        <fmt:message key="main.beanreport"/><br>
-        <fmt:message key="main.through"/> fmt:formatDate: <i><fmt:formatDate pattern="HH:mm:ss dd-MM-yyyy (z)"
-                                                                             value="${timer.date}"
-                                                                             timeZone="${timer.tz}"/></i><br>
-        <fmt:message key="main.through"/> getDate(): <i>${timer.date}</i><br>
-        <fmt:message key="main.through"/> toString(): <i>${timer}</i>
-    </p>
+        <p>
+            <fmt:message key="main.beanreport"/><br>
+            <fmt:message key="main.through"/> fmt:formatDate: <i><fmt:formatDate pattern="HH:mm:ss dd-MM-yyyy (z)"
+                                                                                 value="${timer.date}"
+                                                                                 timeZone="${timer.tz}"/></i><br>
+            <fmt:message key="main.through"/> getDate(): <i>${timer.date}</i><br>
+            <fmt:message key="main.through"/> toString(): <i>${timer}</i>
+        </p>
+    </div>
     <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>

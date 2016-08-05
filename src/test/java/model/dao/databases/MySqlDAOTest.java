@@ -216,7 +216,6 @@ public class MySqlDAOTest {
         User user = usr.getUser("петя");
         Collection<Conversation> userConvs = convs.listConversations(user.getId());
         assertThat(userConvs.size(), is(1));
-
     }
 
     @Test

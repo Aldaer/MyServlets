@@ -35,3 +35,7 @@
 .unread {
     font-weight: bold;
 }
+
+.time {
+    display: none;
+}
