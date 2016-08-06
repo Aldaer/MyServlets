@@ -34,7 +34,7 @@
         </c:if>
     </p>
 
-    <div class="time">
+    <div class="time hidden">
         <p><fmt:message key="main.selecttz"/></p>
         <form action="/main/serv" method="get">
             <p>
@@ -54,6 +54,22 @@
             <fmt:message key="main.through"/> getDate(): <i>${timer.date}</i><br>
             <fmt:message key="main.through"/> toString(): <i>${timer}</i>
         </p>
+    </div>
+    <div class="conv hidden">
+        <div style="width: 20%; float: left">
+            <h3><fmt:message key="main.conv.filter"/></h3>
+            <label>
+                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(0)">
+            </label><fmt:message key="main.sorting.time"/><br>
+            <label>
+                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(1)" checked>
+            </label><fmt:message key="main.sorting.chain"/><br>
+        </div>
+        <div style="width: 80%; float:right">
+            <div class="databox" id="msgbox">
+                <fmt:message key="loading.messages"/>
+            </div>
+        </div>
     </div>
     <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
@@ -95,5 +111,6 @@
     var jsLocale = "${language}";
 </script>
 <script src="/extras/mainpage.js"></script>
+<script src="/extras/conversations.js"></script>
 </body>
 </html>
