@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Context>
+    <!--
     <Realm name="AppSecurity"
            className="com.aldor.jdbc.SaltedRealm"
            driverName="org.h2.Driver"
@@ -10,4 +11,5 @@
            userTable="credentials" userNameCol="username" userCredCol="dpassword"
            userRoleTable="user_roles" roleNameCol="user_role"
     />
+    -->
 </Context>

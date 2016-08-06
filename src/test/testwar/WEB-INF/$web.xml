@@ -4,16 +4,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
-    <display-name>Time Web App</display-name>
+    <display-name>Green Network</display-name>
 
     <servlet>
         <servlet-name>UserDetails</servlet-name>
         <jsp-file>/WEB-INF/userdetails.jsp</jsp-file>
     </servlet>
+
+    <servlet>
+        <servlet-name>Conversations</servlet-name>
+        <jsp-file>/WEB-INF/conversations.jsp</jsp-file>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>UserDetails</servlet-name>
         <url-pattern>/main/userdetails</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Conversations</servlet-name>
+        <url-pattern>/main/conversations</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Container-managed security. Comment out to disable. -->
 <!--

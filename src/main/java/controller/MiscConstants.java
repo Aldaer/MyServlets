@@ -60,8 +60,9 @@ interface PageURLs {
     String MAIN_PAGE = "/WEB-INF/mainpage.jsp";
 
     String SECURED_AREA = "/main/*";
-    String DETAILS_PAGE = "/main/userdetails";      // actually, /WEB-INF/userdetails.jsp - bound through web.xml
-    String LOGOUT = "/main/logout";                 // performed by SecurityFilter
+    String DETAILS_PAGE = "/main/userdetails";          // actually, /WEB-INF/userdetails.jsp - bound through web.xml
+    String CONVERSATIONS_PAGE = "/main/conversations";   // actually, /WEB-INF/conversations.jsp - bound through web.xml
+    String LOGOUT = "/main/logout";                     // performed by SecurityFilter
 
     String MAIN_SERVLET = "/main/serv";
     String LOGIN_SERVLET = "/doLogin";
