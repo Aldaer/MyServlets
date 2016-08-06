@@ -55,25 +55,26 @@
             <fmt:message key="main.through"/> toString(): <i>${timer}</i>
         </p>
     </div>
-    <div class="conv hidden">
+    <div class="hidden" id="convDiv">
         <div style="width: 20%; float: left">
             <h3><fmt:message key="main.conv.filter"/></h3>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(0)">
-            </label><fmt:message key="main.sorting.time"/><br>
+                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(0)" checked>
+            </label><fmt:message key="main.conv.my"/><br>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(1)" checked>
-            </label><fmt:message key="main.sorting.chain"/><br>
+                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(1)">
+            </label><fmt:message key="main.conv.all"/><br>
         </div>
         <div style="width: 80%; float:right">
-            <div class="databox" id="msgbox">
-                <fmt:message key="loading.messages"/>
+            <div class="databox" id="convbox">
+                <fmt:message key="loading.conversations"/>
             </div>
         </div>
     </div>
     <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
+    <button class="smallbutton" id="showconv"><fmt:message key="main.conversations"/></button>
+    <button class="smallbutton" id="showtime"><fmt:message key="main.time"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
-    <a href="/main/conversations" class="smallbutton"><fmt:message key="main.conversations"/></a>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>
 

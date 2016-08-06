@@ -19,13 +19,13 @@ public class Conversation implements Stored {
     long id;
 
     @StoredField(column = "name", maxLength = 100)
-    String name="";
+    String name = "";
 
     @StoredField(column = "description", maxLength = 255)
-    String desc="";
+    String desc = "";
 
-    @StoredField(column="starter", maxLength = 50)
-    String starter="";
+    @StoredField(column = "starter", maxLength = 50)
+    String starter = "";
 
     @StoredField(auto = true, column = "started")
     Timestamp started;

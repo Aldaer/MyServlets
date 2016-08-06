@@ -84,6 +84,8 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         srvContext.setAttribute(CREDS_DAO, credsDao);
         srvContext.setAttribute(USER_DAO, globalDao.getUserDAO());
         srvContext.setAttribute(MSG_DAO, globalDao.getMessageDAO());
+        srvContext.setAttribute(CONV_DAO, globalDao.getConversationDAO());
+
 
         Boolean contAuth = conf.getString(CONFIG_CONTAINER_SECURITY).toLowerCase().equals("true");
         srvContext.setAttribute(CONTAINER_AUTH, contAuth);

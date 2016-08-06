@@ -1,18 +1,30 @@
-const body = $('body');
-const msgbox = $('#msgbox');
+const BODY = $('BODY');
+const MSG_BOX = $('#MSG_BOX');
+const CONV_DIV = $('#CONV_DIV');
+const MSG_PRIVATE = "0,-1";
 
-var chainSort = true;
 var dispDivs;
+var chainSort = true;
 var messageCache;
+var convCache;
+var convListMode = 0;
+var currentConv = MSG_PRIVATE;
 
 $('#showmsg').click(function () {
     $('#msglist').addClass('on');
-
-    loadAllMessages();
+    loadAllMessages(MSG_PRIVATE);
 });
 
-function loadAllMessages() {
-    $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=0,-1", onLoadMessages);
+$('#showconv').click(function () {
+    CONV_DIV.toggleClass("hidden");
+    if (!CONV_DIV.hasClass("hidden")) {
+        setConvMode(convListMode);
+    }
+});
+
+function loadAllMessages(convid) {
+    currentConv = convid;
+    $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId=" + convid, onLoadMessages);
 }
 
 var replyingTo;
@@ -26,7 +38,7 @@ $('#reply').click(function () {
         text: $('#msgreply').val()
     };
     $.post("/main/messageAction", msgData, closeReply());
-    loadAllMessages();
+    loadAllMessages("0,-1");
 });
 
 $('#delete').click(function () {
@@ -52,7 +64,7 @@ function onLoadMessages(data) {
     /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     messageCache = data;
     tzOffsetMillis = new Date().getTimezoneOffset() * 60000;
-    msgbox.empty();
+    MSG_BOX.empty();
     dispDivs = [];
     $.each(data.messages, displayMessage);
 }
@@ -104,7 +116,7 @@ function displayMessage(i, msg) {
     mdiv.css("display", "block");
     mdiv.click(msgid, messageClicked);
 
-    var attachPoint = msgbox;
+    var attachPoint = MSG_BOX;
     var append = true;
     if (chainSort && msg.refId > 0)
         for (var j = 0; j < dispDivs.length; j++)
@@ -126,16 +138,16 @@ var nowReading;
 function startTimer(event) {
     readTimer = setTimeout(markAsRead, 2000);
     nowReading = $(event.currentTarget);
-    body.addClass("waiting");
+    BODY.addClass("waiting");
 }
 
 function stopTimer() {
     clearTimeout(readTimer);
-    body.removeClass("waiting");
+    BODY.removeClass("waiting");
 }
 
 function markAsRead() {
-    body.removeClass("waiting");
+    BODY.removeClass("waiting");
     if (nowReading.hasClass("unread")) {
         nowReading.removeClass("unread");
         nowReading.css("cursor", "");
@@ -147,7 +159,7 @@ function markAsRead() {
 function messageClicked(event) {
     if (event.target.nodeName.toLowerCase() == "a")
         return;
-    
+
     replyingTo = $(event.currentTarget);
     var to = replyingTo.data("msgTo");
     if (to == user && replyingTo.hasClass("unread")) {
@@ -171,6 +183,15 @@ function offsetByPx(pxValue, offs, maxoffs) {
 
 function setSortMode(mode) {
     chainSort = (mode == 1);
-    if (messageCache == null) loadAllMessages();
+    if (messageCache == null) loadAllMessages(currentConv);
     else onLoadMessages(messageCache);
+}
+
+function setConvMode(mode) {
+    convListMode = mode;
+    $.getJSON("/main/conversations?mode=" + convListMode, onLoadConversations);
+}
+
+function onLoadConversations(data) {
+     alert("Received " + data.length + " conversations.");
 }

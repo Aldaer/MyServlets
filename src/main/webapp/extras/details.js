@@ -5,7 +5,7 @@ var filterMode = 0;
 var displayedId;
 var andShow = false;
 
-var body = $("body");
+var body = $("BODY");
 
 $(document).ready(function () {
 

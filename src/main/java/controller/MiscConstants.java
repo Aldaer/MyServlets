@@ -36,6 +36,7 @@ interface AttributeNames {
         static final String USER_DAO = "userDAO";
         static final String CREDS_DAO = "credsDAO";
         static final String MSG_DAO = "messageDAO";
+        static final String CONV_DAO = "convDAO";
 
         static final String LANGUAGE = "language";
         static final String CONTAINER_AUTH = "authByContainer";
@@ -69,6 +70,7 @@ interface PageURLs {
     String REGISTER_SERVLET = "/doRegister";
     String USER_UPDATE_SERVLET = "/main/updateUser";
     String MESSAGE_PROVIDER_SERVLET = "/main/messages";
+    String CONVERSATION_PROVIDER_SERVLET = "/main/conversations";
     String MESSAGE_ACTION_SERVLET = "/main/messageAction";
     String USER_SEARCH_SERVLET = "/main/userSearch";
 }

@@ -23,15 +23,14 @@ import java.util.stream.Stream;
 import static controller.AttributeNames.C;
 import static controller.AttributeNames.S;
 import static controller.MiscConstants.JSON_TYPE;
-import static controller.PageURLs.MESSAGE_PROVIDER_SERVLET;
-import static controller.PageURLs.USER_SEARCH_SERVLET;
+import static controller.PageURLs.*;
 import static controller.utils.MyStringUtils.*;
 
 /**
  * Answers JSON requests, such as getting message or user lists
  */
 @Slf4j
-@WebServlet({MESSAGE_PROVIDER_SERVLET, USER_SEARCH_SERVLET})
+@WebServlet({MESSAGE_PROVIDER_SERVLET, CONVERSATION_PROVIDER_SERVLET, USER_SEARCH_SERVLET})
 public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_TYPE = "type";     // Comma-delimited: "from", "to" // TODO: add more filters as required
     private static final String MSG_QUERY_CONV = "convId";   // Comma-delimited conversation id's
@@ -45,6 +44,8 @@ public class JsonProviderServlet extends HttpServlet {
     private static final int MAX_OBJECTS_RETURNED = 100;
     private static final int MIN_QUERY_LENGTH = 2;       // # of characters in %LIKE% query
 
+    private static final String CONV_MODE = "mode";
+
     private static final JsonGeneratorFactory JF = Json.createGeneratorFactory(null);
 
     @Override
@@ -56,6 +57,9 @@ public class JsonProviderServlet extends HttpServlet {
         switch (req.getRequestURI()) {
             case MESSAGE_PROVIDER_SERVLET:
                 processMessageRequest(req, res);
+                break;
+            case CONVERSATION_PROVIDER_SERVLET:
+                processConversationRequest(req, res);
                 break;
             case USER_SEARCH_SERVLET:
                 processUserQuery(req, res);
@@ -71,7 +75,7 @@ public class JsonProviderServlet extends HttpServlet {
         final MessageFilter.Builder mBuilder = MessageFilter.newBuilder();
 
         mBuilder.setOffset(withinRangeOrMin(parseOrNull(req.getParameter(QUERY_OFFSET)), 0, Integer.MAX_VALUE));
-        mBuilder.setLimit((int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED));
+        mBuilder.setLimit((int) withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED));
 
         String msgTypes = req.getParameter(MSG_QUERY_TYPE);
         if (msgTypes != null) {
@@ -120,7 +124,7 @@ public class JsonProviderServlet extends HttpServlet {
             long[] friends = uDao.getFriendIds(currentUserId);
             log.trace("Found friends: {}", friends.length);
             gen.writeStartArray();
-            for (long frId: friends)
+            for (long frId : friends)
                 gen.write(frId);
             gen.writeEnd().close();
             return;
@@ -143,8 +147,8 @@ public class JsonProviderServlet extends HttpServlet {
             gen.writeEnd().close();
         } else {                                                // User search requested or unknown request
             String userLike = req.getParameter(USR_QUERY);
-            if ((userLike == null || userLike.length() < MIN_QUERY_LENGTH)&& !allFriendsRq) return;
-            int limit = (int)withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
+            if ((userLike == null || userLike.length() < MIN_QUERY_LENGTH) && !allFriendsRq) return;
+            int limit = (int) withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
             Collection<ShortUserInfo> userList = allFriendsRq ?
                     uDao.listFriends(currentUserId) : uDao.listUsers(userLike, limit);
@@ -163,5 +167,43 @@ public class JsonProviderServlet extends HttpServlet {
             gen.writeEnd().writeEnd().close();
         }
     }
+
+    private void processConversationRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        int convMode = parseOrDefault(req.getParameter(CONV_MODE), -1);
+
+        final ConversationDAO convDao = (ConversationDAO) getServletContext().getAttribute(C.CONV_DAO);
+        User currentUser = (User) req.getSession().getAttribute(S.USER);
+
+        Collection<Conversation> convList;
+
+        switch (convMode) {
+            case 0:
+                convList = convDao.listConversations(currentUser.getId());
+                break;
+            case 1:
+                convList = convDao.listOwnConversations(currentUser.getUsername());
+                break;
+            default:
+                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+        }
+
+        log.debug("Outputting {} found conversations", convList.size());
+
+        final JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
+
+        gen.writeStartArray();
+        convList.stream().forEach(conv -> gen
+                .writeStartObject()
+                .write("id", conv.getId())
+                .write("name", conv.getName())
+                .write("desc", conv.getDesc())
+                .write("starter", conv.getStarter())
+                .write("started", conv.getStarted().getTime())
+                .writeEnd());
+        gen.writeEnd().close();
+    }
+
+
 }
 

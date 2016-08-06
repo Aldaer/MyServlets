@@ -10,22 +10,11 @@
         <jsp-file>/WEB-INF/userdetails.jsp</jsp-file>
     </servlet>
 
-    <servlet>
-        <servlet-name>Conversations</servlet-name>
-        <jsp-file>/WEB-INF/conversations.jsp</jsp-file>
-    </servlet>
-
 
     <servlet-mapping>
         <servlet-name>UserDetails</servlet-name>
         <url-pattern>/main/userdetails</url-pattern>
     </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>Conversations</servlet-name>
-        <url-pattern>/main/conversations</url-pattern>
-    </servlet-mapping>
-
 
     <!-- Container-managed security -->
 
