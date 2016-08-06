@@ -1,6 +1,6 @@
 const BODY = $('BODY');
-const MSG_BOX = $('#MSG_BOX');
-const CONV_DIV = $('#CONV_DIV');
+const MSG_BOX = $('#msgbox');
+const CONV_DIV = $('#convdiv');
 const MSG_PRIVATE = "0,-1";
 
 var dispDivs;
@@ -18,8 +18,12 @@ $('#showmsg').click(function () {
 $('#showconv').click(function () {
     CONV_DIV.toggleClass("hidden");
     if (!CONV_DIV.hasClass("hidden")) {
-        setConvMode(convListMode);
+        loadConversations(convListMode);
     }
+});
+
+$('#showtime').click(function() {
+    $('.time').toggleClass("hidden");    
 });
 
 function loadAllMessages(convid) {
@@ -187,11 +191,12 @@ function setSortMode(mode) {
     else onLoadMessages(messageCache);
 }
 
-function setConvMode(mode) {
+function loadConversations(mode) {
     convListMode = mode;
     $.getJSON("/main/conversations?mode=" + convListMode, onLoadConversations);
 }
 
 function onLoadConversations(data) {
-     alert("Received " + data.length + " conversations.");
+//     alert("Received " + data.length + " conversations.");
+    convCache = data;
 }

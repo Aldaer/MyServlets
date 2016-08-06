@@ -34,7 +34,7 @@
         </c:if>
     </p>
 
-    <div class="time hidden">
+    <div class="bigpanel time<c:if test='${empty param.timezone}'> hidden</c:if>">
         <p><fmt:message key="main.selecttz"/></p>
         <form action="/main/serv" method="get">
             <p>
@@ -55,14 +55,14 @@
             <fmt:message key="main.through"/> toString(): <i>${timer}</i>
         </p>
     </div>
-    <div class="hidden" id="convDiv">
+    <div class="bigpanel hidden" id="convdiv">
         <div style="width: 20%; float: left">
             <h3><fmt:message key="main.conv.filter"/></h3>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(0)" checked>
+                <input name="cfilter" type="radio" class="radio" onclick="loadConversations(0)" checked>
             </label><fmt:message key="main.conv.my"/><br>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="setConvMode(1)">
+                <input name="cfilter" type="radio" class="radio" onclick="loadConversations(1)">
             </label><fmt:message key="main.conv.all"/><br>
         </div>
         <div style="width: 80%; float:right">
