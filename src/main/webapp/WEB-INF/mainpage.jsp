@@ -77,7 +77,7 @@
     </div>
     <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
     <button class="smallbutton" id="showconv"><fmt:message key="main.conversations"/></button>
-    <button class="smallbutton" id="showtime"><fmt:message key="main.time"/></button>
+    <button class="smallbutton" id="showtime" disabled><fmt:message key="main.time"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>

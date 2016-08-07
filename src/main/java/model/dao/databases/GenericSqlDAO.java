@@ -110,6 +110,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
     static final String REMOVE_FRIEND = "DELETE FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=? AND " + COL_FRN_FID + "=?);";
 
+    static final String GET_MESSAGE_BY_ID = "SELECT * FROM " + TABLE_MESSAGES + " WHERE (" + CFF_MES_ID + "=?);";
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
     static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CONV_ID + "=?);";
@@ -525,7 +526,7 @@ class SqlMessageDAO implements MessageDAO {
     private final Supplier<Connection> cSource;
 
     @Override
-    public List<Message> getMessages(MessageFilter constraint) {
+    @NotNull public List<Message> getMessages(MessageFilter constraint) {
         String query = buildMessageQuery("SELECT * FROM ", constraint, false);
 
         try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
@@ -538,7 +539,23 @@ class SqlMessageDAO implements MessageDAO {
             return lm;
         } catch (SQLException e) {
             log.error("Error getting data from table '{}': {}", TABLE_MESSAGES, e);
-            return new ArrayList<>();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public @Nullable Message getMessageById(long id) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_MESSAGE_BY_ID)) {
+            pst.setLong(1, id);
+            ResultSet rs = pst.executeQuery();
+            if (!rs.next()) {
+                log.trace("Message #{} not found", id);
+                return null;
+            }
+            return Stored.Processor.reconstructObject(rs, Message::new);
+        } catch (SQLException e) {
+            log.error("Error getting data for message #{}: {}", id, e);
+            return null;
         }
     }
 

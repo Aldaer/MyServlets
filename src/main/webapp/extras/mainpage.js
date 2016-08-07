@@ -12,7 +12,8 @@ var chainSort = true;
 var messageCache;
 var convCache;
 var convListMode = 0;
-var currentConv = PRIVATE_MSG;
+var currentConvIndex = PRIVATE_MSG;
+var convOwner = false;
 
 $('#showmsg').click(function () {
     MSG_LIST.addClass('on');
@@ -32,9 +33,9 @@ $('#showtime').click(function () {
 });
 
 function loadAllMessages(convid) {
-    currentConv = convid;
+    currentConvIndex = convid;
     $.getJSON("/main/messages?offset=0&limit=20&convId="
-        + (currentConv == PRIVATE_MSG ? "0,-1&type=from,to" : convCache[currentConv].id),
+        + (currentConvIndex == PRIVATE_MSG ? "0,-1&type=from,to" : convCache[currentConvIndex].id),
         onLoadMessages);
 }
 
@@ -50,11 +51,11 @@ $('#reply').click(function () {
         action: "send",
         to: replyingTo.data("msgFrom"),
         refId: replyingTo.data("msgId"),
-        convId: currentConv == PRIVATE_MSG ? 0 : convCache[currentConv].id,
+        convId: currentConvIndex == PRIVATE_MSG ? 0 : convCache[currentConvIndex].id,
         text: MSG_REPLY.val()
     };
     $.post("/main/messageAction", msgData, closeReply());
-    loadAllMessages(currentConv);
+    loadAllMessages(currentConvIndex);
 });
 
 $('#delete').click(function () {
@@ -63,7 +64,10 @@ $('#delete').click(function () {
         msgId: replyingTo.data("msgId")
     };
     $.post("/main/messageAction", msgData, closeReply());
-    replyingTo.remove();
+    if (currentConvIndex == PRIVATE_MSG)
+        replyingTo.remove();
+    else 
+        loadAllMessages(currentConvIndex);
 });
 
 $('#closeview').click(function () {
@@ -185,6 +189,8 @@ function messageClicked(event) {
     var mClone = replyingTo.clone();
     mClone.css("margin", "3px");
     msgPlace.append(mClone);
+    var canDelete = currentConvIndex == PRIVATE_MSG || convOwner;
+    document.getElementById("delete").disabled = ! canDelete;
 }
 
 function offsetByPx(pxValue, offs, maxoffs) {
@@ -195,7 +201,7 @@ function offsetByPx(pxValue, offs, maxoffs) {
 
 function setSortMode(mode) {
     chainSort = (mode == 1);
-    if (messageCache == null) loadAllMessages(currentConv);
+    if (messageCache == null) loadAllMessages(currentConvIndex);
     else onLoadMessages(messageCache);
 }
 
@@ -225,6 +231,7 @@ function convClicked(event, i) {
 //    alert("i = " + i + ", cache=" + convCache[i].name);
     event.preventDefault();
     MSG_LIST.addClass('on');
+    convOwner = (convCache[i].starter == user);
     loadAllMessages(i);
     return false;
 }

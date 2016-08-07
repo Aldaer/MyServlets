@@ -2,10 +2,7 @@ package controller;
 
 import lombok.extern.slf4j.Slf4j;
 import model.MyTimer;
-import model.dao.Message;
-import model.dao.MessageDAO;
-import model.dao.User;
-import model.dao.UserDAO;
+import model.dao.*;
 import model.utils.TimeZoneNames;
 
 import javax.servlet.RequestDispatcher;
@@ -53,7 +50,7 @@ public class MainServlet extends HttpServlet {
                         processMessageSend(req);
                         return;
                     case "delete":
-                        processMessageDelete(req);
+                        processMessageDelete(req, res);
                         return;
                 }
                 return;
@@ -174,11 +171,36 @@ public class MainServlet extends HttpServlet {
     }
 
 
-    private void processMessageDelete(HttpServletRequest req) {
+    private void processMessageDelete(HttpServletRequest req, HttpServletResponse res) {
         Long id = parseOrNull(req.getParameter("msgId"));
         if (id == null) return;
 
         MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
-        mDao.deleteMessage(id);              // TODO: message delete authorization
+        Message msg = mDao.getMessageById(id);
+        if (msg == null) return;
+
+        int deleteMethod = 0;
+        String username = ((User) req.getSession().getAttribute(S.USER)).getUsername();
+        if (msg.getConversationId()<=0) {       // Private
+            if (msg.getTo().equals(username))
+                deleteMethod = 1;               // Delete
+        } else {                                // Conversation
+            ConversationDAO cDao = (ConversationDAO) getServletContext().getAttribute(C.CONV_DAO);
+            Conversation conv = cDao.getConversation(msg.getConversationId());
+            if (conv == null)                   // Not existing
+                deleteMethod = 1;
+            else if (conv.getStarter().equals(username))
+                deleteMethod = 2;               // Wipe
+        }
+        switch (deleteMethod) {
+            case 1:
+                mDao.deleteMessage(id);
+                break;
+            case 2:
+                mDao.updateMessage(id, "***", null);
+                break;
+            default:
+                res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
 }

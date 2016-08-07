@@ -3,6 +3,8 @@ package model.dao;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -16,7 +18,14 @@ public interface MessageDAO {
      * @param constraint Message filtering criteria
      * @return List of messages from database, ordered as per SQL result set
      */
-    List<Message> getMessages(MessageFilter constraint);
+    @NotNull List<Message> getMessages(MessageFilter constraint);
+
+    /**
+     * Returns message by id, null if not found
+     * @param id Message id
+     * @return Message
+     */
+    @Nullable Message getMessageById(long id);
 
 // TODO: implement optimized get-and-count in one query:
 //    int getAndCountMessages(MessageFilter constraint, List<Message> destination);
@@ -31,6 +40,9 @@ public interface MessageDAO {
 
     /**
      * Updates message with a given id, null arguments are ignored
+     * @param id Message id
+     * @param newText New text of the message
+     * @param unread Set/remove unread status
      */
     void updateMessage(long id, String newText, Boolean unread);
 
