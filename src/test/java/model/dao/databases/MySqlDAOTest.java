@@ -227,4 +227,11 @@ public class MySqlDAOTest {
         Collection<Conversation> convs2 = convs.listConversations(user.getId());
         assertThat(convs2.size(), is(convs1.size() + 1));
     }
+
+    @Test
+    public void testGetUserByConversation() throws Exception {
+        Collection<ShortUserInfo> convPs = usr.listParticipants(1);
+        assertThat(convPs.size(), is(2));
+    }
+
 }

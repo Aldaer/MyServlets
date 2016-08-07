@@ -95,4 +95,8 @@ class UserDAO_props implements UserDAO {
         return src;
     }
 
+    @Override
+    public Collection<ShortUserInfo> listParticipants(long convId) {
+        return null;
+    }
 }

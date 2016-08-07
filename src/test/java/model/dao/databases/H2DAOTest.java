@@ -199,14 +199,13 @@ public class H2DAOTest {
 
     @Test
     public void testGetConversationByParticipant() throws Exception {
-        User user=usr.getUser("петя");
+        User user = usr.getUser("петя");
         Collection<Conversation> userConvs = convs.listConversations(user.getId());
         assertThat(userConvs.size(), is(1));
 
     }
 
-
-        @Test
+    @Test
     public void testCreateConversation() throws Exception {
         User user = usr.getUser("вася");
         Collection<Conversation> convs1 = convs.listConversations(user.getId());
@@ -215,4 +214,11 @@ public class H2DAOTest {
         Collection<Conversation> convs2 = convs.listConversations(user.getId());
         assertThat(convs2.size(), is(convs1.size() + 1));
     }
+
+    @Test
+    public void testGetUserByConversation() throws Exception {
+        Collection<ShortUserInfo> convPs = usr.listParticipants(1);
+        assertThat(convPs.size(), is(2));
+    }
+
 }

@@ -41,12 +41,12 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
 
     // Columns in tables with their own DAO classes
-    static final String CFF_CR_UNAME = getColumnForField(Credentials.class, "uName");
-    static final String CFF_CR_PWD = getColumnForField(Credentials.class, "pwd");
+    static final String CFF_CRED_UNAME = getColumnForField(Credentials.class, "uName");
+    static final String CFF_CRED_PWD = getColumnForField(Credentials.class, "pwd");
 
-    static final String CFF_USR_ID = getColumnForField(User.class, "id");
-    static final String CFF_USR_UNAME = getColumnForField(User.class, "username");
-    static final String CFF_USR_FNAME = getColumnForField(User.class, "fullName");
+    static final String CFF_USER_ID = getColumnForField(User.class, "id");
+    static final String CFF_USER_UNAME = getColumnForField(User.class, "username");
+    static final String CFF_USER_FNAME = getColumnForField(User.class, "fullName");
 
     static final String CFF_MES_ID = getColumnForField(Message.class, "id");
     static final String CFF_MES_REF = getColumnForField(Message.class, "refId");
@@ -56,8 +56,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String CFF_MES_TEXT = getColumnForField(Message.class, "text");
     static final String CFF_MES_CONV = getColumnForField(Message.class, "conversationId");
 
-    static final String CFF_CNV_ID = getColumnForField(Conversation.class, "id");
-    static final String CFF_CNV_OWNER = getColumnForField(Conversation.class, "starter");
+    static final String CFF_CONV_ID = getColumnForField(Conversation.class, "id");
+    static final String CFF_CONV_OWNER = getColumnForField(Conversation.class, "starter");
 
 
     // Columns in tables with no DAO classes
@@ -75,16 +75,20 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String COL_CNVP_USER_ID = "uid";
 
 
-    static final String GET_CREDS_BY_LOGIN_NAME = "SELECT " + CFF_CR_PWD + " FROM " + TABLE_CREDENTIALS + " WHERE (" + CFF_CR_UNAME + "=?);";
-    static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + "=?);";
-    static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_ID + "=?);";
+    static final String GET_CREDS_BY_LOGIN_NAME = "SELECT " + CFF_CRED_PWD + " FROM " + TABLE_CREDENTIALS + " WHERE (" + CFF_CRED_UNAME + "=?);";
+    static final String GET_USER_BY_LOGIN_NAME = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USER_UNAME + "=?);";
+    static final String GET_USER_BY_ID = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USER_ID + "=?);";
 
-    static final String GET_USER_BY_PARTIAL_NAME = "SELECT " + CFF_USR_ID + "," + CFF_USR_UNAME + "," + CFF_USR_FNAME
-            + " FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + " LIKE ? OR " + CFF_USR_FNAME + " LIKE ?) LIMIT ";
+    static final String GET_USER_BY_PARTIAL_NAME = "SELECT " + CFF_USER_ID + "," + CFF_USER_UNAME + "," + CFF_USER_FNAME
+            + " FROM " + TABLE_USERS + " WHERE (" + CFF_USER_UNAME + " LIKE ? OR " + CFF_USER_FNAME + " LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
+    static final String GET_USERS_BY_CONV =  "SELECT " + CFF_USER_ID + "," + CFF_USER_UNAME + "," + CFF_USER_FNAME
+            + " FROM " + TABLE_USERS + " AS U INNER JOIN " + TABLE_CONV_PARTS + " AS P ON U." + CFF_USER_ID + "= P."
+            + COL_CNVP_USER_ID + " WHERE P." + COL_CNVP_CONV_ID + "=?;";
+
     static final String CHECK_IF_USER_EXISTS = "SELECT 1 FROM " + TABLE_CREDENTIALS
-            + " AS C WHERE (C." + CFF_CR_UNAME + "=?) UNION SELECT 1 FROM "
+            + " AS C WHERE (C." + CFF_CRED_UNAME + "=?) UNION SELECT 1 FROM "
             + TABLE_TEMP_CREDENTIALS + " AS TC WHERE (TC." + COL_TCR_UNAME + "=?);";
 
     static final String CREATE_TEMPORARY_ACCOUNT = "INSERT INTO " + TABLE_TEMP_CREDENTIALS
@@ -96,12 +100,11 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String CREATE_USER_ROLE_AUTH = "INSERT INTO " + TABLE_ROLES + " (" + COL_RLS_UNAME + ", "
             + COL_RLS_UROLE + ") VALUES (?, '" + DEFAULT_ROLE + "');";
 
-    static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USR_UNAME + "=?) FOR UPDATE;";
+    static final String GET_USER_FOR_UPDATE = "SELECT * FROM " + TABLE_USERS + " WHERE (" + CFF_USER_UNAME + "=?) FOR UPDATE;";
 
     static final String GET_USERS_FRIEND_IDS = "SELECT fid FROM " + TABLE_FRIENDS + " WHERE (" + COL_FRN_UID + "=?);";
-    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " INNER JOIN " + TABLE_FRIENDS
-            + " ON " + TABLE_USERS + "." + CFF_USR_ID + " = " + TABLE_FRIENDS + "." + COL_FRN_FID
-            + " WHERE " + TABLE_FRIENDS + "." + COL_FRN_UID + "=";
+    static final String GET_USERS_FRIEND_DETAILS = "SELECT * FROM " + TABLE_USERS + " AS U INNER JOIN " + TABLE_FRIENDS
+            + " AS F ON U." + CFF_USER_ID + " = F." + COL_FRN_FID + " WHERE F." + COL_FRN_UID + "=";
 
     static final String ADD_FRIEND_POSTFIX = " INTO " + TABLE_FRIENDS + " (" + COL_FRN_UID + ", " + COL_FRN_FID + ") VALUES (?,?);";
 
@@ -109,15 +112,15 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
     static final String DELETE_MESSAGE_QUERY = "DELETE FROM " + TABLE_MESSAGES + " WHERE " + CFF_MES_ID + "=";
 
-    static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CNV_ID + "=?);";
+    static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CONV_ID + "=?);";
     static final String GET_CONV_BY_PARTICIPANT = "SELECT * FROM " + TABLE_CONV + " INNER JOIN " + TABLE_CONV_PARTS
-            + " ON " + CFF_CNV_ID + "=" + COL_CNVP_CONV_ID + " WHERE " + COL_CNVP_USER_ID + "=?;";
-    static final String GET_CONV_BY_OWNER = "SELECT * FROM " + TABLE_CONV + " WHERE " + CFF_CNV_OWNER + "=?;";
+            + " ON " + CFF_CONV_ID + "=" + COL_CNVP_CONV_ID + " WHERE " + COL_CNVP_USER_ID + "=?;";
+    static final String GET_CONV_BY_OWNER = "SELECT * FROM " + TABLE_CONV + " WHERE " + CFF_CONV_OWNER + "=?;";
     static final String ADD_USER_TO_CONV_POSTFIX = " INTO " + TABLE_CONV_PARTS + " (" + COL_CNVP_CONV_ID + ","
             + COL_CNVP_USER_ID + ") VALUES (?,?);";
     static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
             + COL_CNVP_USER_ID + "=?);";
-    static final String DELETE_CONV = "DELETE FROM " + TABLE_CONV + " WHERE " + CFF_CNV_ID + "=?;";
+    static final String DELETE_CONV = "DELETE FROM " + TABLE_CONV + " WHERE " + CFF_CONV_ID + "=?;";
 
 
 
@@ -314,6 +317,20 @@ class SqlUserDAO implements UserDAO {
             return reconstructShortUserInfo(rs);
         } catch (SQLException e) {
             log.error("Error getting list of friends for user #{}: {}", userId, e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Collection<ShortUserInfo> listParticipants(long convId) {
+        try (Connection conn = cSource.get();
+             PreparedStatement pst = conn.prepareStatement(GET_USERS_BY_CONV)) {
+            pst.setLong(1, convId);
+            log.trace("Executing query: {} <== ({})", GET_USERS_BY_CONV, convId);
+            ResultSet rs = pst.executeQuery();
+            return reconstructShortUserInfo(rs);
+        } catch (SQLException e) {
+            log.error("Error getting list of users in conversation #{}: {}", convId, e);
             return Collections.emptyList();
         }
     }

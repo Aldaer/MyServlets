@@ -53,6 +53,13 @@ public interface UserDAO {
     Collection<ShortUserInfo> listFriends(long currentUserId);
 
     /**
+     * Outputs a collection of user data finding users through {@code conversation_participants} table
+     * @param convId Id of the conversation to find participants
+     * @return Collection of user info
+     */
+    Collection<ShortUserInfo> listParticipants(long convId);
+
+    /**
      * Adds new friend to user's friend list
      * @param id User to add friend to
      * @param friendId User being added to friend list

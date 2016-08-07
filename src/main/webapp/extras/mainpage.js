@@ -33,8 +33,8 @@ $('#showtime').click(function () {
 
 function loadAllMessages(convid) {
     currentConv = convid;
-    $.getJSON("/main/messages?type=from,to&offset=0&limit=20&convId="
-        + (currentConv == PRIVATE_MSG ? "0,-1" : convCache[currentConv].id),
+    $.getJSON("/main/messages?offset=0&limit=20&convId="
+        + (currentConv == PRIVATE_MSG ? "0,-1&type=from,to" : convCache[currentConv].id),
         onLoadMessages);
 }
 
