@@ -178,10 +178,10 @@ public class JsonProviderServlet extends HttpServlet {
 
         switch (convMode) {
             case 0:
-                convList = convDao.listConversations(currentUser.getId());
+                convList = convDao.listOwnConversations(currentUser.getUsername());
                 break;
             case 1:
-                convList = convDao.listOwnConversations(currentUser.getUsername());
+                convList = convDao.listConversations(currentUser.getId());
                 break;
             default:
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);

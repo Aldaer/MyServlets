@@ -35,3 +35,12 @@
 .unread {
     font-weight: bold;
 }
+
+#convtable {
+    border-collapse: separate;
+    border-spacing: 6px;
+}
+#convtable td, #convtable a {
+    background-color: beige;
+    white-space: nowrap;
+}

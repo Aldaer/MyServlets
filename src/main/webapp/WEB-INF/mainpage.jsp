@@ -66,8 +66,8 @@
             </label><fmt:message key="main.conv.all"/><br>
         </div>
         <div style="width: 80%; float:right">
-            <div class="databox" id="convbox">
-                <fmt:message key="loading.conversations"/>
+            <div class="databox">
+                <table id="convtable"><td><fmt:message key="loading.conversations"/></td></table>
             </div>
         </div>
     </div>
@@ -110,8 +110,9 @@
 <script>
     var user = '${currentUser.username}';
     var jsLocale = "${language}";
+
+    var createdByStr = '<fmt:message key="conv.createdby"/>';
 </script>
 <script src="/extras/mainpage.js"></script>
-<script src="/extras/conversations.js"></script>
 </body>
 </html>

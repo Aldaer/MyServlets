@@ -702,6 +702,7 @@ class SqlConvDAO implements ConversationDAO {
     @Override
     public @NotNull Collection<Conversation> listOwnConversations(String username) {
         try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_OWNER)) {
+            pst.setString(1, username);
             log.trace("Executing query: {} <== ({})", GET_CONV_BY_OWNER, username);
             ResultSet rs = pst.executeQuery();
             List<Conversation> lc = new ArrayList<>();

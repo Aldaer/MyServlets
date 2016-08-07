@@ -1,7 +1,8 @@
 const BODY = $('BODY');
 const MSG_BOX = $('#msgbox');
-const CONV_DIV = $('#convdiv');
+const CONV_TABLE = $('#convtable');
 const MSG_PRIVATE = "0,-1";
+const TZ_OFFSET_MS = new Date().getTimezoneOffset() * 60000;
 
 var dispDivs;
 var chainSort = true;
@@ -16,14 +17,15 @@ $('#showmsg').click(function () {
 });
 
 $('#showconv').click(function () {
-    CONV_DIV.toggleClass("hidden");
-    if (!CONV_DIV.hasClass("hidden")) {
+    var convDiv;
+    (convDiv = $('#convdiv')).toggleClass("hidden");
+    if (!convDiv.hasClass("hidden")) {
         loadConversations(convListMode);
     }
 });
 
-$('#showtime').click(function() {
-    $('.time').toggleClass("hidden");    
+$('#showtime').click(function () {
+    $('.time').toggleClass("hidden");
 });
 
 function loadAllMessages(convid) {
@@ -62,55 +64,48 @@ function closeReply() {
     $('#msgview').removeClass("centered");
 }
 
-var tzOffsetMillis;
-
 function onLoadMessages(data) {
     /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     messageCache = data;
-    tzOffsetMillis = new Date().getTimezoneOffset() * 60000;
+
     MSG_BOX.empty();
     dispDivs = [];
     $.each(data.messages, displayMessage);
 }
 
+function userlink(uname) {
+    return $("<a />", {
+        href: "/main/userdetails?user=" + uname,
+        text: uname
+    });
+}
+
 function displayMessage(i, msg) {
     var mdiv = $('#bubbleprototype').clone();
     mdiv.removeAttr("id");
-    var userlink;
+    var ulink;
     if (msg.from == user) {
         mdiv.append("--> ");
-        userlink = $("<a />", {
-            href: "/main/userdetails?user=" + encodeURIComponent(msg.to),
-            text: msg.to
-        });
+        ulink = userlink(msg.to);
         mdiv.addClass("messageout");
+        if (!chainSort) mdiv.addClass("leftshift");
     } else {
         mdiv.append("<-- ");
-        userlink = $("<a />", {
-            href: "/main/userdetails?user=" + encodeURIComponent(msg.from),
-            text: msg.from
-        });
+        ulink = userlink(msg.from);
         mdiv.addClass("messagein");
         if (!chainSort) mdiv.addClass("rightshift");
     }
-    if (chainSort) {
-
-    } else if (msg.from == user)
-        mdiv.addClass("leftshift");
-    else
-        mdiv.addClass("rightshift");
-
     if (msg.conversationId == 0) {
         mdiv.addClass("unread");
         if (msg.to == user) {
-            mdiv.on("mouseenter", startTimer);
-            mdiv.on("mouseleave", stopTimer);
+            mdiv.on("mouseenter", startHoverTimer);
+            mdiv.on("mouseleave", stopHoverTimer);
         }
     }
 
-    var msgTime = new Date(msg.utcTimestamp - tzOffsetMillis);
+    var msgTime = new Date(msg.utcTimestamp - TZ_OFFSET_MS);
 
-    mdiv.append(userlink, ' [', msgTime.toLocaleString(jsLocale), ']:<br>');
+    mdiv.append(ulink, ' [', msgTime.toLocaleString(jsLocale), ']:<br>');
     mdiv.append(msg.text);
 
     var msgid = msg.id;
@@ -136,17 +131,17 @@ function displayMessage(i, msg) {
     dispDivs.push(mdiv);
 }
 
-var readTimer;
+var hoverTimer;
 var nowReading;
 
-function startTimer(event) {
-    readTimer = setTimeout(markAsRead, 2000);
+function startHoverTimer(event) {
+    hoverTimer = setTimeout(markAsRead, 2000);
     nowReading = $(event.currentTarget);
     BODY.addClass("waiting");
 }
 
-function stopTimer() {
-    clearTimeout(readTimer);
+function stopHoverTimer() {
+    clearTimeout(hoverTimer);
     BODY.removeClass("waiting");
 }
 
@@ -199,4 +194,15 @@ function loadConversations(mode) {
 function onLoadConversations(data) {
 //     alert("Received " + data.length + " conversations.");
     convCache = data;
+    CONV_TABLE.empty();
+    $.each(data, displayConversation);
+}
+
+function displayConversation(i, conv) {
+    var newrow = $("<tr></tr>");
+    newrow.append("<td>" + conv.name + "</td>");
+    newrow.append("<td>" + createdByStr + "</td>");
+    newrow.append(userlink(conv.starter).appendTo("<td></td>"));
+    newrow.append("<td width='99%'>" + conv.desc + "</td>");
+    CONV_TABLE.append(newrow);
 }
