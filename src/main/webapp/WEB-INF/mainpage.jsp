@@ -60,14 +60,18 @@
             <h3><fmt:message key="main.conv.filter"/></h3>
             <label>
                 <input name="cfilter" type="radio" class="radio" onclick="loadConversations(0)" checked>
-            </label><fmt:message key="main.conv.my"/><br>
+                <fmt:message key="main.conv.my"/>
+            </label><br>
             <label>
                 <input name="cfilter" type="radio" class="radio" onclick="loadConversations(1)">
-            </label><fmt:message key="main.conv.all"/><br>
+                <fmt:message key="main.conv.all"/>
+            </label><br>
         </div>
         <div style="width: 80%; float:right">
             <div class="databox">
-                <table id="convtable"><td><fmt:message key="loading.conversations"/></td></table>
+                <table id="convtable">
+                    <tr id="convheader"><th>Name</th><th>Created by</th><th>At</th><th>Description</th></tr>
+                    <td><fmt:message key="loading.conversations"/></td></table>
             </div>
         </div>
     </div>
@@ -83,10 +87,12 @@
         <h3><fmt:message key="main.message.sorting"/></h3>
         <label>
             <input name="msort" type="radio" class="radio" onclick="setSortMode(0)">
-        </label><fmt:message key="main.sorting.time"/><br>
+            <fmt:message key="main.sorting.time"/>
+        </label><br>
         <label>
             <input name="msort" type="radio" class="radio" onclick="setSortMode(1)" checked>
-        </label><fmt:message key="main.sorting.chain"/><br>
+            <fmt:message key="main.sorting.chain"/>
+        </label><br>
     </div>
     <div style="width: 80%; float:right">
         <div class="databox" id="msgbox">
@@ -110,8 +116,6 @@
 <script>
     var user = '${currentUser.username}';
     var jsLocale = "${language}";
-
-    var createdByStr = '<fmt:message key="conv.createdby"/>';
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

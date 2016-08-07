@@ -40,7 +40,10 @@
     border-collapse: separate;
     border-spacing: 6px;
 }
-#convtable td, #convtable a {
+
+#convtable td, #convtable th, #convtable a {
     background-color: beige;
     white-space: nowrap;
+    font-size: 12px;
+    vertical-align: middle;
 }

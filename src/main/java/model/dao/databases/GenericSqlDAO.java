@@ -548,7 +548,7 @@ class SqlMessageDAO implements MessageDAO {
         try (Connection conn = cSource.get();
              PreparedStatement pst = conn.prepareStatement(query)) {
             message.packIntoPreparedStatement(pst);
-            log.trace("Sending new message from {}", message.getFrom());
+            log.trace("Sending new message from {}, conversation id {}", message.getFrom(), message.getConversationId());
             if (pst.executeUpdate() != 1)
                 throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {

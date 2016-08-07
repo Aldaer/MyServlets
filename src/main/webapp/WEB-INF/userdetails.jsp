@@ -26,11 +26,11 @@
                 key="details.unconfirmed"/></p></c:if>
         <form class="details-form" method="post" action="/main/updateUser" accept-charset="UTF-8">
             <p id="login">${displayedName}</p>
-            <div class="block">
+            <div>
                 <label><fmt:message key="details.fullname"/></label>
                 <input type="text" class="details" name="fullname" value="${displayedProfile.fullName}"/>
             </div>
-            <div class="block">
+            <div>
                 <label><fmt:message key="details.email"/></label>
                 <input type="text" class="details" name="email" value="${displayedProfile.email}"/>
             </div>
