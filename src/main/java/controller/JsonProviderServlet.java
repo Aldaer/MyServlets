@@ -36,7 +36,7 @@ public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_CONV = "convId";   // Comma-delimited conversation id's
 
     private static final String USR_QUERY = "query";         // Partial name of a user to find
-    private static final String USR_DETAILS = "DETAILS";     // Exact username of a user to get DETAILS
+    private static final String USR_DETAILS = "details";     // Exact username of a user to get DETAILS
     private static final String USR_FRIENDS = "friends";     // Send a list of current user's friends
 
     private static final String QUERY_OFFSET = "offset"; // # of messages to skip

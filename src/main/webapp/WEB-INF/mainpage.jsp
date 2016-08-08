@@ -134,14 +134,17 @@
         </c:forTokens>
     </datalist>
     <textarea id="newmsgtext" rows="10"></textarea>
-    <button class="smallbutton" onclick="sendMessage()"><fmt:message key="message.button.send"/></button>
+    <button class="smallbutton" id="send" onclick="sendMessage()">S/R</button>
     <button class="smallbutton ruby" id="delete" onclick="deleteMessage()"><fmt:message key="message.button.delete"/></button>
     <button class="smallbutton amber" onclick="closeReply()"><fmt:message key="message.button.close"/></button>
 </div>
 
 <script>
-    var user = '${currentUser.username}';
-    var jsLocale = '${language}';
+    const user = '${currentUser.username}';
+    const jsLocale = '${language}';
+
+    const sendText = "<fmt:message key="message.button.send"/>";
+    const replyText = "<fmt:message key="message.button.reply"/>";
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

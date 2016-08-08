@@ -1,18 +1,16 @@
-// TODO: FIX TIME DIFFERENCE!!!
-// TODO: FIX SEND/REPLY PROBLEM!!!
-
 const BODY = $('BODY');
 
 const MSG_BOX = $('#msgbox');
 const MSG_LIST = $('#msglist');
 const CONV_TABLE = $('#convtable');
 const CONV_HEADER = $('#convheader').clone();
-const CONV_BOX_TEXT = $('#convBoxHdr').val();
+const CONV_BOX_HEADER = $('#convBoxHdr');
+const CONV_BOX_HEADER_HTML = CONV_BOX_HEADER.html();
 const PARTCS = $('#participants');
+const PARTCS_HTML = PARTCS.html();
 const RECIPIENT = $('#recipient');
-const CONV_PARTCS_TEXT = PARTCS.val();
+const SEND_BUTTON = $('#send');
 const PRIVATE_MSG = -1;
-const TZ_OFFSET_MS = new Date().getTimezoneOffset() * 60000;
 
 var dispDivs;
 var chainSort = true;
@@ -29,7 +27,8 @@ function showMessages() {
     $('#convBoxHdr').addClass("hidden");
     $('#participants').addClass("hidden");
     RECIPIENT.parent().removeClass("hidden");
-    loadAllMessages(PRIVATE_MSG);
+    currentConvIndex = PRIVATE_MSG;
+    loadAllMessages();
 }
 
 function toggleConversations() {
@@ -49,6 +48,7 @@ function newMessage() {
     $('#msgview').addClass("centered");
     $('#newmsgtext').val("");
     $('#msgtext').empty();
+    SEND_BUTTON.html(sendText);
     document.getElementById("delete").disabled = true;
 }
 
@@ -56,8 +56,7 @@ function toggleTime() {
     $('.time').toggleClass("hidden");
 }
 
-function loadAllMessages(convid) {
-    currentConvIndex = convid;
+function loadAllMessages() {
     $.getJSON("/main/messages?offset=0&limit=20&convId="
         + (currentConvIndex == PRIVATE_MSG ? "0,-1&type=from,to" : convCache[currentConvIndex].id),
         onLoadMessages); // TODO: implement limits
@@ -81,8 +80,8 @@ function sendMessage() {
     } else {
         msgData.to = RECIPIENT.val();
     }
-    $.post("/main/messageAction", msgData, closeReply);
-    loadAllMessages(currentConvIndex);
+    $.post("/main/messageAction", msgData, loadAllMessages);
+    closeReply();
 }
 
 function deleteMessage() {
@@ -90,8 +89,8 @@ function deleteMessage() {
         action: "delete",
         msgId: replyingTo.data("msgId")
     };
-    $.post("/main/messageAction", msgData, closeReply);
-    loadAllMessages(currentConvIndex);
+    $.post("/main/messageAction", msgData, loadAllMessages);
+    closeReply();
 }
 
 function closeReply() {
@@ -164,8 +163,7 @@ function displayMessage(i, msg) {
 }
 
 function localTime(timestamp) {
-    var msgTime = new Date(timestamp - TZ_OFFSET_MS);
-    return msgTime.toLocaleString(jsLocale);
+    return new Date(timestamp).toLocaleString(jsLocale);
 }
 
 var hoverTimer;
@@ -213,6 +211,7 @@ function messageClicked(event) {
     RECIPIENT.val(replyingTo.data("msgFrom"));
     RECIPIENT.prop("disabled", true);
     $('#msgview').addClass("centered");
+    SEND_BUTTON.html(replyText);
     $('#msgreply').val("");
     var msgPlace = $('#msgtext');
     msgPlace.empty();
@@ -232,7 +231,7 @@ function offsetByPx(pxValue, offs, maxoffs) {
 
 function setSortMode(mode) {
     chainSort = (mode == 1);
-    if (messageCache == null) loadAllMessages(currentConvIndex);
+    if (messageCache == null) loadAllMessages();
     else onLoadMessages(messageCache);
 }
 
@@ -275,15 +274,15 @@ function convClicked(event, i) {
     MSG_LIST.addClass('on');
     $('#privateHdr').addClass("hidden");
     RECIPIENT.parent().addClass("hidden");
-    const CBHDR = $('#convBoxHdr');
-    CBHDR.removeClass("hidden");
-    CBHDR.val(CONV_BOX_TEXT);
-    CBHDR.append(" ").append(convCache[i].name);
+    CONV_BOX_HEADER.html(CONV_BOX_HEADER_HTML);
+    CONV_BOX_HEADER.removeClass("hidden");
+    CONV_BOX_HEADER.append(" ").append(convCache[i].name);
+    PARTCS.html(PARTCS_HTML);
     PARTCS.removeClass("hidden");
-    PARTCS.val(CONV_PARTCS_TEXT);
     PARTCS.append(" ");
     convOwner = (convCache[i].starter == user);
-    loadAllMessages(i);
+    currentConvIndex = i;
+    loadAllMessages();
     loadConvParticipants(i);
     return false;
 }

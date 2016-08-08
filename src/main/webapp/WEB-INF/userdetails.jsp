@@ -85,7 +85,7 @@
     var exists = ${not empty displayedProfile};
     var displayedId = ${displayedProfile.id};
 
-    var usersFoundMsg = '<fmt:message key="details.users.found"/> ';
+    const usersFoundMsg = '<fmt:message key="details.users.found"/> ';
 </script>
 <script src="/extras/details.js"></script>
 </body>

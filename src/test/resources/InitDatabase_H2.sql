@@ -1,12 +1,9 @@
 // Uncomment lines when creating embedded database instead of in-memory
 
 // == H2 ==
-//CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
-//SET SCHEMA userdata;
-
-// == MySql ==
-// create database userdatabase;
-// use userdatabase;
+// drop schema userdata;
+// CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
+// SET SCHEMA userdata;
 
 CREATE ALIAS CURRENT_UTC_TIMESTAMP AS $$
 import java.sql.Timestamp;
@@ -17,6 +14,7 @@ Timestamp ts() {
 return Timestamp.valueOf(LocalDateTime.now(ZoneOffset.UTC));
 }
 $$;
+
 DROP TABLE IF EXISTS credentials;
 CREATE TABLE credentials (
   username VARCHAR_IGNORECASE(50) NOT NULL PRIMARY KEY,
@@ -73,7 +71,7 @@ CREATE TABLE messages (
   refid BIGINT NOT NULL DEFAULT 0,
   u_from VARCHAR_IGNORECASE(50) NOT NULL,
   u_to VARCHAR_IGNORECASE(50),
-  m_time TIMESTAMP NOT NULL DEFAULT CURRENT_UTC_TIMESTAMP(),
+  m_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   conversation_id BIGINT NOT NULL DEFAULT 0,
   text VARCHAR DEFAULT ''
 );
@@ -103,7 +101,7 @@ CREATE TABLE conversations (
   name VARCHAR_IGNORECASE(100) NOT NULL,
   description VARCHAR(255),
   starter VARCHAR_IGNORECASE(50),
-  started TIMESTAMP DEFAULT CURRENT_UTC_TIMESTAMP()
+  started TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
 
 INSERT INTO conversations (id, name, description, starter) VALUES (1, 'Сообщество', 'Просто поболтать', 'вася');
