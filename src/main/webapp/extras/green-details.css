@@ -21,6 +21,7 @@
 .colorbox.nonfriend {
     background-color: #ffffc2;
 }
+
 input.radio {
     text-align: left;
     width: auto;
@@ -38,4 +39,8 @@ input.radio {
     border: 1px solid rgba(0, 0, 0, .2);
     background: white;
     vertical-align: middle;
+}
+
+.bigpanel .smallmargin {
+    margin: 3px;
 }

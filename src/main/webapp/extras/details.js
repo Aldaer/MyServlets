@@ -1,33 +1,29 @@
-var details = $('.details');
+const DETAILS = $('.details');
 var friendList;
 var displayedList;
 var filterMode = 0;
 var andShow = false;
 
-var body = $("BODY");
+const BODY = $("body");
 
 $(document).ready(function () {
 
-    details.change(function () {
+    DETAILS.change(function () {
         $(this).addClass("edited");
         $('#update').removeClass("hidden");
     });
 
-    $('#userlistbox').on("click", ".userlink", function () {
+    $('#userlistbox').on("click", ".userlink", function (event) {
+        event.preventDefault();
         reloadUser(this.text);
+        return false;
     });
 
-    $('#allfriends').click(function () {
-        showFriends();
-    });
+    $('#allfriends').click(showFriends);
 
-    $('#addfriend').click(function () {
-        addToFriends(displayedId);
-    });
+    $('#addfriend').click(addToFriends);
 
-    $('#remfriend').click(function () {
-        removeFromFriends(displayedId);
-    });
+    $('#remfriend').click(removeFromFriends);
 
     $('#createmsg').click(function() {
         var recp = $('#recipient');
@@ -43,12 +39,12 @@ $(document).ready(function () {
 
     $('#send').click(sendNow);
 
-    body.addClass("waiting");
+    BODY.addClass("waiting");
     $.getJSON("/main/userSearch?friends=ids", updateFriendList);
 });
 
 function updateFriendList(flist) {
-    body.removeClass("waiting");
+    BODY.removeClass("waiting");
     friendList = flist;
     updateElements();
     if (andShow) displayFilteredUsers(filterMode);    
@@ -60,13 +56,13 @@ function isFriend(id) {
 
 function updateElements() {
     if (own) {
-        details.prop("disabled", false);
+        DETAILS.prop("disabled", false);
         $('#update').removeClass("hidden");
         $('#addfriend').addClass("hidden");
         $('#remfriend').addClass("hidden");
     } else {
         $('#update').addClass("hidden");
-        details.prop("disabled", true);
+        DETAILS.prop("disabled", true);
         $('.warning').addClass("hidden");
         if (isFriend(displayedId)) {
             $('#addfriend').addClass("hidden");
@@ -76,7 +72,7 @@ function updateElements() {
             $('#remfriend').addClass("hidden");
         }
     }
-    details.removeClass("edited");
+    DETAILS.removeClass("edited");
 
     if (exists) {
         $('#login').removeClass("strikeout");
@@ -97,8 +93,8 @@ function reloadUser(name) {
     });
 }
 
-$('.details-form').submit(function () {
-    // TODO: user details form validation
+$('.DETAILS-form').submit(function () {
+    // TODO: user DETAILS form validation
 });
 
 $('#find').click(function () {
@@ -110,13 +106,13 @@ $('#find').click(function () {
     } else {
         $('#fpanel').addClass('on');
         querybox.css("color", "initial");
-        body.addClass("waiting");
+        BODY.addClass("waiting");
         $.getJSON("/main/userSearch?query=" + encodeURIComponent(querybox.val()), onLoadUsers);
     }
 });
 
 function onLoadUsers(data) {
-    body.removeClass("waiting");
+    BODY.removeClass("waiting");
     $('#usersFoundHeader').text(usersFoundMsg + data.users.length);
     $('#userlistbox').empty();
     displayedList = data.users;
@@ -156,26 +152,26 @@ function showFriends() {
     $.getJSON("/main/userSearch?friends=all", onLoadUsers);
 }
 
-function addToFriends(id) {
+function addToFriends() {
     var msgData = {
         action: "addfriend",
-        id: id,
+        id: displayedId,
         friends: "ids"
     };
     requestFriendUpdate(msgData);
 }
 
-function removeFromFriends(id) {
+function removeFromFriends() {
     var msgData = {
         action: "remfriend",
-        id: id,
+        id: displayedId,
         friends: "ids"
     };
     requestFriendUpdate(msgData);
 }
 
 function requestFriendUpdate(data) {
-    body.addClass("waiting");
+    BODY.addClass("waiting");
     andShow = true;
     $.getJSON("/main/updateUser", data, updateFriendList);    
 }

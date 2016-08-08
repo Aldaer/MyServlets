@@ -44,7 +44,7 @@
     </div>
     <div style="width: 40%; float:right">
         <p><fmt:message key="details.search"/></p>
-        <input type="text" id="query"/><br>
+        <input type="text" id="query" class="smallmargin"/><br>
         <button class="smallbutton" id="find"><fmt:message key="details.find.user"/></button>
         <button class="smallbutton friend" id="allfriends"><fmt:message key="details.show.friends"/></button>
     </div>

@@ -60,13 +60,14 @@
         <div style="width: 20%; float: left">
             <h3><fmt:message key="main.conv.filter"/></h3>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="loadConversations(0)" checked>
+                <input name="cfilter" type="radio" class="radio" id="ownconv" onclick="loadConversations(0)" checked>
                 <fmt:message key="main.conv.my"/>
             </label><br>
             <label>
                 <input name="cfilter" type="radio" class="radio" onclick="loadConversations(1)">
                 <fmt:message key="main.conv.all"/>
             </label><br>
+            <button class="smallbutton" onclick="showNewConv(true)"><fmt:message key="conv.new.show"/></button>
         </div>
         <div style="width: 80%; float:right">
             <div class="databox">
@@ -81,12 +82,18 @@
                         <td><fmt:message key="loading.conversations"/></td>
                     </tr>
                 </table>
+                <div id="newconv" class="hidden">
+                    <input id="convname" type="text" placeholder="<fmt:message key='conv.new.name'/>"/><br>
+                    <input id="convdesc" type="text" placeholder="<fmt:message key='conv.new.desc'/>"/><br>
+                    <button class="smallbutton" onclick="createNewConv()"><fmt:message key="conv.button.create"/></button>
+                    <button class="smallbutton amber" onclick="showNewConv(false)"><fmt:message key="message.button.close"/></button>
+                </div>
             </div>
         </div>
     </div>
-    <button class="smallbutton" id="showmsgs"><fmt:message key="main.mymessages"/></button>
-    <button class="smallbutton" id="showconv"><fmt:message key="main.conversations"/></button>
-    <button class="smallbutton" id="showtime" disabled><fmt:message key="main.time"/></button>
+    <button class="smallbutton" onclick="showMessages()"><fmt:message key="main.mymessages"/></button>
+    <button class="smallbutton" onclick="toggleConversations()"><fmt:message key="main.conversations"/></button>
+    <button class="smallbutton" onclick="toggleTime()" disabled><fmt:message key="main.time"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>
@@ -105,7 +112,7 @@
             <input name="msort" type="radio" class="radio" onclick="setSortMode(1)" checked>
             <fmt:message key="main.sorting.chain"/>
         </label><br>
-        <button class="smallbutton" style="width:80%" id="newmsg"><fmt:message key="main.new.message"/></button>
+        <button class="smallbutton" style="width:80%" onclick="newMessage()"><fmt:message key="main.new.message"/></button>
     </div>
     <div style="width:80%;float:right">
         <div class="databox" id="msgbox">
@@ -127,14 +134,14 @@
         </c:forTokens>
     </datalist>
     <textarea id="newmsgtext" rows="10"></textarea>
-    <button class="smallbutton" id="send"><fmt:message key="message.button.send"/></button>
-    <button class="smallbutton ruby" id="delete"><fmt:message key="message.button.delete"/></button>
-    <button class="smallbutton amber" id="closeview"><fmt:message key="message.button.close"/></button>
+    <button class="smallbutton" onclick="sendMessage()"><fmt:message key="message.button.send"/></button>
+    <button class="smallbutton ruby" id="delete" onclick="deleteMessage()"><fmt:message key="message.button.delete"/></button>
+    <button class="smallbutton amber" onclick="closeReply()"><fmt:message key="message.button.close"/></button>
 </div>
 
 <script>
     var user = '${currentUser.username}';
-    var jsLocale = "${language}";
+    var jsLocale = '${language}';
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

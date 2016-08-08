@@ -8,7 +8,7 @@ import model.dao.databases.Stored;
 import model.dao.databases.StoredField;
 
 /**
- * User details
+ * User DETAILS
  */
 @Getter
 @AllArgsConstructor

@@ -1,3 +1,6 @@
+// TODO: FIX TIME DIFFERENCE!!!
+// TODO: FIX SEND/REPLY PROBLEM!!!
+
 const BODY = $('BODY');
 
 const MSG_BOX = $('#msgbox');
@@ -15,46 +18,43 @@ var dispDivs;
 var chainSort = true;
 var messageCache;
 var convCache;
-var convListMode = 0; // 0 = owned, 1 = participated
+var convListMode = 0; // 0 = owned, 1 = participated, 2 = create new
 var currentConvIndex = PRIVATE_MSG;
 var convOwner = false;
 var replyingTo; // null => new message
 
-$('#showmsgs').click(function () {
+function showMessages() {
     MSG_LIST.addClass('on');
     $('#privateHdr').removeClass("hidden");
     $('#convBoxHdr').addClass("hidden");
     $('#participants').addClass("hidden");
     RECIPIENT.parent().removeClass("hidden");
     loadAllMessages(PRIVATE_MSG);
-});
+}
 
-$('#showconv').click(function () {
+function toggleConversations() {
     var convDiv;
     (convDiv = $('#convdiv')).toggleClass("hidden");
     if (!convDiv.hasClass("hidden")) {
         loadConversations(convListMode);
     }
-});
+}
 
-$('#newmsg').click(function () {
-    if (event.target.nodeName.toLowerCase() == "a")
-        return;
-
+function newMessage() {
     replyingTo = null;
     RECIPIENT.prop("disabled", false);
     RECIPIENT.val("");
     RECIPIENT.focus();
 
     $('#msgview').addClass("centered");
-    $('#msgreply').val("");
+    $('#newmsgtext').val("");
     $('#msgtext').empty();
     document.getElementById("delete").disabled = true;
-});
+}
 
-$('#showtime').click(function () {
+function toggleTime() {
     $('.time').toggleClass("hidden");
-});
+}
 
 function loadAllMessages(convid) {
     currentConvIndex = convid;
@@ -63,7 +63,7 @@ function loadAllMessages(convid) {
         onLoadMessages); // TODO: implement limits
 }
 
-$('#send').click(function () {
+function sendMessage() {
     const MSG_TEXT = $('#newmsgtext');
     if (MSG_TEXT.val() == "") {
         MSG_TEXT.focus();
@@ -81,25 +81,18 @@ $('#send').click(function () {
     } else {
         msgData.to = RECIPIENT.val();
     }
-    $.post("/main/messageAction", msgData, closeReply());
+    $.post("/main/messageAction", msgData, closeReply);
     loadAllMessages(currentConvIndex);
-});
+}
 
-$('#delete').click(function () {
+function deleteMessage() {
     var msgData = {
         action: "delete",
         msgId: replyingTo.data("msgId")
     };
-    $.post("/main/messageAction", msgData, closeReply());
-    if (currentConvIndex == PRIVATE_MSG)
-        replyingTo.remove();
-    else
-        loadAllMessages(currentConvIndex);
-});
-
-$('#closeview').click(function () {
-    closeReply();
-});
+    $.post("/main/messageAction", msgData, closeReply);
+    loadAllMessages(currentConvIndex);
+}
 
 function closeReply() {
     $('#msgview').removeClass("centered");
@@ -194,8 +187,16 @@ function markAsRead() {
     if (nowReading.hasClass("unread")) {
         nowReading.removeClass("unread");
         nowReading.css("cursor", "");
-        $.post("/main/messageAction?action=update&id=" + nowReading.data("msgId") + "&unread=false");
-        $('#messagealert').css("display", "none");
+        var msgData = {
+            action: "update",
+            id: nowReading.data("msgId"),
+            unread: false
+        };
+
+//        $.post("/main/messageAction?action=update&id=" + nowReading.data("msgId") + "&unread=false");
+
+        $.post("/main/messageAction", msgData);
+        $('#messagealert').addClass("hidden");
     }
 }
 
@@ -285,4 +286,22 @@ function convClicked(event, i) {
     loadAllMessages(i);
     loadConvParticipants(i);
     return false;
+}
+
+function showNewConv(show) {
+    if (show)
+        $('#newconv').removeClass("hidden");
+    else
+        $('#newconv').addClass("hidden");
+}
+
+function createNewConv() {
+    var convData = {
+        mode: 2,
+        name: $('#convname').val(),
+        desc: $('#convdesc').val()
+    };
+    $.post("/main/conversations", convData, onLoadConversations, "json");
+    $('#ownconv').prop("checked", true);
+    showNewConv(false);
 }

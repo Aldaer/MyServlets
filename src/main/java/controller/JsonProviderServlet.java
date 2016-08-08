@@ -36,7 +36,7 @@ public class JsonProviderServlet extends HttpServlet {
     private static final String MSG_QUERY_CONV = "convId";   // Comma-delimited conversation id's
 
     private static final String USR_QUERY = "query";         // Partial name of a user to find
-    private static final String USR_DETAILS = "details";     // Exact username of a user to get details
+    private static final String USR_DETAILS = "DETAILS";     // Exact username of a user to get DETAILS
     private static final String USR_FRIENDS = "friends";     // Send a list of current user's friends
 
     private static final String QUERY_OFFSET = "offset"; // # of messages to skip
@@ -67,6 +67,11 @@ public class JsonProviderServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        doGet(req, res);
+    }
+
     private void processMessageRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
         String cUserName = ((User) req.getSession().getAttribute(S.USER)).getUsername();
@@ -89,8 +94,8 @@ public class JsonProviderServlet extends HttpServlet {
         }
 
         TreeSet<Message> messagesByTimestamp = new TreeSet<>(Message.byTime);
-        messagesByTimestamp.addAll(msgDao.getMessages(mBuilder));
         int totalCount = msgDao.countMessages(mBuilder);            // May be more than messagesByTimestamp.size() due to offset and limit
+        messagesByTimestamp.addAll(msgDao.getMessages(mBuilder));
 
         final JsonGenerator gen = new JsonNullableGenerator(JF, res.getOutputStream());
 
@@ -191,6 +196,12 @@ public class JsonProviderServlet extends HttpServlet {
                 break;
             case 1:
                 convList = convDao.listConversations(currentUser.getId());
+                break;
+            case 2:
+                String convName = req.getParameter("name");
+                String convDesc = req.getParameter("desc");
+                convDao.createConversation(convName, convDesc, currentUser);
+                convList = convDao.listOwnConversations(currentUser.getUsername());
                 break;
             default:
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
