@@ -84,7 +84,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final int MIN_PARTIAL_LEN = 2;
 
     static final String GET_USERS_BY_CONV =  "SELECT " + CFF_USER_ID + "," + CFF_USER_UNAME + "," + CFF_USER_FNAME
-            + " FROM " + TABLE_USERS + " AS U INNER JOIN " + TABLE_CONV_PARTS + " AS P ON U." + CFF_USER_ID + "= P."
+            + " FROM " + TABLE_USERS + " AS U INNER JOIN " + TABLE_CONV_PARTS + " AS P ON U." + CFF_USER_ID + "=P."
             + COL_CNVP_USER_ID + " WHERE P." + COL_CNVP_CONV_ID + "=?;";
 
     static final String CHECK_IF_USER_EXISTS = "SELECT 1 FROM " + TABLE_CREDENTIALS

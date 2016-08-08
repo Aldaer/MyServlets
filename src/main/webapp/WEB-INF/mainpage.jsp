@@ -70,12 +70,20 @@
         <div style="width: 80%; float:right">
             <div class="databox">
                 <table id="convtable">
-                    <tr id="convheader"><th>Name</th><th>Created by</th><th>At</th><th>Description</th></tr>
-                    <td><fmt:message key="loading.conversations"/></td></table>
+                    <tr id="convheader">
+                        <th><fmt:message key="conv.table.name"/></th>
+                        <th><fmt:message key="conv.table.created.by"/></th>
+                        <th><fmt:message key="conv.table.created.at"/></th>
+                        <th><fmt:message key="conv.table.description"/></th>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="loading.conversations"/></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
-    <button class="smallbutton" id="showmsg"><fmt:message key="main.mymessages"/></button>
+    <button class="smallbutton" id="showmsgs"><fmt:message key="main.mymessages"/></button>
     <button class="smallbutton" id="showconv"><fmt:message key="main.conversations"/></button>
     <button class="smallbutton" id="showtime" disabled><fmt:message key="main.time"/></button>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
@@ -83,6 +91,9 @@
 </div>
 
 <div class="bigpanel slideout" id="msglist">
+    <h3 id="privateHdr" class="hidden"><fmt:message key="main.private.header"/></h3>
+    <h3 id="convBoxHdr" class="hidden"><fmt:message key="main.conversation.header"/></h3>
+    <p id="participants"><fmt:message key="main.conversation.participants"/></p>
     <div style="width: 20%; float: left">
         <h3><fmt:message key="main.message.sorting"/></h3>
         <label>
@@ -93,8 +104,9 @@
             <input name="msort" type="radio" class="radio" onclick="setSortMode(1)" checked>
             <fmt:message key="main.sorting.chain"/>
         </label><br>
+        <button class="smallbutton" style="width:80%" id="newmsg"><fmt:message key="main.new.message"/></button>
     </div>
-    <div style="width: 80%; float:right">
+    <div style="width:80%;float:right">
         <div class="databox" id="msgbox">
             <fmt:message key="loading.messages"/>
         </div>
@@ -107,8 +119,9 @@
     <h2><fmt:message key="main.message.view"/></h2>
     <p id="msgheader"></p>
     <p id="msgtext"></p>
-    <textarea id="msgreply" rows="10"></textarea>
-    <button class="smallbutton" id="reply"><fmt:message key="message.button.reply"/></button>
+    <div><fmt:message key="message.recip"/> <input type="text" id="recipient" disabled/></div>
+    <textarea id="newmsgtext" rows="10"></textarea>
+    <button class="smallbutton" id="send"><fmt:message key="message.button.send"/></button>
     <button class="smallbutton ruby" id="delete"><fmt:message key="message.button.delete"/></button>
     <button class="smallbutton amber" id="closeview"><fmt:message key="message.button.close"/></button>
 </div>

@@ -145,27 +145,36 @@ public class JsonProviderServlet extends HttpServlet {
                     .write("exists", false)
                     .write("username", "???");
             gen.writeEnd().close();
-        } else {                                                // User search requested or unknown request
+            return;
+        }
+
+        Collection<ShortUserInfo> userList;                     // User list requested
+
+        Long convId = parseOrNull(req.getParameter(MSG_QUERY_CONV));
+        if (convId != null) {                                   // Conversation participants request
+            userList = uDao.listParticipants(convId);
+        } else {
+
+            // User search request or unknown request
             String userLike = req.getParameter(USR_QUERY);
             if ((userLike == null || userLike.length() < MIN_QUERY_LENGTH) && !allFriendsRq) return;
             int limit = (int) withinRangeOrMax(parseOrNull(req.getParameter(QUERY_LIMIT)), 0, MAX_OBJECTS_RETURNED);
 
-            Collection<ShortUserInfo> userList = allFriendsRq ?
-                    uDao.listFriends(currentUserId) : uDao.listUsers(userLike, limit);
-
-            log.debug("Outputting {} found users", userList.size());
-            gen.writeStartObject();
-            gen.writeStartArray("users");
-            userList.stream().sorted((u1, u2) -> u1.getUsername().compareTo(u2.getUsername()))
-                    .forEachOrdered(usr -> gen
-                            .writeStartObject()
-                            .write("id", usr.getId())
-                            .write("username", usr.getUsername())
-                            .write("fullName", usr.getFullName())
-                            .writeEnd()
-                    );
-            gen.writeEnd().writeEnd().close();
+            userList = allFriendsRq ? uDao.listFriends(currentUserId) : uDao.listUsers(userLike, limit);
         }
+
+        log.debug("Outputting {} found users", userList.size());
+        gen.writeStartObject();
+        gen.writeStartArray("users");
+        userList.stream().sorted((u1, u2) -> u1.getUsername().compareTo(u2.getUsername()))
+                .forEachOrdered(usr -> gen
+                        .writeStartObject()
+                        .write("id", usr.getId())
+                        .write("username", usr.getUsername())
+                        .write("fullName", usr.getFullName())
+                        .writeEnd()
+                );
+        gen.writeEnd().writeEnd().close();
     }
 
     private void processConversationRequest(HttpServletRequest req, HttpServletResponse res) throws IOException {

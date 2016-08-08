@@ -4,6 +4,10 @@ const MSG_BOX = $('#msgbox');
 const MSG_LIST = $('#msglist');
 const CONV_TABLE = $('#convtable');
 const CONV_HEADER = $('#convheader').clone();
+const CONV_BOX_TEXT = $('#convBoxHdr').val();
+const PARTCS = $('#participants');
+const RECIPIENT = $('#recipient');
+const CONV_PARTCS_TEXT = PARTCS.val();
 const PRIVATE_MSG = -1;
 const TZ_OFFSET_MS = new Date().getTimezoneOffset() * 60000;
 
@@ -11,12 +15,17 @@ var dispDivs;
 var chainSort = true;
 var messageCache;
 var convCache;
-var convListMode = 0;
+var convListMode = 0; // 0 = owned, 1 = participated
 var currentConvIndex = PRIVATE_MSG;
 var convOwner = false;
+var replyingTo; // null => new message
 
-$('#showmsg').click(function () {
+$('#showmsgs').click(function () {
     MSG_LIST.addClass('on');
+    $('#privateHdr').removeClass("hidden");
+    $('#convBoxHdr').addClass("hidden");
+    $('#participants').addClass("hidden");
+    RECIPIENT.parent().removeClass("hidden");
     loadAllMessages(PRIVATE_MSG);
 });
 
@@ -28,6 +37,21 @@ $('#showconv').click(function () {
     }
 });
 
+$('#newmsg').click(function () {
+    if (event.target.nodeName.toLowerCase() == "a")
+        return;
+
+    replyingTo = null;
+    RECIPIENT.prop("disabled", false);
+    RECIPIENT.val("");
+    RECIPIENT.focus();
+
+    $('#msgview').addClass("centered");
+    $('#msgreply').val("");
+    $('#msgtext').empty();
+    document.getElementById("delete").disabled = true;
+});
+
 $('#showtime').click(function () {
     $('.time').toggleClass("hidden");
 });
@@ -36,24 +60,27 @@ function loadAllMessages(convid) {
     currentConvIndex = convid;
     $.getJSON("/main/messages?offset=0&limit=20&convId="
         + (currentConvIndex == PRIVATE_MSG ? "0,-1&type=from,to" : convCache[currentConvIndex].id),
-        onLoadMessages);
+        onLoadMessages); // TODO: implement limits
 }
 
-var replyingTo;
-
-$('#reply').click(function () {
-    const MSG_REPLY = $('#msgreply');
-    if (MSG_REPLY.val() == "") {
-        MSG_REPLY.focus();
+$('#send').click(function () {
+    const MSG_TEXT = $('#newmsgtext');
+    if (MSG_TEXT.val() == "") {
+        MSG_TEXT.focus();
         return;
     }
     var msgData = {
         action: "send",
-        to: replyingTo.data("msgFrom"),
-        refId: replyingTo.data("msgId"),
         convId: currentConvIndex == PRIVATE_MSG ? 0 : convCache[currentConvIndex].id,
-        text: MSG_REPLY.val()
+        text: MSG_TEXT.val()
     };
+
+    if (replyingTo != null) {
+        msgData.to = replyingTo.data("msgFrom");
+        msgData.refId = replyingTo.data("msgId");
+    } else {
+        msgData.to = RECIPIENT.val();
+    }
     $.post("/main/messageAction", msgData, closeReply());
     loadAllMessages(currentConvIndex);
 });
@@ -66,7 +93,7 @@ $('#delete').click(function () {
     $.post("/main/messageAction", msgData, closeReply());
     if (currentConvIndex == PRIVATE_MSG)
         replyingTo.remove();
-    else 
+    else
         loadAllMessages(currentConvIndex);
 });
 
@@ -182,6 +209,8 @@ function messageClicked(event) {
         nowReading = replyingTo;
         markAsRead();
     }
+    RECIPIENT.val(replyingTo.data("msgFrom"));
+    RECIPIENT.prop("disabled", true);
     $('#msgview').addClass("centered");
     $('#msgreply').val("");
     var msgPlace = $('#msgtext');
@@ -190,7 +219,8 @@ function messageClicked(event) {
     mClone.css("margin", "3px");
     msgPlace.append(mClone);
     var canDelete = currentConvIndex == PRIVATE_MSG || convOwner;
-    document.getElementById("delete").disabled = ! canDelete;
+    document.getElementById("delete").disabled = !canDelete;
+
 }
 
 function offsetByPx(pxValue, offs, maxoffs) {
@@ -216,6 +246,18 @@ function onLoadConversations(data) {
     $.each(data, displayConversation);
 }
 
+function loadConvParticipants(i) {
+    const convid = convCache[i].id;
+    $.getJSON("/main/userSearch?convId=" + convid, fillConvParticipants);
+}
+
+function fillConvParticipants(data) {
+    if (data.users.length < 1) return;
+    PARTCS.append(userlink(data.users[0].username));
+    for (i = 1; i < data.users.length; i++)
+        PARTCS.append(", ").append(userlink(data.users[i].username));
+}
+
 function displayConversation(i, conv) {
     var newrow = $("<tr></tr>");
     var convlink = $("<a href='#' class='convlink' onclick='return convClicked(event," + i + ")'></a>").append(conv.name);
@@ -228,10 +270,19 @@ function displayConversation(i, conv) {
 }
 
 function convClicked(event, i) {
-//    alert("i = " + i + ", cache=" + convCache[i].name);
     event.preventDefault();
     MSG_LIST.addClass('on');
+    $('#privateHdr').addClass("hidden");
+    RECIPIENT.parent().addClass("hidden");
+    const CBHDR = $('#convBoxHdr');
+    CBHDR.removeClass("hidden");
+    CBHDR.val(CONV_BOX_TEXT);
+    CBHDR.append(" ").append(convCache[i].name);
+    PARTCS.removeClass("hidden");
+    PARTCS.val(CONV_PARTCS_TEXT);
+    PARTCS.append(" ");
     convOwner = (convCache[i].starter == user);
     loadAllMessages(i);
+    loadConvParticipants(i);
     return false;
 }

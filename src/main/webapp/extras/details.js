@@ -2,7 +2,6 @@ var details = $('.details');
 var friendList;
 var displayedList;
 var filterMode = 0;
-var displayedId;
 var andShow = false;
 
 var body = $("BODY");

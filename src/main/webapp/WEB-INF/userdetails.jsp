@@ -83,6 +83,7 @@
     var currUser = "${currentUser.username}";
     var own = ${ownProfile};
     var exists = ${not empty displayedProfile};
+    var displayedId = ${displayedProfile.id};
 
     var usersFoundMsg = '<fmt:message key="details.users.found"/> ';
 </script>
