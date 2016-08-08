@@ -5,6 +5,7 @@
 <%--@elvariable id="lastTZ" type="java.lang.String"--%>
 <%--@elvariable id="supportedTZ" type="java.util.Properties"--%>
 <%--@elvariable id="unreadPM" type="java.lang.Integer"--%>
+<%--@elvariable id="friendString" type="java.util.String"--%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -119,7 +120,12 @@
     <h2><fmt:message key="main.message.view"/></h2>
     <p id="msgheader"></p>
     <p id="msgtext"></p>
-    <div><fmt:message key="message.recip"/> <input type="text" id="recipient" disabled/></div>
+    <div><fmt:message key="message.recip"/> <input type="text" id="recipient" list="friends" disabled/></div>
+    <datalist id="friends">
+        <c:forTokens items="${friendString}" delims="," var="fname">
+            <option value="${fname}">${fname}</option>
+        </c:forTokens>
+    </datalist>
     <textarea id="newmsgtext" rows="10"></textarea>
     <button class="smallbutton" id="send"><fmt:message key="message.button.send"/></button>
     <button class="smallbutton ruby" id="delete"><fmt:message key="message.button.delete"/></button>

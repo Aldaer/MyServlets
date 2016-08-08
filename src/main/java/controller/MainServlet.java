@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static controller.AttributeNames.*;
 import static controller.MiscConstants.DEFAULT_LOCALE;
@@ -100,6 +102,10 @@ public class MainServlet extends HttpServlet {
         req.setAttribute(R.UNREAD_PM, unreadPrivateMessages);
 
         RequestDispatcher respJSP = req.getRequestDispatcher(MAIN_PAGE);
+        UserDAO uDao = (UserDAO) getServletContext().getAttribute(C.USER_DAO);
+        Collection<ShortUserInfo> friends = uDao.listFriends(user.getId());
+        String fString = friends.stream().map(ShortUserInfo::getUsername).sorted().collect(Collectors.joining(","));
+        req.setAttribute(R.FRIEND_STRING, fString);
         respJSP.forward(req, res);
         return;
     }
@@ -126,9 +132,7 @@ public class MainServlet extends HttpServlet {
             }
             req.getRequestDispatcher(USER_SEARCH_SERVLET).forward(req, res);        // Send back updated friend list for current user
             return;
-        } else
-
-        {
+        } else {
             String newFullName = req.getParameter("fullname");
             String newEmail = req.getParameter("email");
             if (newFullName == null || newFullName.equals("")) newFullName = user.getUsername();
@@ -139,8 +143,8 @@ public class MainServlet extends HttpServlet {
             log.info("Updating user info for user '{}'", user.getUsername());
             userDAO.updateUserInfo(user);
             res.sendRedirect(DETAILS_PAGE);
+            return;
         }
-
     }
 
     private void processMessageUpdate(HttpServletRequest req) {
@@ -181,7 +185,7 @@ public class MainServlet extends HttpServlet {
 
         int deleteMethod = 0;
         String username = ((User) req.getSession().getAttribute(S.USER)).getUsername();
-        if (msg.getConversationId()<=0) {       // Private
+        if (msg.getConversationId() <= 0) {       // Private
             if (msg.getTo().equals(username))
                 deleteMethod = 1;               // Delete
         } else {                                // Conversation
