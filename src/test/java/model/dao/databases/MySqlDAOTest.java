@@ -234,4 +234,22 @@ public class MySqlDAOTest {
         assertThat(convPs.size(), is(2));
     }
 
+    @Test
+    public void testInviteAndJoin() throws Exception {
+        User user = usr.getUser("вася");
+        Conversation newConv = convs.createConversation("topic", "desc", user);
+        long u2id = usr.getUser("петя").getId();
+        int numConvs = convs.listConversations(u2id).size();
+        Collection<Conversation> u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(0));
+        convs.inviteToConversation(newConv.getId(), u2id);
+        u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(1));
+        assertThat(u2invites.iterator().next().getName(), is("topic"));
+        convs.joinConversation(newConv.getId(), u2id);
+        u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(0));
+        int newNumConvs = convs.listConversations(u2id).size();
+        assertThat(newNumConvs, is(numConvs + 1));
+    }
 }

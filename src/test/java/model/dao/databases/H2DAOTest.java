@@ -202,7 +202,6 @@ public class H2DAOTest {
         User user = usr.getUser("петя");
         Collection<Conversation> userConvs = convs.listConversations(user.getId());
         assertThat(userConvs.size(), is(1));
-
     }
 
     @Test
@@ -219,6 +218,25 @@ public class H2DAOTest {
     public void testGetUserByConversation() throws Exception {
         Collection<ShortUserInfo> convPs = usr.listParticipants(1);
         assertThat(convPs.size(), is(2));
+    }
+
+    @Test
+    public void testInviteAndJoin() throws Exception {
+        User user = usr.getUser("вася");
+        Conversation newConv = convs.createConversation("topic", "desc", user);
+        long u2id = usr.getUser("петя").getId();
+        int numConvs = convs.listConversations(u2id).size();
+        Collection<Conversation> u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(0));
+        convs.inviteToConversation(newConv.getId(), u2id);
+        u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(1));
+        assertThat(u2invites.iterator().next().getName(), is("topic"));
+        convs.joinConversation(newConv.getId(), u2id);
+        u2invites = convs.listInvites(u2id);
+        assertThat(u2invites.size(), is(0));
+        int newNumConvs = convs.listConversations(u2id).size();
+        assertThat(newNumConvs, is(numConvs + 1));
     }
 
 }

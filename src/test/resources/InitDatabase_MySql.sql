@@ -108,5 +108,14 @@ CREATE TABLE conversation_participants (
   CONSTRAINT convkey PRIMARY KEY (convid, uid)
 );
 
+DROP TABLE IF EXISTS conversation_invited;
+CREATE TABLE conversation_invited (
+  convid BIGINT,
+  uid BIGINT,
+  FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
+  FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT invkey PRIMARY KEY (convid, uid)
+);
+
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT id FROM users WHERE username='вася'));
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT id FROM users WHERE username='петя'));

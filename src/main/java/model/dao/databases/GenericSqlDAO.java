@@ -38,6 +38,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String TABLE_FRIENDS = "friends";
     static final String TABLE_CONV = "conversations";
     static final String TABLE_CONV_PARTS = "conversation_participants";
+    static final String TABLE_CONV_INVITES = "conversation_invited";
 
 
     // Columns in tables with their own DAO classes
@@ -70,7 +71,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     // Friends
     static final String COL_FRN_UID = "uid";
     static final String COL_FRN_FID = "fid";
-    // Conversation participants
+    // Conversation participants and conversation invited (tables have the same structure)
     static final String COL_CNVP_CONV_ID = "convid";
     static final String COL_CNVP_USER_ID = "uid";
 
@@ -83,7 +84,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             + " FROM " + TABLE_USERS + " WHERE (" + CFF_USER_UNAME + " LIKE ? OR " + CFF_USER_FNAME + " LIKE ?) LIMIT ";
     static final int MIN_PARTIAL_LEN = 2;
 
-    static final String GET_USERS_BY_CONV =  "SELECT " + CFF_USER_ID + "," + CFF_USER_UNAME + "," + CFF_USER_FNAME
+    static final String GET_USERS_BY_CONV = "SELECT " + CFF_USER_ID + "," + CFF_USER_UNAME + "," + CFF_USER_FNAME
             + " FROM " + TABLE_USERS + " AS U INNER JOIN " + TABLE_CONV_PARTS + " AS P ON U." + CFF_USER_ID + "=P."
             + COL_CNVP_USER_ID + " WHERE P." + COL_CNVP_CONV_ID + "=?;";
 
@@ -116,13 +117,16 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String GET_CONV_BY_ID = "SELECT * FROM " + TABLE_CONV + " WHERE (" + CFF_CONV_ID + "=?);";
     static final String GET_CONV_BY_PARTICIPANT = "SELECT * FROM " + TABLE_CONV + " INNER JOIN " + TABLE_CONV_PARTS
             + " ON " + CFF_CONV_ID + "=" + COL_CNVP_CONV_ID + " WHERE " + COL_CNVP_USER_ID + "=?;";
+    static final String GET_CONV_BY_INVITED = "SELECT * FROM " + TABLE_CONV + " INNER JOIN " + TABLE_CONV_INVITES
+            + " ON " + CFF_CONV_ID + "=" + COL_CNVP_CONV_ID + " WHERE " + COL_CNVP_USER_ID + "=?;";
+
     static final String GET_CONV_BY_OWNER = "SELECT * FROM " + TABLE_CONV + " WHERE " + CFF_CONV_OWNER + "=?;";
-    static final String ADD_USER_TO_CONV_POSTFIX = " INTO " + TABLE_CONV_PARTS + " (" + COL_CNVP_CONV_ID + ","
-            + COL_CNVP_USER_ID + ") VALUES (?,?);";
-    static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
+    static final String ADD_USER_TO_CONV_POSTFIX = " (" + COL_CNVP_CONV_ID + "," + COL_CNVP_USER_ID + ") VALUES (?,?);";
+    static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV_PARTS + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
+            + COL_CNVP_USER_ID + "=?);";
+    static final String REMOVE_USER_FROM_INVITED = "DELETE FROM " + TABLE_CONV_INVITES + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
             + COL_CNVP_USER_ID + "=?);";
     static final String DELETE_CONV = "DELETE FROM " + TABLE_CONV + " WHERE " + CFF_CONV_ID + "=?;";
-
 
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
@@ -526,7 +530,8 @@ class SqlMessageDAO implements MessageDAO {
     private final Supplier<Connection> cSource;
 
     @Override
-    @NotNull public List<Message> getMessages(MessageFilter constraint) {
+    @NotNull
+    public List<Message> getMessages(MessageFilter constraint) {
         String query = buildMessageQuery("SELECT * FROM ", constraint, false);
 
         try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
@@ -693,10 +698,12 @@ class SqlMessageDAO implements MessageDAO {
 @Slf4j
 class SqlConvDAO implements ConversationDAO {
     private final Supplier<Connection> cSource;
-    private final String addUserToConvQuery;
+    private final String addUserToConvParticipants;
+    private final String addUserToConvInvited;
 
     SqlConvDAO(Supplier<Connection> cSource, String upsertPrefix) {
-        addUserToConvQuery = upsertPrefix + ADD_USER_TO_CONV_POSTFIX;
+        addUserToConvParticipants = upsertPrefix + " INTO " + TABLE_CONV_PARTS + ADD_USER_TO_CONV_POSTFIX;
+        addUserToConvInvited = upsertPrefix + " INTO " + TABLE_CONV_INVITES + ADD_USER_TO_CONV_POSTFIX;
         this.cSource = cSource;
     }
 
@@ -720,18 +727,28 @@ class SqlConvDAO implements ConversationDAO {
 
     @Override
     public @NotNull Collection<Conversation> listConversations(long userId) {
-        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(GET_CONV_BY_PARTICIPANT)) {
+        return listConversationsOrInvites(userId, GET_CONV_BY_PARTICIPANT);
+    }
+
+    @Override
+    public @NotNull Collection<Conversation> listInvites(long userId) {
+        return listConversationsOrInvites(userId, GET_CONV_BY_INVITED);
+    }
+
+    private @NotNull Collection<Conversation> listConversationsOrInvites(long userId, String query) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setLong(1, userId);
-            log.trace("Executing query: {} <== ({})", GET_CONV_BY_PARTICIPANT, userId);
+            log.trace("Executing query: {} <== ({})", query, userId);
             ResultSet rs = pst.executeQuery();
             List<Conversation> lc = new ArrayList<>();
             Stored.Processor.reconstructAllObjects(rs, Conversation::new, lc, false);
             return lc;
         } catch (SQLException e) {
             log.error("Error getting data from table '{}': {}", TABLE_CONV, e);
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
+
 
     @Override
     public @NotNull Collection<Conversation> listOwnConversations(String username) {
@@ -764,7 +781,7 @@ class SqlConvDAO implements ConversationDAO {
                 long convId = convKey.getLong(1);
                 conv.setId(convId);
                 convKey.close();
-                joinConversation(conn, convId, starter.getId());
+                joinConversationOrInvite(conn, convId, starter.getId(), addUserToConvParticipants);
                 conn.commit();
                 return conv;
             } catch (SQLException e) {
@@ -780,18 +797,40 @@ class SqlConvDAO implements ConversationDAO {
     @Override
     public void joinConversation(long convId, long userId) {
         try (Connection conn = cSource.get()) {
-            joinConversation(conn, convId, userId);
+            conn.setAutoCommit(false);
+            try {
+                joinConversationOrInvite(conn, convId, userId, addUserToConvParticipants);
+
+                PreparedStatement remInvite = conn.prepareStatement(REMOVE_USER_FROM_INVITED);
+                remInvite.setLong(1, convId);
+                remInvite.setLong(2, userId);
+                remInvite.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         } catch (SQLException e) {
             log.error("Error adding user #{} to conversation #{} : {}", userId, convId, e);
         }
     }
 
-    private void joinConversation(Connection conn, long convId, long userId) throws SQLException {
-        PreparedStatement addOwner = conn.prepareStatement(addUserToConvQuery);
+    @Override
+    public void inviteToConversation(long convId, long userId) {
+        try (Connection conn = cSource.get()) {
+            joinConversationOrInvite(conn, convId, userId, addUserToConvInvited);
+        } catch (SQLException e) {
+            log.error("Error giving user #{} invite to conversation #{} : {}", userId, convId, e);
+        }
+    }
+
+    private void joinConversationOrInvite(Connection conn, long convId, long userId, String query) throws SQLException {
+        PreparedStatement addOwner = conn.prepareStatement(query);
         addOwner.setLong(1, convId);
         addOwner.setLong(2, userId);
         addOwner.executeUpdate();
     }
+
 
     @Override
     public void leaveConversation(long convId, Long userId) {
@@ -817,4 +856,6 @@ class SqlConvDAO implements ConversationDAO {
             log.error("Error deleting conversation #{}: {}", convId, e);
         }
     }
+
+
 }

@@ -24,6 +24,14 @@ public interface ConversationDAO {
     @NotNull Collection<Conversation> listConversations(long userId);
 
     /**
+     * Returns conversations into which the indicated user was invited
+     * @param userId Id of the participating user
+     * @return Collection of conversation objects loaded from database
+     */
+    @NotNull Collection<Conversation> listInvites(long userId);
+
+
+    /**
      * Returns conversations which the indicated user started
      * @param username Login name of the starting user
      * @return Collection of conversation objects loaded from database
@@ -42,11 +50,18 @@ public interface ConversationDAO {
     @Nullable Conversation createConversation(String name, String desc, User starter);
 
     /**
-     * Indicated user joins the conversation
+     * Indicated user joins the conversation. Joining removes user from invited to the same conversation
      * @param convId Conversation id
      * @param userId User id
      */
     void joinConversation(long convId, long userId);
+
+    /**
+     * Indicated user gets invited to conversation
+     * @param convId Conversation id
+     * @param userId User id
+     */
+    void inviteToConversation(long convId, long userId);
 
     /**
      * Indicated user leaves the conversation

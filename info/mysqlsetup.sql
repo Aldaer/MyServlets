@@ -61,3 +61,11 @@ CREATE TABLE conversation_participants (
   FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT convkey PRIMARY KEY (convid, uid)
 );
+
+CREATE TABLE conversation_invited (
+  convid BIGINT,
+  uid BIGINT,
+  FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
+  FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT invkey PRIMARY KEY (convid, uid)
+);
