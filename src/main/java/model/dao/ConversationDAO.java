@@ -68,7 +68,14 @@ public interface ConversationDAO {
      * @param convId Conversation id
      * @param userId User id
      */
-    void leaveConversation(long convId, Long userId);
+    void leaveConversation(long convId, long userId);
+
+    /**
+     * Indicated user is no longer invited to conversation
+     * @param convId Conversation id
+     * @param userId User id
+     */
+    void removeInvite(long convId, long userId);
 
     /**
      * Deletes the conversation

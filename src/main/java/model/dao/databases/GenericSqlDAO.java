@@ -781,7 +781,7 @@ class SqlConvDAO implements ConversationDAO {
                 long convId = convKey.getLong(1);
                 conv.setId(convId);
                 convKey.close();
-                joinConversationOrInvite(conn, convId, starter.getId(), addUserToConvParticipants);
+                updateParticipantOrInviteTable(conn, convId, starter.getId(), addUserToConvParticipants);
                 conn.commit();
                 return conv;
             } catch (SQLException e) {
@@ -799,12 +799,8 @@ class SqlConvDAO implements ConversationDAO {
         try (Connection conn = cSource.get()) {
             conn.setAutoCommit(false);
             try {
-                joinConversationOrInvite(conn, convId, userId, addUserToConvParticipants);
-
-                PreparedStatement remInvite = conn.prepareStatement(REMOVE_USER_FROM_INVITED);
-                remInvite.setLong(1, convId);
-                remInvite.setLong(2, userId);
-                remInvite.executeUpdate();
+                updateParticipantOrInviteTable(conn, convId, userId, addUserToConvParticipants);
+                updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_INVITED);
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
@@ -818,31 +814,36 @@ class SqlConvDAO implements ConversationDAO {
     @Override
     public void inviteToConversation(long convId, long userId) {
         try (Connection conn = cSource.get()) {
-            joinConversationOrInvite(conn, convId, userId, addUserToConvInvited);
+            updateParticipantOrInviteTable(conn, convId, userId, addUserToConvInvited);
         } catch (SQLException e) {
             log.error("Error giving user #{} invite to conversation #{} : {}", userId, convId, e);
         }
     }
 
-    private void joinConversationOrInvite(Connection conn, long convId, long userId, String query) throws SQLException {
-        PreparedStatement addOwner = conn.prepareStatement(query);
-        addOwner.setLong(1, convId);
-        addOwner.setLong(2, userId);
-        addOwner.executeUpdate();
-    }
-
-
     @Override
-    public void leaveConversation(long convId, Long userId) {
-        if (userId == null) return;
-        try (Connection conn = cSource.get();
-             PreparedStatement pst = conn.prepareStatement(REMOVE_USER_FROM_CONV)) {
-            pst.setLong(1, convId);
-            pst.setLong(2, userId);
-            log.trace("Executing query: {} <== ({},{})", REMOVE_USER_FROM_CONV, convId, userId);
-            if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
+    public void leaveConversation(long convId, long userId) {
+        try (Connection conn = cSource.get()) {
+            updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_CONV);
         } catch (SQLException e) {
             log.error("Error removing user #{} from conversation #{}: {}", convId, userId, e);
+        }
+    }
+
+    @Override
+    public void removeInvite(long convId, long userId) {
+        try (Connection conn = cSource.get()) {
+            updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_INVITED);
+        } catch (SQLException e) {
+            log.error("Error removing user #{} from invited to conversation #{}: {}", convId, userId, e);
+        }
+    }
+
+    private void updateParticipantOrInviteTable(Connection conn, long convId, long userId, String query) throws SQLException {
+        try (PreparedStatement pst = conn.prepareStatement(query)) {
+            pst.setLong(1, convId);
+            pst.setLong(2, userId);
+            log.trace("Executing query: {} <== ({},{})", query, convId, userId);
+            pst.executeUpdate();
         }
     }
 

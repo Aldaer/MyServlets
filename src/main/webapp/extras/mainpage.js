@@ -16,7 +16,7 @@ var dispDivs;
 var chainSort = true;
 var messageCache;
 var convCache;
-var convListMode = 0; // 0 = owned, 1 = participated, 2 = create new
+var convListMode = 0; // 0 = owned, 1 = participated, 2 = invites, 10 = create new
 var currentConvIndex = PRIVATE_MSG;
 var convOwner = false;
 var replyingTo; // null => new message
@@ -98,7 +98,6 @@ function closeReply() {
 }
 
 function onLoadMessages(data) {
-    /*    alert("Received " + data.messages.length + " of " + data.totalCount + " messages."); */
     messageCache = data;
 
     MSG_BOX.empty();
@@ -296,7 +295,7 @@ function showNewConv(show) {
 
 function createNewConv() {
     var convData = {
-        mode: 2,
+        mode: 10,
         name: $('#convname').val(),
         desc: $('#convdesc').val()
     };

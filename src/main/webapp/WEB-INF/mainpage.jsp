@@ -70,6 +70,10 @@
                 <input name="cfilter" type="radio" class="radio" onclick="loadConversations(1)">
                 <fmt:message key="main.conv.all"/>
             </label><br>
+            <label>
+                <input name="cfilter" type="radio" class="radio" onclick="loadConversations(2)">
+                <fmt:message key="main.conv.invites"/>
+            </label><br>
             <button class="smallbutton" onclick="showNewConv(true)"><fmt:message key="conv.new.show"/></button>
         </div>
         <div style="width: 80%; float:right">

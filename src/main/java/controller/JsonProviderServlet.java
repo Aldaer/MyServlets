@@ -198,6 +198,9 @@ public class JsonProviderServlet extends HttpServlet {
                 convList = convDao.listConversations(currentUser.getId());
                 break;
             case 2:
+                convList = convDao.listInvites(currentUser.getId());
+                break;
+            case 10:
                 String convName = req.getParameter("name");
                 String convDesc = req.getParameter("desc");
                 convDao.createConversation(convName, convDesc, currentUser);
