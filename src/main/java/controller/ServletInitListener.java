@@ -33,6 +33,7 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
     private static final String CONFIG_DATABASE_USE_SHA_DIGEST = "sha_digest";
     private static final String CONFIG_CONTAINER_SECURITY = "container_security";           // "true" = container-based; "false" = own
 
+
     private ConnectionPool connectionPool;
 
     // -------------------------------------------------------
@@ -92,6 +93,8 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         log.info("Container-based authentication = {}", contAuth);
 
         if (conf.containsKey("autologin")) srvContext.setAttribute("AUTOLOGIN", conf.getString("autologin")); // TODO: remove in production
+        if (conf.containsKey("show_legacy") && conf.getString("show_legacy").toLowerCase().equals("true"))
+            srvContext.setAttribute("showLegacy", Boolean.TRUE);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

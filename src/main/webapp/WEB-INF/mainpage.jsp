@@ -6,6 +6,7 @@
 <%--@elvariable id="supportedTZ" type="java.util.Properties"--%>
 <%--@elvariable id="unreadPM" type="java.lang.Integer"--%>
 <%--@elvariable id="friendString" type="java.util.String"--%>
+<%--@elvariable id="showLegacy" type="java.lang.Boolean"--%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -35,7 +36,8 @@
         </c:if>
     </p>
 
-    <div class="bigpanel time<c:if test='${empty param.timezone}'> hidden</c:if>">
+    <c:if test="${showLegacy}">
+    <div class="bigpanel time hidden">
         <p><fmt:message key="main.selecttz"/></p>
         <form action="/main/serv" method="get">
             <p>
@@ -56,6 +58,7 @@
             <fmt:message key="main.through"/> toString(): <i>${timer}</i>
         </p>
     </div>
+    </c:if>
     <div class="bigpanel hidden" id="convdiv">
         <div style="width: 20%; float: left">
             <h3><fmt:message key="main.conv.filter"/></h3>
@@ -93,7 +96,7 @@
     </div>
     <button class="smallbutton" onclick="showMessages()"><fmt:message key="main.mymessages"/></button>
     <button class="smallbutton" onclick="toggleConversations()"><fmt:message key="main.conversations"/></button>
-    <button class="smallbutton" onclick="toggleTime()" disabled><fmt:message key="main.time"/></button>
+    <c:if test="${showLegacy}"><button class="smallbutton" onclick="toggleTime()"><fmt:message key="main.time"/></button></c:if>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
     <a href="/main/logout" class="smallbutton amber"><fmt:message key="main.logout"/></a>
 </div>
