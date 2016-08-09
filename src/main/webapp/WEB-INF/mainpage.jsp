@@ -172,6 +172,7 @@
     const SEND_TEXT = '<fmt:message key="message.button.send"/>';
     const REPLY_TEXT = '<fmt:message key="message.button.reply"/>';
     const BAN_CONFIRM = '<fmt:message key="conv.ban.confirm"/>';
+    const DELETE_CONFIRM = '<fmt:message key="message.delete.confirm"/>';
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

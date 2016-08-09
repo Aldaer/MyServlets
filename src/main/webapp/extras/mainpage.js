@@ -53,7 +53,7 @@ function newMessage() {
     $('#msgview').addClass("centered");
     $('#newmsgtext').val("");
     $('#msgtext').empty();
-    SEND_BUTTON.html(sendText);
+    SEND_BUTTON.html(SEND_TEXT);
     document.getElementById("delete").disabled = true;
 }
 
@@ -98,6 +98,7 @@ function sendMessage() {
 }
 
 function deleteMessage() {
+    if (!confirm(DELETE_CONFIRM)) return;
     var msgData = {
         action: "delete",
         msgId: replyingTo.data("msgId")
@@ -221,7 +222,7 @@ function messageClicked(event) {
     RECIPIENT.val(replyingTo.data("msgFrom"));
     RECIPIENT.prop("disabled", true);
     $('#msgview').addClass("centered");
-    SEND_BUTTON.html(replyText);
+    SEND_BUTTON.html(REPLY_TEXT);
     $('#msgreply').val("");
     var msgPlace = $('#msgtext');
     msgPlace.empty();
