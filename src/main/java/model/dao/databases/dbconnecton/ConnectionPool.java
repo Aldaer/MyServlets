@@ -82,7 +82,7 @@ public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
                             cQueue.queue().add(rc);
                         }
                     } catch (SQLException e) {
-                        LOG.error("Error creating DB connection: {} ", e);
+                        LOG.error("Error creating DB connection: {} ", e.getMessage());
                         throw new RuntimeException(e);
                     }
                 }

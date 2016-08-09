@@ -126,6 +126,7 @@
     <h3 id="privateHdr" class="hidden"><fmt:message key="main.private.header"/></h3>
     <h3 id="convBoxHdr" class="hidden"><fmt:message key="main.conversation.header"/></h3>
     <p id="participants"><fmt:message key="main.conversation.participants"/></p>
+    <p id="inviteMore" class="hidden">Invite participants:</p>
     <div style="width: 20%; float: left">
         <h3><fmt:message key="main.message.sorting"/></h3>
         <label>
@@ -153,17 +154,18 @@
     <p id="msgheader"></p>
     <p id="msgtext"></p>
     <div><fmt:message key="message.recip"/> <input type="text" id="recipient" list="friends" disabled/></div>
-    <datalist id="friends">
-        <c:forTokens items="${friendString}" delims="," var="fname">
-            <option value="${fname}">${fname}</option>
-        </c:forTokens>
-    </datalist>
     <textarea id="newmsgtext" rows="10"></textarea>
     <button class="smallbutton" id="send" onclick="sendMessage()">S/R</button>
     <button class="smallbutton ruby" id="delete" onclick="deleteMessage()"><fmt:message
             key="message.button.delete"/></button>
     <button class="smallbutton amber" onclick="closeReply()"><fmt:message key="message.button.close"/></button>
 </div>
+
+<datalist id="friends">
+    <c:forTokens items="${friendString}" delims="," var="fname">
+        <option value="${fname}">${fname}</option>
+    </c:forTokens>
+</datalist>
 
 <script>
     const user = '${currentUser.username}';

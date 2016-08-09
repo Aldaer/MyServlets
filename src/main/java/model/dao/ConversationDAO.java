@@ -57,7 +57,8 @@ public interface ConversationDAO {
     void joinConversation(long convId, long userId);
 
     /**
-     * Indicated user gets invited to conversation
+     * Indicated user gets invited to conversation. If user is already member of the conversation,
+     * no new invitation is generated.
      * @param convId Conversation id
      * @param userId User id
      */

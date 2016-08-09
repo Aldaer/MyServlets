@@ -39,7 +39,7 @@ public class SecurityFilter extends HttpFilter {
             if (req.getUserPrincipal() != null) try {
                 req.logout();
             } catch (ServletException e) {
-                log.warn("Logout error: {}", e);
+                log.warn("Logout error: {}", e.getMessage());
             }
             ofNullable(req.getSession(false)).ifPresent(sn -> {
                 ofNullable(sn.getAttribute(USER))

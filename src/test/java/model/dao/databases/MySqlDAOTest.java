@@ -273,4 +273,16 @@ public class MySqlDAOTest {
         int newNumConvs = convs.listConversations(u2id).size();
         assertThat(newNumConvs, is(numConvs));
     }
+
+    @Test
+    public void testNoInvitesIfAlreadyIn() throws Exception {
+        User user = usr.getUser("вася");
+        long uid = user.getId();
+        Conversation conv = convs.getConversation(1);
+        assertThat(conv.getStarter(), is("вася"));
+        int numInvites = convs.listInvites(uid).size();
+        convs.inviteToConversation(1, uid);
+        int numInvites2 = convs.listInvites(uid).size();
+        assertThat(numInvites2, is(numInvites));
+    }
 }

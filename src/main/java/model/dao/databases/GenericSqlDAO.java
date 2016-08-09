@@ -122,6 +122,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
     static final String GET_CONV_BY_OWNER = "SELECT * FROM " + TABLE_CONV + " WHERE " + CFF_CONV_OWNER + "=?;";
     static final String ADD_USER_TO_CONV_POSTFIX = " (" + COL_CNVP_CONV_ID + "," + COL_CNVP_USER_ID + ") VALUES (?,?);";
+    static final String IS_USER_IN_CONV = "SELECT 1 FROM " + TABLE_CONV_PARTS + " WHERE (" + COL_CNVP_USER_ID + "=? AND "
+            + COL_CNVP_CONV_ID + "=?);";
     static final String REMOVE_USER_FROM_CONV = "DELETE FROM " + TABLE_CONV_PARTS + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
             + COL_CNVP_USER_ID + "=?);";
     static final String REMOVE_USER_FROM_INVITED = "DELETE FROM " + TABLE_CONV_INVITES + " WHERE (" + COL_CNVP_CONV_ID + "=? AND "
@@ -221,7 +223,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
                         statement.addBatch(cmd);
                         log.trace("Added command to batch: {}", cmd);
                     } catch (SQLException e) {
-                        log.error("Error adding SQL command {} to batch: {}", currentCmd.toString(), e);
+                        log.error("Error adding SQL command {} to batch: {}", currentCmd.toString(), e.getMessage());
                     } finally {
                         currentCmd.setLength(0);
                     }
@@ -235,7 +237,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             int[] results = statement.executeBatch();
             log.trace("Executed batch of {} commands", results.length);
         } catch (SQLException e) {
-            log.error("Error executing SQL script: {}", e);
+            log.error("Error executing SQL script: {}", e.getMessage());
         }
     }
 }
@@ -273,7 +275,7 @@ class SqlUserDAO implements UserDAO {
             }
             return Stored.Processor.reconstructObject(rs, User::new);
         } catch (SQLException e) {
-            log.error("Error getting data for user [{}]: {}", key, e);
+            log.error("Error getting data for user [{}]: {}", key, e.getMessage());
             return null;
         }
     }
@@ -291,7 +293,7 @@ class SqlUserDAO implements UserDAO {
             rs.updateRow();
             rs.close();
         } catch (SQLException e) {
-            log.error("Error updating data for user [{}]: {}", user.getUsername(), e);
+            log.error("Error updating data for user [{}]: {}", user.getUsername(), e.getMessage());
         }
     }
 
@@ -309,7 +311,7 @@ class SqlUserDAO implements UserDAO {
             ResultSet rs = pst.executeQuery();
             return reconstructShortUserInfo(rs);
         } catch (SQLException e) {
-            log.error("Error getting list of users: {}", e);
+            log.error("Error getting list of users: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -323,7 +325,7 @@ class SqlUserDAO implements UserDAO {
             ResultSet rs = st.executeQuery(sql);
             return reconstructShortUserInfo(rs);
         } catch (SQLException e) {
-            log.error("Error getting list of friends for user #{}: {}", userId, e);
+            log.error("Error getting list of friends for user #{}: {}", userId, e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -337,7 +339,7 @@ class SqlUserDAO implements UserDAO {
             ResultSet rs = pst.executeQuery();
             return reconstructShortUserInfo(rs);
         } catch (SQLException e) {
-            log.error("Error getting list of users in conversation #{}: {}", convId, e);
+            log.error("Error getting list of users in conversation #{}: {}", convId, e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -368,7 +370,7 @@ class SqlUserDAO implements UserDAO {
             }
 
         } catch (SQLException e) {
-            log.error("Error getting list of friends for user id={}: {}", id, e);
+            log.error("Error getting list of friends for user id={}: {}", id, e.getMessage());
         }
         return Arrays.copyOf(result, n);
     }
@@ -383,7 +385,7 @@ class SqlUserDAO implements UserDAO {
             log.trace("Executing query: {} <== ({},{})", addFriendQuery, id, friendId);
             pst.executeUpdate();
         } catch (SQLException e) {
-            log.error("Error adding friend #{} to user #{}'s list: {}", friendId, id, e);
+            log.error("Error adding friend #{} to user #{}'s list: {}", friendId, id, e.getMessage());
         }
     }
 
@@ -397,7 +399,7 @@ class SqlUserDAO implements UserDAO {
             log.trace("Executing query: {} <== ({},{})", REMOVE_FRIEND, id, friendId);
             if (pst.executeUpdate() != 1) throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {
-            log.error("Error removing friend #{} from user #{}'s list: {}", friendId, id, e);
+            log.error("Error removing friend #{} from user #{}'s list: {}", friendId, id, e.getMessage());
         }
     }
 }
@@ -428,7 +430,7 @@ class SqlCredentialsDAO implements CredentialsDAO {
             creds.updateFromResultSet(rs);
             return creds;
         } catch (SQLException e) {
-            log.error("Error getting user credentials: {}", e);
+            log.error("Error getting user credentials: {}", e.getMessage());
             return null;
         }
     }
@@ -447,7 +449,7 @@ class SqlCredentialsDAO implements CredentialsDAO {
             log.trace("Executing query: {} <== ({}, {})", CHECK_IF_USER_EXISTS, login, login);
             return pst.executeQuery().next();
         } catch (SQLException e) {
-            log.error("Error checking if user {} exists: {}", login, e);
+            log.error("Error checking if user {} exists: {}", login, e.getMessage());
             return false;
         }
     }
@@ -476,7 +478,7 @@ class SqlCredentialsDAO implements CredentialsDAO {
             int numPurged = pst.executeUpdate();
             log.debug("Purged {} temporary user accounts", numPurged);
         } catch (SQLException e) {
-            log.error("Error purging temporary user accounts: {}", e);
+            log.error("Error purging temporary user accounts: {}", e.getMessage());
         }
     }
 
@@ -516,7 +518,7 @@ class SqlCredentialsDAO implements CredentialsDAO {
                 throw e;
             }
         } catch (SQLException e) {
-            log.error("Error creating user '{}': {}", username, e);
+            log.error("Error creating user '{}': {}", username, e.getMessage());
             return null;
         }
     }
@@ -545,7 +547,7 @@ class SqlMessageDAO implements MessageDAO {
             Stored.Processor.reconstructAllObjects(rs, Message::new, lm, false);
             return lm;
         } catch (SQLException e) {
-            log.error("Error getting data from table '{}': {}", TABLE_MESSAGES, e);
+            log.error("Error getting data from table '{}': {}", TABLE_MESSAGES, e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -561,7 +563,7 @@ class SqlMessageDAO implements MessageDAO {
             }
             return Stored.Processor.reconstructObject(rs, Message::new);
         } catch (SQLException e) {
-            log.error("Error getting data for message #{}: {}", id, e);
+            log.error("Error getting data for message #{}: {}", id, e.getMessage());
             return null;
         }
     }
@@ -578,7 +580,7 @@ class SqlMessageDAO implements MessageDAO {
             rs.next();
             return rs.getInt(1);
         } catch (SQLException e) {
-            log.error("Error counting rows in table '{}': {}", TABLE_MESSAGES, e);
+            log.error("Error counting rows in table '{}': {}", TABLE_MESSAGES, e.getMessage());
             return -1;
         }
     }
@@ -593,7 +595,7 @@ class SqlMessageDAO implements MessageDAO {
             if (pst.executeUpdate() != 1)
                 throw new SQLException(WRONG_ROW_COUNT);
         } catch (SQLException e) {
-            log.error("Error sending message from '{}' [{}]: {}", message.getFrom(), message.getText(), e);
+            log.error("Error sending message from '{}' [{}]: {}", message.getFrom(), message.getText(), e.getMessage());
         }
     }
 
@@ -633,7 +635,7 @@ class SqlMessageDAO implements MessageDAO {
 
             if (pst.executeUpdate() != 1) throw new SQLException("Invalid update count");
         } catch (SQLException e) {
-            log.error("Error updating data for message [{}]: {}", id, e);
+            log.error("Error updating data for message [{}]: {}", id, e.getMessage());
         }
     }
 
@@ -643,7 +645,7 @@ class SqlMessageDAO implements MessageDAO {
             int nDeleted = st.executeUpdate(DELETE_MESSAGE_QUERY + id + ";");
             log.trace("Deleted {} message(s)", nDeleted);
         } catch (SQLException e) {
-            log.error("Error deleting message #{}: {}", id, e);
+            log.error("Error deleting message #{}: {}", id, e.getMessage());
         }
     }
 
@@ -722,7 +724,7 @@ class SqlConvDAO implements ConversationDAO {
             }
             return Stored.Processor.reconstructObject(rs, Conversation::new);
         } catch (SQLException e) {
-            log.error("Error getting data for conversation #{}: {}", id, e);
+            log.error("Error getting data for conversation #{}: {}", id, e.getMessage());
             return null;
         }
     }
@@ -741,7 +743,7 @@ class SqlConvDAO implements ConversationDAO {
         try (Connection conn = cSource.get()) {
             return listConversationsOrInvites(conn, userId, query);
         } catch (SQLException e) {
-            log.error("Error getting data from conversation or invitation table: {}", e);
+            log.error("Error getting data from conversation or invitation table: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -767,7 +769,7 @@ class SqlConvDAO implements ConversationDAO {
             Stored.Processor.reconstructAllObjects(rs, Conversation::new, lc, false);
             return lc;
         } catch (SQLException e) {
-            log.error("Error getting data from table '{}': {}", TABLE_CONV, e);
+            log.error("Error getting data from table '{}': {}", TABLE_CONV, e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -796,7 +798,7 @@ class SqlConvDAO implements ConversationDAO {
                 throw e;
             }
         } catch (SQLException e) {
-            log.error("Error creating conversation '{}' by '{}' : {}", name, starter.getUsername(), e);
+            log.error("Error creating conversation '{}' by '{}' : {}", name, starter.getUsername(), e.getMessage());
             return null;
         }
     }
@@ -806,25 +808,37 @@ class SqlConvDAO implements ConversationDAO {
         try (Connection conn = cSource.get()) {
             conn.setAutoCommit(false);
             try {
-                updateParticipantOrInviteTable(conn, convId, userId, addUserToConvParticipants);
                 updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_INVITED);
+                updateParticipantOrInviteTable(conn, convId, userId, addUserToConvParticipants);
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
             }
         } catch (SQLException e) {
-            log.error("Error adding user #{} to conversation #{} : {}", userId, convId, e);
+            log.error("Error adding user #{} to conversation #{} : {}", userId, convId, e.getMessage());
         }
     }
 
     @Override
     public void inviteToConversation(long convId, long userId) {
         try (Connection conn = cSource.get()) {
+            conn.setAutoCommit(false);
             updateParticipantOrInviteTable(conn, convId, userId, addUserToConvInvited);
+            try (PreparedStatement checkIfAlreadyIn = conn.prepareStatement(IS_USER_IN_CONV)) {
+                checkIfAlreadyIn.setLong(1, userId);
+                checkIfAlreadyIn.setLong(2, convId);
+                ResultSet rs = checkIfAlreadyIn.executeQuery();
+                if (rs.next()) conn.rollback();     // Already in conversation, revoking invitation
+                else conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         } catch (SQLException e) {
-            log.error("Error giving user #{} invite to conversation #{} : {}", userId, convId, e);
+            log.error("Error giving user #{} invite to conversation #{} : {}", userId, convId, e.getMessage());
         }
+
     }
 
     @Override
@@ -832,7 +846,7 @@ class SqlConvDAO implements ConversationDAO {
         try (Connection conn = cSource.get()) {
             updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_CONV);
         } catch (SQLException e) {
-            log.error("Error removing user #{} from conversation #{}: {}", convId, userId, e);
+            log.error("Error removing user #{} from conversation #{}: {}", convId, userId, e.getMessage());
         }
     }
 
@@ -841,7 +855,7 @@ class SqlConvDAO implements ConversationDAO {
         try (Connection conn = cSource.get()) {
             updateParticipantOrInviteTable(conn, convId, userId, REMOVE_USER_FROM_INVITED);
         } catch (SQLException e) {
-            log.error("Error removing user #{} from invited to conversation #{}: {}", convId, userId, e);
+            log.error("Error removing user #{} from invited to conversation #{}: {}", convId, userId, e.getMessage());
         }
     }
 
@@ -873,7 +887,7 @@ class SqlConvDAO implements ConversationDAO {
             pst.setLong(1, convId);
             pst.executeUpdate();
         } catch (SQLException e) {
-            log.error("Error deleting conversation #{}: {}", convId, e);
+            log.error("Error deleting conversation #{}: {}", convId, e.getMessage());
         }
     }
 
@@ -893,7 +907,7 @@ class SqlConvDAO implements ConversationDAO {
             }
             return listConversationsOrInvites(conn, userId, GET_CONV_BY_INVITED);
         } catch (SQLException e) {
-            log.error("Error processing invite list for user #{}: {}", userId, e);
+            log.error("Error processing invite list for user #{}: {}", userId, e.getMessage());
             return Collections.emptyList();
         }
     }
