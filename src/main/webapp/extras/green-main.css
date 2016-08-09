@@ -47,3 +47,12 @@
     font-size: 12px;
     vertical-align: middle;
 }
+
+.conv_invite {
+    width: 5%;
+    text-align: center;
+}
+
+.conv_invite input {
+    margin: 5px 0 0 0;
+}

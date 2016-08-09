@@ -10,18 +10,20 @@ const PARTCS = $('#participants');
 const PARTCS_HTML = PARTCS.html();
 const RECIPIENT = $('#recipient');
 const SEND_BUTTON = $('#send');
+const INVIT_BUTTON = $('#invconv');
 const PRIVATE_MSG = -1;
 
 var dispDivs;
 var chainSort = true;
 var messageCache;
 var convCache;
-var convListMode = 0; // 0 = owned, 1 = participated, 2 = invites, 10 = create new
+// 0 = list owned, 1 = list watched, 2 = list invites, 3 = accept/decline invites, 10 = create new
+var convListMode = 0;
 var currentConvIndex = PRIVATE_MSG;
 var convOwner = false;
 var replyingTo; // null => new message
 
-function showMessages() {
+function showPrivMessages() {
     MSG_LIST.addClass('on');
     $('#privateHdr').removeClass("hidden");
     $('#convBoxHdr').addClass("hidden");
@@ -183,15 +185,13 @@ function markAsRead() {
     BODY.removeClass("waiting");
     if (nowReading.hasClass("unread")) {
         nowReading.removeClass("unread");
-        nowReading.css("cursor", "");
+        nowReading.off("mouseenter");
+        nowReading.off("mouseleave");
         var msgData = {
             action: "update",
             id: nowReading.data("msgId"),
             unread: false
         };
-
-//        $.post("/main/messageAction?action=update&id=" + nowReading.data("msgId") + "&unread=false");
-
         $.post("/main/messageAction", msgData);
         $('#messagealert').addClass("hidden");
     }
@@ -236,6 +236,7 @@ function setSortMode(mode) {
 
 function loadConversations(mode) {
     convListMode = mode;
+    $('.invit').addClass("hidden");
     $.getJSON("/main/conversations?mode=" + convListMode, onLoadConversations);
 }
 
@@ -259,13 +260,40 @@ function fillConvParticipants(data) {
 
 function displayConversation(i, conv) {
     var newrow = $("<tr></tr>");
-    var convlink = $("<a href='#' class='convlink' onclick='return convClicked(event," + i + ")'></a>").append(conv.name);
+    var convcheck = $("<td></td>");
+    var convlink;
+    if (INVIT_BUTTON.is(':checked')) {
+        convcheck.addClass("conv_invite");
+        convcheck.html("<input type='checkbox' onclick='convChecked(event)'>");
+        convcheck.data("convId", conv.id);
+        convlink = conv.name;
+    } else
+        convlink = $("<a href='#' class='convlink' onclick='return convClicked(event," + i + ")'></a>").append(conv.name);
+    newrow.append(convcheck);
     newrow.append($("<td></td>").append(convlink));
     newrow.append($("<td align='center'></td>").append(userlink(conv.starter)));
     newrow.append("<td>" + localTime(conv.started) + "</td>");
     newrow.append("<td width='99%'>" + conv.desc + "</td>");
-    newrow.data("convId", conv.id);
     CONV_TABLE.append(newrow);
+}
+
+function convChecked(event) {
+    if (event.target.checked)
+        $('.invit').removeClass("hidden");
+}
+
+function acceptInvitation(accept) {
+    var convList = "";
+    $('.conv_invite').each(function () {
+        convList += $(this).data("convId") + ",";
+    });
+//    alert(convList.slice(0, -1));
+    var convData = {
+        mode: 3,
+        accept: accept ? "yes" : "no",
+        ids: convList.slice(0, -1)
+    };
+    $.post("/main/conversations", convData, onLoadConversations, "json");
 }
 
 function convClicked(event, i) {

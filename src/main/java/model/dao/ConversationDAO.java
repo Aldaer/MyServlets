@@ -83,4 +83,12 @@ public interface ConversationDAO {
      */
     void deleteConversation(long convId);
 
+    /**
+     * Accepts or declines invitations to one or more conversations for a specified user
+     * @param userId User id
+     * @param accept true = accept, false = decline
+     * @param inviteList conversation ids, comma-separated
+     * @return List of remaining invitations after accept/decline
+     */
+    Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, long[] inviteList);
 }

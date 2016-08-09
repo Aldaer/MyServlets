@@ -200,6 +200,16 @@ public class JsonProviderServlet extends HttpServlet {
             case 2:
                 convList = convDao.listInvites(currentUser.getId());
                 break;
+            case 3:
+                boolean accept = "yes".equalsIgnoreCase(req.getParameter("accept"));
+                try {
+                    long[] inviteList = Stream.of(req.getParameter("ids").split(",")).mapToLong(Long::parseLong).toArray();
+                    convList = convDao.acceptOrDeclineInvites(currentUser.getId(), accept, inviteList);
+                    break;
+                } catch (NullPointerException | NumberFormatException e) {
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
             case 10:
                 String convName = req.getParameter("name");
                 String convDesc = req.getParameter("desc");

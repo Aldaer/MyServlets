@@ -736,19 +736,24 @@ class SqlConvDAO implements ConversationDAO {
     }
 
     private @NotNull Collection<Conversation> listConversationsOrInvites(long userId, String query) {
-        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(query)) {
+        try (Connection conn = cSource.get()) {
+            return listConversationsOrInvites(conn, userId, query);
+        } catch (SQLException e) {
+            log.error("Error getting data from conversation or invitation table: {}", e);
+            return Collections.emptyList();
+        }
+    }
+
+    private @NotNull Collection<Conversation> listConversationsOrInvites(Connection conn, long userId, String query) throws SQLException {
+        try (PreparedStatement pst = conn.prepareStatement(query)) {
             pst.setLong(1, userId);
             log.trace("Executing query: {} <== ({})", query, userId);
             ResultSet rs = pst.executeQuery();
             List<Conversation> lc = new ArrayList<>();
             Stored.Processor.reconstructAllObjects(rs, Conversation::new, lc, false);
             return lc;
-        } catch (SQLException e) {
-            log.error("Error getting data from table '{}': {}", TABLE_CONV, e);
-            return Collections.emptyList();
         }
     }
-
 
     @Override
     public @NotNull Collection<Conversation> listOwnConversations(String username) {
@@ -847,6 +852,18 @@ class SqlConvDAO implements ConversationDAO {
         }
     }
 
+    private void updateParticipantOrInviteTable(Connection conn, long[] convIds, long userId, String query) throws SQLException {
+        try (PreparedStatement pst = conn.prepareStatement(query)) {
+            for (long convId : convIds) {
+                pst.setLong(1, convId);
+                pst.setLong(2, userId);
+                pst.addBatch();
+            }
+            log.trace("Executing batch of {} update(s): {} <== ([*], {})", convIds.length, query, userId);
+            pst.executeBatch();
+        }
+    }
+
     @Override
     public void deleteConversation(long convId) {
         try (Connection conn = cSource.get();
@@ -858,5 +875,22 @@ class SqlConvDAO implements ConversationDAO {
         }
     }
 
-
+    @Override
+    public Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, long[] inviteList) {
+        try (Connection conn = cSource.get()) {
+            conn.setAutoCommit(false);
+            try {
+                if (accept) updateParticipantOrInviteTable(conn, inviteList, userId, addUserToConvParticipants);
+                updateParticipantOrInviteTable(conn, inviteList, userId, REMOVE_USER_FROM_INVITED);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+            return listConversationsOrInvites(conn, userId, GET_CONV_BY_INVITED);
+        } catch (SQLException e) {
+            log.error("Error processing invite list for user #{}: {}", userId, e);
+            return Collections.emptyList();
+        }
+    }
 }

@@ -71,7 +71,7 @@
                 <fmt:message key="main.conv.all"/>
             </label><br>
             <label>
-                <input name="cfilter" type="radio" class="radio" onclick="loadConversations(2)">
+                <input name="cfilter" type="radio" class="radio" id="invconv" onclick="loadConversations(2)">
                 <fmt:message key="main.conv.invites"/>
             </label><br>
             <button class="smallbutton" onclick="showNewConv(true)"><fmt:message key="conv.new.show"/></button>
@@ -80,6 +80,7 @@
             <div class="databox">
                 <table id="convtable">
                     <tr id="convheader">
+                        <th></th>
                         <th><fmt:message key="conv.table.name"/></th>
                         <th><fmt:message key="conv.table.created.by"/></th>
                         <th><fmt:message key="conv.table.created.at"/></th>
@@ -95,10 +96,14 @@
                     <button class="smallbutton" onclick="createNewConv()"><fmt:message key="conv.button.create"/></button>
                     <button class="smallbutton amber" onclick="showNewConv(false)"><fmt:message key="message.button.close"/></button>
                 </div>
+                <div class="invit hidden">
+                    <button class="smallbutton" onclick="acceptInvitation(true)"><fmt:message key="conv.button.accept"/></button>
+                    <button class="smallbutton amber" onclick="acceptInvitation(false)"><fmt:message key="conv.button.decline"/></button>
+                </div>
             </div>
         </div>
     </div>
-    <button class="smallbutton" onclick="showMessages()"><fmt:message key="main.mymessages"/></button>
+    <button class="smallbutton" onclick="showPrivMessages()"><fmt:message key="main.mymessages"/></button>
     <button class="smallbutton" onclick="toggleConversations()"><fmt:message key="main.conversations"/></button>
     <c:if test="${showLegacy}"><button class="smallbutton" onclick="toggleTime()"><fmt:message key="main.time"/></button></c:if>
     <a href="/main/userdetails" class="smallbutton"><fmt:message key="main.users"/></a>
