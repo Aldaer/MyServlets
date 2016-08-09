@@ -25,9 +25,9 @@ var replyingTo; // null => new message
 
 function showPrivMessages() {
     MSG_LIST.addClass('on');
-    $('#privateHdr').removeClass("hidden");
-    $('#convBoxHdr').addClass("hidden");
-    $('#participants').addClass("hidden");
+    unhide('#privateHdr');
+    hide('#convBoxHdr');
+    hide('#participants');
     RECIPIENT.parent().removeClass("hidden");
     currentConvIndex = PRIVATE_MSG;
     loadAllMessages();
@@ -56,6 +56,14 @@ function newMessage() {
 
 function toggleTime() {
     $('.time').toggleClass("hidden");
+}
+
+function hide(selector) {
+    $(selector).addClass("hidden");
+}
+
+function unhide(selector) {
+    $(selector).removeClass("hidden");
 }
 
 function loadAllMessages() {
@@ -193,7 +201,7 @@ function markAsRead() {
             unread: false
         };
         $.post("/main/messageAction", msgData);
-        $('#messagealert').addClass("hidden");
+        hide('#messagealert');
     }
 }
 
@@ -236,13 +244,15 @@ function setSortMode(mode) {
 
 function loadConversations(mode) {
     convListMode = mode;
-    $('.invit').addClass("hidden");
+    if (mode == 2) hide('#invitealert');
+    hide('.invit');
     $.getJSON("/main/conversations?mode=" + convListMode, onLoadConversations);
 }
 
 function onLoadConversations(data) {
     convCache = data;
     CONV_TABLE.html(CONV_HEADER.clone());
+    hide('.invit');
     $.each(data, displayConversation);
 }
 
@@ -263,9 +273,9 @@ function displayConversation(i, conv) {
     var convcheck = $("<td></td>");
     var convlink;
     if (INVIT_BUTTON.is(':checked')) {
-        convcheck.addClass("conv_invite");
-        convcheck.html("<input type='checkbox' onclick='convChecked(event)'>");
-        convcheck.data("convId", conv.id);
+        convcheck.prop("width", "50px");
+        convcheck.html("<input type='checkbox' class='conv_invite' onclick='convChecked(event)'>");
+        convcheck.children("input").data("convId", conv.id);
         convlink = conv.name;
     } else
         convlink = $("<a href='#' class='convlink' onclick='return convClicked(event," + i + ")'></a>").append(conv.name);
@@ -279,15 +289,15 @@ function displayConversation(i, conv) {
 
 function convChecked(event) {
     if (event.target.checked)
-        $('.invit').removeClass("hidden");
+        unhide('.invit');
 }
 
 function acceptInvitation(accept) {
     var convList = "";
     $('.conv_invite').each(function () {
-        convList += $(this).data("convId") + ",";
+        if ($(this).is(':checked'))
+            convList += $(this).data("convId") + ",";
     });
-//    alert(convList.slice(0, -1));
     var convData = {
         mode: 3,
         accept: accept ? "yes" : "no",
@@ -299,7 +309,7 @@ function acceptInvitation(accept) {
 function convClicked(event, i) {
     event.preventDefault();
     MSG_LIST.addClass('on');
-    $('#privateHdr').addClass("hidden");
+    hide('#privateHdr');
     RECIPIENT.parent().addClass("hidden");
     CONV_BOX_HEADER.html(CONV_BOX_HEADER_HTML);
     CONV_BOX_HEADER.removeClass("hidden");
@@ -316,9 +326,9 @@ function convClicked(event, i) {
 
 function showNewConv(show) {
     if (show)
-        $('#newconv').removeClass("hidden");
+        unhide('#newconv');
     else
-        $('#newconv').addClass("hidden");
+        hide('#newconv');
 }
 
 function createNewConv() {

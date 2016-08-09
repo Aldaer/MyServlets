@@ -128,6 +128,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             + COL_CNVP_USER_ID + "=?);";
     static final String DELETE_CONV = "DELETE FROM " + TABLE_CONV + " WHERE " + CFF_CONV_ID + "=?;";
 
+    static final String COUNT_INVITATIONS = "SELECT COUNT(*) AS icount FROM " + TABLE_CONV_INVITES + " WHERE ("
+            + COL_CNVP_USER_ID + "=?);";
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
@@ -876,21 +878,36 @@ class SqlConvDAO implements ConversationDAO {
     }
 
     @Override
-    public Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, long[] inviteList) {
+    public @NotNull Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, @NotNull long[] inviteList) {
         try (Connection conn = cSource.get()) {
-            conn.setAutoCommit(false);
-            try {
-                if (accept) updateParticipantOrInviteTable(conn, inviteList, userId, addUserToConvParticipants);
-                updateParticipantOrInviteTable(conn, inviteList, userId, REMOVE_USER_FROM_INVITED);
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
+            if (inviteList.length > 0) {
+                conn.setAutoCommit(false);
+                try {
+                    if (accept) updateParticipantOrInviteTable(conn, inviteList, userId, addUserToConvParticipants);
+                    updateParticipantOrInviteTable(conn, inviteList, userId, REMOVE_USER_FROM_INVITED);
+                    conn.commit();
+                } catch (SQLException e) {
+                    conn.rollback();
+                    throw e;
+                }
             }
             return listConversationsOrInvites(conn, userId, GET_CONV_BY_INVITED);
         } catch (SQLException e) {
             log.error("Error processing invite list for user #{}: {}", userId, e);
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public int countInvitations(long userId) {
+        try (Connection conn = cSource.get(); PreparedStatement pst = conn.prepareStatement(COUNT_INVITATIONS)) {
+            pst.setLong(1, userId);
+            log.trace("Executing query: {}", COUNT_INVITATIONS);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            return 0;
         }
     }
 }

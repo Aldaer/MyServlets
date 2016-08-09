@@ -90,5 +90,12 @@ public interface ConversationDAO {
      * @param inviteList conversation ids, comma-separated
      * @return List of remaining invitations after accept/decline
      */
-    Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, long[] inviteList);
+    @NotNull Collection<Conversation> acceptOrDeclineInvites(long userId, boolean accept, @NotNull long[] inviteList);
+
+    /**
+     * Outputs number of pending invitations for a specified user
+     * @param userId User id
+     * @return Number if invitations pending
+     */
+    int countInvitations(long userId);
 }

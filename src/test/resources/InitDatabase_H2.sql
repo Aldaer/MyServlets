@@ -1,7 +1,7 @@
 // Uncomment lines when creating embedded database instead of in-memory
 
 // == H2 ==
-// drop schema userdata;
+// DROP SCHEMA IF EXISTS userdata;
 // CREATE SCHEMA IF NOT EXISTS userdata AUTHORIZATION SA;
 // SET SCHEMA userdata;
 
@@ -55,6 +55,10 @@ INSERT INTO users (username, fullname, email, regcomplete) VALUES ('вася', '
 INSERT INTO credentials (username, dpassword) VALUES ('петя', 'e751782f2cdfd0fb5a42cc375956e9e7e797731c0f0a1b36d5b84ca9a63e01ee35bbc5a806c273cd');
 INSERT INTO users (username, fullname, email, regcomplete) VALUES ('петя', 'Петр Васечкин', 'p.vasechkin@email.com', TRUE);
 
+/* password = 12345 */
+INSERT INTO credentials (username, dpassword) VALUES ('коля', '4adfa1abe229e85f38c354fe09f49648db9fddc88485d0081d62cdc135a62355d06144f1d2335885');
+INSERT INTO users (username, fullname, email, regcomplete) VALUES ('коля', 'Николай Смирнов', 'nsmir@email.com', TRUE);
+
 /* password = 123 */
 INSERT INTO credentials (username, dpassword) VALUES ('admin', 'e23fa8862aeea8d58a5726e4c365c96d0fe4bf055e88dd9ee2b41c7b885500386f3c3af390c4ef8e');
 INSERT INTO users (username, email, regcomplete) VALUES ('admin', 'admin@somewhere.com', TRUE);
@@ -105,6 +109,7 @@ CREATE TABLE conversations (
 );
 
 INSERT INTO conversations (id, name, description, starter) VALUES (1, 'Сообщество', 'Просто поболтать', 'вася');
+INSERT INTO conversations (id, name, description, starter) VALUES (2, 'Петин разговор', 'Тоже поболтать', 'петя');
 
 DROP TABLE IF EXISTS conversation_participants;
 CREATE TABLE conversation_participants (
@@ -126,3 +131,7 @@ CREATE TABLE conversation_invited (
 
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT TOP 1 id FROM users WHERE username='вася'));
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT TOP 1 id FROM users WHERE username='петя'));
+INSERT INTO conversation_participants (convid, uid) values (2, (SELECT TOP 1 id FROM users WHERE username='петя'));
+
+INSERT INTO conversation_invited (convid, uid) values (1, (SELECT TOP 1 id FROM users WHERE username='коля'));
+INSERT INTO conversation_invited (convid, uid) values (2, (SELECT TOP 1 id FROM users WHERE username='коля'));

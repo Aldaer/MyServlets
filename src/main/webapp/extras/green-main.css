@@ -48,11 +48,7 @@
     vertical-align: middle;
 }
 
-.conv_invite {
-    width: 5%;
-    text-align: center;
-}
-
-.conv_invite input {
+input.conv_invite {
+    width:20px;
     margin: 5px 0 0 0;
 }

@@ -26,6 +26,7 @@ interface AttributeNames {
         static final String REG_ATTEMPT = "regAttempt";
 
         static final String UNREAD_PM = "unreadPM";
+        static final String INVITATIONS_PENDING = "invites";
         static final String FRIEND_STRING = "friendString";
     }
 

@@ -201,7 +201,7 @@ public class H2DAOTest {
     public void testGetConversationByParticipant() throws Exception {
         User user = usr.getUser("петя");
         Collection<Conversation> userConvs = convs.listConversations(user.getId());
-        assertThat(userConvs.size(), is(1));
+        assertThat(userConvs.size(), is(2));
     }
 
     @Test
@@ -231,7 +231,7 @@ public class H2DAOTest {
         convs.inviteToConversation(newConv.getId(), u2id);
         u2invites = convs.listInvites(u2id);
         assertThat(u2invites.size(), is(1));
-        assertThat(u2invites.iterator().next().getName(), is("topic"));
+        assertThat(u2invites.iterator().next().getName(), is("topic1"));
         convs.joinConversation(newConv.getId(), u2id);
         u2invites = convs.listInvites(u2id);
         assertThat(u2invites.size(), is(0));
@@ -245,17 +245,17 @@ public class H2DAOTest {
         Conversation newConv = convs.createConversation("topic2", "desc2", user);
         long u2id = usr.getUser("петя").getId();
         int numConvs = convs.listConversations(u2id).size();
-        Collection<Conversation> u2invites = convs.listInvites(u2id);
-        assertThat(u2invites.size(), is(0));
+        int numInvites = convs.countInvitations(u2id);
+        assertThat(numInvites, is(0));
         convs.inviteToConversation(newConv.getId(), u2id);
-        u2invites = convs.listInvites(u2id);
-        assertThat(u2invites.size(), is(1));
+        numInvites = convs.countInvitations(u2id);
+        assertThat(numInvites, is(1));
 
         long[] declineList = {newConv.getId()};
         Collection<Conversation> remainingInvites = convs.acceptOrDeclineInvites(u2id, false, declineList);
         assertThat(remainingInvites.size(), is(0));
-        u2invites = convs.listInvites(u2id);
-        assertThat(u2invites.size(), is(0));
+        numInvites = convs.countInvitations(u2id);
+        assertThat(numInvites, is(0));
         int newNumConvs = convs.listConversations(u2id).size();
         assertThat(newNumConvs, is(numConvs));
     }

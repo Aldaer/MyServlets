@@ -93,13 +93,17 @@ public class MainServlet extends HttpServlet {
         req.setAttribute("supportedTZ", new TimeZoneNames(lang).getSupportedTimeZones());
 
         User user = (User) session.getAttribute(S.USER);
-        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
 
+        MessageDAO mDao = (MessageDAO) getServletContext().getAttribute(C.MSG_DAO);
         MessageDAO.MessageFilter privateUnread = MessageDAO.MessageFilter.newBuilder()
                 .setTo(user.getUsername())
                 .setConvId(UNREAD_PRIVATE);
         Integer unreadPrivateMessages = mDao.countMessages(privateUnread);
         req.setAttribute(R.UNREAD_PM, unreadPrivateMessages);
+
+        ConversationDAO cDao = (ConversationDAO) getServletContext().getAttribute((C.CONV_DAO));
+        Integer invPending = cDao.countInvitations(user.getId());
+        req.setAttribute(R.INVITATIONS_PENDING, invPending);
 
         RequestDispatcher respJSP = req.getRequestDispatcher(MAIN_PAGE);
         UserDAO uDao = (UserDAO) getServletContext().getAttribute(C.USER_DAO);

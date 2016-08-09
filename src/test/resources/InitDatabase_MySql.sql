@@ -1,12 +1,13 @@
 # == MySql ==
-# CREATE DATABASE userdatabase;
-# USE userdatabase;
 # Note that connection string for initialization differs from working connection string
 # since it doesn't include database name.
 # Do not change database name from 'test' without changing constant TEST_DB_NAME in MySqlDAOTest
 DROP DATABASE IF EXISTS test;
 CREATE DATABASE test COLLATE utf8_general_ci;
-USE `test`;
+USE test;
+# Uncomment to work with main user database instead of test
+# CREATE DATABASE userdatabase COLLATE utf8_general_ci;
+# USE userdatabase;
 
 DROP TABLE IF EXISTS credentials;
 CREATE TABLE credentials (
@@ -48,6 +49,10 @@ INSERT INTO users (username, fullname, email, regcomplete) VALUES ('вася', '
 INSERT INTO credentials (username, dpassword) VALUES ('петя', 'e751782f2cdfd0fb5a42cc375956e9e7e797731c0f0a1b36d5b84ca9a63e01ee35bbc5a806c273cd');
 INSERT INTO users (username, fullname, email, regcomplete) VALUES ('петя', 'Петр Васечкин', 'p.vasechkin@email.com', TRUE);
 
+/* password = 12345 */
+INSERT INTO credentials (username, dpassword) VALUES ('коля', '4adfa1abe229e85f38c354fe09f49648db9fddc88485d0081d62cdc135a62355d06144f1d2335885');
+INSERT INTO users (username, fullname, email, regcomplete) VALUES ('коля', 'Николай Смирнов', 'nsmir@email.com', TRUE);
+
 /* password = 123 */
 INSERT INTO credentials (username, dpassword) VALUES ('admin', 'e23fa8862aeea8d58a5726e4c365c96d0fe4bf055e88dd9ee2b41c7b885500386f3c3af390c4ef8e');
 INSERT INTO users (username, email, regcomplete) VALUES ('admin', 'admin@somewhere.com', TRUE);
@@ -70,7 +75,7 @@ CREATE TABLE messages (
 );
 
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'петя', 'Привет, Петя!', '2015-01-01 12:00:00');
-INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('петя', 'вася', 'И тебе привет!', '2015-01-01 12:10:00');
+INSERT INTO messages (u_from, u_to, refid, text, m_time) VALUES ('петя', 'вася', LAST_INSERT_ID(), 'И тебе привет!', '2015-01-01 12:10:00');
 INSERT INTO messages (u_from, u_to, text, m_time) VALUES ('вася', 'non existing user', 'Письмо никому', '2015-01-01 13:00:00');
 
 INSERT INTO messages (u_from, conversation_id, text, m_time) VALUES ('вася', 1, 'Письмо в сообщество', '2015-01-02 12:00:00');
@@ -98,11 +103,12 @@ CREATE TABLE conversations (
 );
 
 INSERT INTO conversations (id, name, description, starter) VALUES (1, 'Сообщество', 'Просто поболтать', 'вася');
+INSERT INTO conversations (id, name, description, starter) VALUES (2, 'Петин разговор', 'Тоже поболтать', 'петя');
 
 DROP TABLE IF EXISTS conversation_participants;
 CREATE TABLE conversation_participants (
   convid BIGINT,
-  uid    BIGINT,
+  uid BIGINT,
   FOREIGN KEY (convid) REFERENCES conversations(id) ON DELETE CASCADE,
   FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT convkey PRIMARY KEY (convid, uid)
@@ -119,3 +125,7 @@ CREATE TABLE conversation_invited (
 
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT id FROM users WHERE username='вася'));
 INSERT INTO conversation_participants (convid, uid) values (1, (SELECT id FROM users WHERE username='петя'));
+INSERT INTO conversation_participants (convid, uid) values (2, (SELECT id FROM users WHERE username='петя'));
+
+INSERT INTO conversation_invited (convid, uid) values (1, (SELECT id FROM users WHERE username='коля'));
+INSERT INTO conversation_invited (convid, uid) values (2, (SELECT id FROM users WHERE username='коля'));
