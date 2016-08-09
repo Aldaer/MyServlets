@@ -27,9 +27,8 @@ import static controller.utils.MyStringUtils.parseOrNull;
 import static java.util.Optional.ofNullable;
 
 /**
- * My first attempt on servlets
+ * Main servlet, processing user data and messaging
  */
-
 @Slf4j
 @WebServlet(name = "MainServlet", urlPatterns = {MAIN_SERVLET, USER_UPDATE_SERVLET, MESSAGE_ACTION_SERVLET})
 public class MainServlet extends HttpServlet {
@@ -175,7 +174,7 @@ public class MainServlet extends HttpServlet {
                 null,
                 convId,
                 req.getParameter("text"));
-        mDao.sendMessage(newMsg);
+        mDao.sendMessage(newMsg);   // TODO: check conversation status
     }
 
 

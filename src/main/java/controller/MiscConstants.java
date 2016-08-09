@@ -75,4 +75,5 @@ interface PageURLs {
     String CONVERSATION_PROVIDER_SERVLET = "/main/conversations";
     String MESSAGE_ACTION_SERVLET = "/main/messageAction";
     String USER_SEARCH_SERVLET = "/main/userSearch";
+    String MODERATOR_SERVLET = "/main/moderatorAction";
 }

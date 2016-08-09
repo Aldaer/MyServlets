@@ -169,8 +169,9 @@
     const user = '${currentUser.username}';
     const jsLocale = '${language}';
 
-    const sendText = "<fmt:message key="message.button.send"/>";
-    const replyText = "<fmt:message key="message.button.reply"/>";
+    const SEND_TEXT = '<fmt:message key="message.button.send"/>';
+    const REPLY_TEXT = '<fmt:message key="message.button.reply"/>';
+    const BAN_CONFIRM = '<fmt:message key="conv.ban.confirm"/>';
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>

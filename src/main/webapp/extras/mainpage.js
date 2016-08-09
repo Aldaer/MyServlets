@@ -12,6 +12,9 @@ const RECIPIENT = $('#recipient');
 const SEND_BUTTON = $('#send');
 const INVIT_BUTTON = $('#invconv');
 const PRIVATE_MSG = -1;
+const BAN_LINK = $("<img src='/images/ban_icon.png' style='vertical-align: bottom'>");
+const BAN_USER = 1;
+const INVITE_USER = 2;
 
 var dispDivs;
 var chainSort = true;
@@ -20,7 +23,7 @@ var convCache;
 // 0 = list owned, 1 = list watched, 2 = list invites, 3 = accept/decline invites, 10 = create new
 var convListMode = 0;
 var currentConvIndex = PRIVATE_MSG;
-var convOwner = false;
+var isConvOwner = false;
 var replyingTo; // null => new message
 
 function showPrivMessages() {
@@ -225,7 +228,7 @@ function messageClicked(event) {
     var mClone = replyingTo.clone();
     mClone.css("margin", "3px");
     msgPlace.append(mClone);
-    var canDelete = currentConvIndex == PRIVATE_MSG || convOwner;
+    var canDelete = currentConvIndex == PRIVATE_MSG || isConvOwner;
     document.getElementById("delete").disabled = !canDelete;
 
 }
@@ -256,16 +259,39 @@ function onLoadConversations(data) {
     $.each(data, displayConversation);
 }
 
-function loadConvParticipants(i) {
-    const convid = convCache[i].id;
-    $.getJSON("/main/userSearch?convId=" + convid, fillConvParticipants);
+function loadConvParticipants() {
+    PARTCS.html(PARTCS_HTML);
+    PARTCS.removeClass("hidden");
+    PARTCS.append(" ");
+    $.getJSON("/main/userSearch?convId=" + convCache[currentConvIndex].id, fillConvParticipants);
 }
 
 function fillConvParticipants(data) {
     if (data.users.length < 1) return;
-    PARTCS.append(userlink(data.users[0].username));
-    for (i = 1; i < data.users.length; i++)
-        PARTCS.append(", ").append(userlink(data.users[i].username));
+    for (i = 0; i < data.users.length; i++) {
+        if (i > 0) PARTCS.append(", ");
+        const iName = data.users[i].username;
+        PARTCS.append(userlink(iName));
+        if (isConvOwner && (iName != user)) {
+            var banlink = BAN_LINK.clone();
+            banlink.click(banParticipant);
+            banlink.data("uid", data.users[i].id);
+            banlink.data("username", iName);
+            PARTCS.append(banlink);
+        }
+    }
+}
+
+function banParticipant() {
+    var banText = BAN_CONFIRM.replace("$1", $(this).data("username")).replace("$2", convCache[currentConvIndex].name);
+    if (confirm(banText)) {
+        var uData = {
+            action: BAN_USER,
+            convId: convCache[currentConvIndex].id,
+            uid: $(this).data("uid")
+        };
+        $.post("/main/moderatorAction", uData, loadConvParticipants);
+    }
 }
 
 function displayConversation(i, conv) {
@@ -314,13 +340,10 @@ function convClicked(event, i) {
     CONV_BOX_HEADER.html(CONV_BOX_HEADER_HTML);
     CONV_BOX_HEADER.removeClass("hidden");
     CONV_BOX_HEADER.append(" ").append(convCache[i].name);
-    PARTCS.html(PARTCS_HTML);
-    PARTCS.removeClass("hidden");
-    PARTCS.append(" ");
-    convOwner = (convCache[i].starter == user);
+    isConvOwner = (convCache[i].starter == user);
     currentConvIndex = i;
     loadAllMessages();
-    loadConvParticipants(i);
+    loadConvParticipants();
     return false;
 }
 
