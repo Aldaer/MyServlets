@@ -10,11 +10,15 @@ const PARTCS = $('#participants');
 const PARTCS_HTML = PARTCS.html();
 const RECIPIENT = $('#recipient');
 const SEND_BUTTON = $('#send');
-const INVIT_BUTTON = $('#invconv');
+const INVIT_RADIO = $('#invconv');
+const UNINV_FRIENDS_OPT = $('#uninvitedFriends');
+const INVITE_ME_EDIT = $('#inviteMe');
+const INVITE_US_EDIT = $('#inviteUs');
+const INVITE_NOW_BUTTON = $('#inviteNow');
 const PRIVATE_MSG = -1;
 const BAN_LINK = $("<img src='/images/ban_icon.png' style='vertical-align: bottom'>");
 const BAN_USER = 1;
-const INVITE_USER = 2;
+const INVITE_USERS = 2;
 
 var dispDivs;
 var chainSort = true;
@@ -267,7 +271,10 @@ function loadConvParticipants() {
     $.getJSON("/main/userSearch?convId=" + convCache[currentConvIndex].id, fillConvParticipants);
 }
 
+var uninvitedFriends = [];
+
 function fillConvParticipants(data) {
+    uninvitedFriends = FRIEND_LIST.split(',');
     if (data.users.length < 1) return;
     for (i = 0; i < data.users.length; i++) {
         if (i > 0) PARTCS.append(", ");
@@ -280,7 +287,51 @@ function fillConvParticipants(data) {
             banlink.data("username", iName);
             PARTCS.append(banlink);
         }
+        uninvitedFriends = arrayWithout(uninvitedFriends, iName);
     }
+    generateInviteOptions();
+}
+
+function generateInviteOptions() {
+    UNINV_FRIENDS_OPT.html("");
+    $.each(uninvitedFriends, function (i, v) {
+        UNINV_FRIENDS_OPT.append($('<option></option>').val(v).html(v));
+    });
+}
+
+function addToInvitations() {
+    var newName = INVITE_ME_EDIT.val();
+    if (newName.length > 0) {
+        var s = INVITE_US_EDIT.val();
+        if (s.length > 0) s += ",";
+        s += newName;
+        INVITE_US_EDIT.val(s);
+        uninvitedFriends = arrayWithout(uninvitedFriends, newName);
+        generateInviteOptions();
+        INVITE_ME_EDIT.val("");
+        INVITE_NOW_BUTTON.prop("disabled", false);
+    }
+}
+
+function inviteNow() {
+    var uData = {
+        action: INVITE_USERS,
+        convId: convCache[currentConvIndex].id,
+        users: INVITE_US_EDIT.val()
+    };
+    $.post("/main/moderatorAction", uData);
+    INVITE_US_EDIT.val("");
+    INVITE_NOW_BUTTON.prop("disabled", true);
+}
+
+function arrayWithout(array, string) {
+    var newArray = [];
+    for (var i = 0; i < array.length; i++) {
+        var ai = array[i];
+        if (ai != string)
+            newArray.push(ai)
+    }
+    return newArray;
 }
 
 function banParticipant() {
@@ -299,13 +350,13 @@ function displayConversation(i, conv) {
     var newrow = $("<tr></tr>");
     var convcheck = $("<td></td>");
     var convlink;
-    if (INVIT_BUTTON.is(':checked')) {
+    if (INVIT_RADIO.is(':checked')) {
         convcheck.prop("width", "50px");
         convcheck.html("<input type='checkbox' class='conv_invite' onclick='convChecked(event)'>");
         convcheck.children("input").data("convId", conv.id);
         convlink = conv.name;
     } else
-        convlink = $("<a href='#' class='convlink' onclick='return convClicked(event," + i + ")'></a>").append(conv.name);
+        convlink = $("<a href='#' class='convlink' onclick='return displayConversationFull(event," + i + ")'></a>").append(conv.name);
     newrow.append(convcheck);
     newrow.append($("<td></td>").append(convlink));
     newrow.append($("<td align='center'></td>").append(userlink(conv.starter)));
@@ -333,7 +384,7 @@ function acceptInvitation(accept) {
     $.post("/main/conversations", convData, onLoadConversations, "json");
 }
 
-function convClicked(event, i) {
+function displayConversationFull(event, i) {
     event.preventDefault();
     MSG_LIST.addClass('on');
     hide('#privateHdr');
@@ -342,6 +393,13 @@ function convClicked(event, i) {
     CONV_BOX_HEADER.removeClass("hidden");
     CONV_BOX_HEADER.append(" ").append(convCache[i].name);
     isConvOwner = (convCache[i].starter == user);
+    if (isConvOwner) {
+        INVITE_ME_EDIT.val("");
+        INVITE_US_EDIT.val("");
+        INVITE_NOW_BUTTON.prop("disabled", true);
+        unhide("#inviteMore");
+    }
+    else hide("#inviteMore");
     currentConvIndex = i;
     loadAllMessages();
     loadConvParticipants();

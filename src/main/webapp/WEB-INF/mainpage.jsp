@@ -126,7 +126,13 @@
     <h3 id="privateHdr" class="hidden"><fmt:message key="main.private.header"/></h3>
     <h3 id="convBoxHdr" class="hidden"><fmt:message key="main.conversation.header"/></h3>
     <p id="participants"><fmt:message key="main.conversation.participants"/></p>
-    <p id="inviteMore" class="hidden">Invite participants:</p>
+    <p id="inviteMore" class="hidden"><fmt:message key="conv.invite"/>
+        <input type="text" id="inviteMe" list="uninvitedFriends" style="width:25%"/>
+        <datalist id="uninvitedFriends"></datalist>
+        <button class="smallbutton" onclick="addToInvitations()"><b>&nbsp+&nbsp</b></button>
+        <input type="text" id="inviteUs" style="width:30%" disabled/>
+        <button class="smallbutton" id="inviteNow" onclick="inviteNow()" disabled><fmt:message key="conv.button.invite"/></button>
+    </p>
     <div style="width: 20%; float: left">
         <h3><fmt:message key="main.message.sorting"/></h3>
         <label>
@@ -154,18 +160,17 @@
     <p id="msgheader"></p>
     <p id="msgtext"></p>
     <div><fmt:message key="message.recip"/> <input type="text" id="recipient" list="friends" disabled/></div>
+    <datalist id="friends">
+        <c:forTokens items="${friendString}" delims="," var="fname">
+            <option value="${fname}">${fname}</option>
+        </c:forTokens>
+    </datalist>
     <textarea id="newmsgtext" rows="10"></textarea>
     <button class="smallbutton" id="send" onclick="sendMessage()">S/R</button>
     <button class="smallbutton ruby" id="delete" onclick="deleteMessage()"><fmt:message
             key="message.button.delete"/></button>
     <button class="smallbutton amber" onclick="closeReply()"><fmt:message key="message.button.close"/></button>
 </div>
-
-<datalist id="friends">
-    <c:forTokens items="${friendString}" delims="," var="fname">
-        <option value="${fname}">${fname}</option>
-    </c:forTokens>
-</datalist>
 
 <script>
     const user = '${currentUser.username}';
@@ -175,6 +180,7 @@
     const REPLY_TEXT = '<fmt:message key="message.button.reply"/>';
     const BAN_CONFIRM = '<fmt:message key="conv.ban.confirm"/>';
     const DELETE_CONFIRM = '<fmt:message key="message.delete.confirm"/>';
+    const FRIEND_LIST= '${friendString}';
 </script>
 <script src="/extras/mainpage.js"></script>
 </body>
