@@ -32,6 +32,12 @@ dependencies {
 
     // Required by H2 in-memory compiler when using lombok
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
+
+    // Spring
+    compile 'org.springframework:spring-core:+'
+    compile 'org.springframework:spring-context:+'
+    testCompile 'org.springframework:spring-test:+'
+
 }
 
 task testWar(type: War) {

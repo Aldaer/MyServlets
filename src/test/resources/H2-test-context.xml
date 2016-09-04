@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="model, controller"/>
+
+    <bean id="h2DbDriver" class="org.h2.Driver"/>
+
+    <bean id="testConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+        <constructor-arg name="databaseUri" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"/>
+    </bean>
+
+    <bean id="globalDao" class="model.dao.databases.H2GlobalDao"/>
+</beans>
