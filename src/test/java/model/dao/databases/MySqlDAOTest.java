@@ -2,16 +2,13 @@ package model.dao.databases;
 
 import model.dao.*;
 import model.dao.MessageDAO.MessageFilter;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import javax.annotation.Resource;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -21,68 +18,23 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @SuppressWarnings("ConstantConditions")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:MySql-test-context.xml")
 public class MySqlDAOTest {
-    private static final String TEST_DB_NAME = "test"; // Must be the same as DB name in InitDatabase_MySql.sql
+    @Resource
+    Supplier<Connection> testRunConnectionSource;
 
-    private static CredentialsDAO creds;
-    private static UserDAO usr;
-    private static MessageDAO msg;
-    private static ConversationDAO convs;
+    @Resource
+    private CredentialsDAO creds;
 
-    private static Connection keepalive;
+    @Resource
+    private UserDAO usr;
 
-    @BeforeClass
-    public static void createDAO() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        GenericSqlDAO glob = new MySqlGlobalDao();
+    @Resource
+    private MessageDAO msg;
 
-        Supplier<Connection> csSetup = () -> {
-            try {
-                return DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", "epam", "1234");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
-        };
-
-        keepalive = csSetup.get();
-        glob.useConnectionSource(csSetup);
-
-        String[] script = {};
-        try {
-            script = Files.readAllLines(Paths.get("src/test/resources/InitDatabase_MySql.sql")).toArray(script);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        glob.executeScript(script);
-
-        Supplier<Connection> csRun = () -> {
-            try {
-                return DriverManager.getConnection("jdbc:mysql://localhost:3306/" + TEST_DB_NAME + "?useSSL=false", "epam", "1234");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
-            }
-        };
-        glob.useConnectionSource(csRun);
-
-        creds = glob.getCredentialsDAO();
-        creds.useSaltedHash(true);
-        creds.purgeTemporaryUsers(System.currentTimeMillis());
-        usr = glob.getUserDAO();
-        msg = glob.getMessageDAO();
-        convs = glob.getConversationDAO();
-    }
-
-    @AfterClass
-    public static void tearDown() throws Exception {
-        keepalive.createStatement().executeUpdate("DROP DATABASE " + TEST_DB_NAME + ";");
-        keepalive.close();
-    }
+    @Resource
+    private ConversationDAO convs;
 
     @Test
     public void getCredentialsVerifyTest() throws Exception {
@@ -122,22 +74,22 @@ public class MySqlDAOTest {
         MessageFilter.Builder bldr = MessageFilter.newBuilder().setFrom("вася");
         List<Message> messages = msg.getMessages(bldr);
         assertThat(messages.size(), is(3));
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         System.out.println("---offset 1");
         bldr.setOffset(1L);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2");
         bldr.setOffset(0L);
         bldr.setLimit(2);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2, offset 2");
         bldr.setOffset(2L);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(1));
     }
 
@@ -160,8 +112,8 @@ public class MySqlDAOTest {
         bld.setMinTime(Timestamp.valueOf("2015-01-01 12:05:00"));
         bld.setMaxTime(Timestamp.valueOf("2015-01-02 12:00:00"));
         List<Message> messages = msg.getMessages(bld);
-        messages.stream().forEach(System.out::println);
         assertThat(messages.size(), is(3));
+        messages.forEach(System.out::println);
     }
 
 
@@ -170,17 +122,17 @@ public class MySqlDAOTest {
         MessageFilter.Builder bld = MessageFilter.newBuilder().setTextLike("%никому%");
         List<Message> messages = msg.getMessages(bld);
         assertThat(messages.size(), is(1));
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
     }
 
     @Test
     public void testListUsersLike() throws Exception {
         Collection<ShortUserInfo> list1 = usr.listUsers("ася", 20);
-        list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
         assertThat(list1.size(), is(1));
-        list1 = usr.listUsers("вас", 20);
         list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
+        list1 = usr.listUsers("вас", 20);
         assertThat(list1.size(), is(2));
+        list1.forEach(u -> System.out.println(u.getUsername() + " -- " + u.getFullName()));
     }
 
     @Test
@@ -237,7 +189,7 @@ public class MySqlDAOTest {
     @Test
     public void testInviteAndJoin() throws Exception {
         User user = usr.getUser("вася");
-        Conversation newConv = convs.createConversation("topic", "desc", user);
+        Conversation newConv = convs.createConversation("topic1", "desc1", user);
         long u2id = usr.getUser("петя").getId();
         int numConvs = convs.listConversations(u2id).size();
         Collection<Conversation> u2invites = convs.listInvites(u2id);
@@ -245,7 +197,7 @@ public class MySqlDAOTest {
         convs.inviteToConversation(newConv.getId(), u2id);
         u2invites = convs.listInvites(u2id);
         assertThat(u2invites.size(), is(1));
-        assertThat(u2invites.iterator().next().getName(), is("topic"));
+        assertThat(u2invites.iterator().next().getName(), is("topic1"));
         convs.joinConversation(newConv.getId(), u2id);
         u2invites = convs.listInvites(u2id);
         assertThat(u2invites.size(), is(0));
@@ -285,4 +237,5 @@ public class MySqlDAOTest {
         int numInvites2 = convs.listInvites(uid).size();
         assertThat(numInvites2, is(numInvites));
     }
+
 }

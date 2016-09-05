@@ -8,19 +8,23 @@
 
     <context:component-scan base-package="model, controller"/>
 
-    <bean id="h2DbDriver" class="org.h2.Driver"/>
+    <bean id="h2DbDriver" class="com.mysql.cj.jdbc.Driver"/>
 
-    <bean id="testSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
-        <constructor-arg name="databaseUri" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"/>
+    <bean id="testConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+        <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
+        <constructor-arg name="username" value="epam"/>
+        <constructor-arg name="password" value="1234"/>
     </bean>
 
     <bean id="testRunConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
-        <constructor-arg name="databaseUri" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"/>
+        <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306/test?useSSL=false"/>
+        <constructor-arg name="username" value="epam"/>
+        <constructor-arg name="password" value="1234"/>
     </bean>
 
     <bean id="initScriptPath" class="java.lang.String">
-        <constructor-arg value="src/test/resources/InitDatabase_H2.sql"/>
+        <constructor-arg value="src/test/resources/InitDatabase_MySql.sql"/>
     </bean>
 
-    <bean id="globalDao" class="model.dao.databases.H2GlobalDao"/>
+    <bean id="globalDao" class="model.dao.databases.MySqlGlobalDao"/>
 </beans>

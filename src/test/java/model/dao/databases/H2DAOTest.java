@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 @ContextConfiguration("classpath:H2-test-context.xml")
 public class H2DAOTest {
     @Resource
-    Supplier<Connection> testConnectionSource;
+    Supplier<Connection> testRunConnectionSource;
 
     @Resource
     private CredentialsDAO creds;
@@ -74,22 +74,22 @@ public class H2DAOTest {
         MessageFilter.Builder bldr = MessageFilter.newBuilder().setFrom("вася");
         List<Message> messages = msg.getMessages(bldr);
         assertThat(messages.size(), is(3));
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         System.out.println("---offset 1");
         bldr.setOffset(1L);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2");
         bldr.setOffset(0L);
         bldr.setLimit(2);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(2));
         System.out.println("---max 2, offset 2");
         bldr.setOffset(2L);
         messages = msg.getMessages(bldr);
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
         assertThat(messages.size(), is(1));
     }
 
@@ -113,7 +113,7 @@ public class H2DAOTest {
         bld.setMaxTime(Timestamp.valueOf("2015-01-02 12:00:00"));
         List<Message> messages = msg.getMessages(bld);
         assertThat(messages.size(), is(3));
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
     }
 
 
@@ -122,7 +122,7 @@ public class H2DAOTest {
         MessageFilter.Builder bld = MessageFilter.newBuilder().setTextLike("%никому%");
         List<Message> messages = msg.getMessages(bld);
         assertThat(messages.size(), is(1));
-        messages.stream().forEach(System.out::println);
+        messages.forEach(System.out::println);
     }
 
     @Test

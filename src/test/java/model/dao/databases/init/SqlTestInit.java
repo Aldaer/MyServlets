@@ -18,6 +18,8 @@ import java.util.function.Supplier;
 
 @Configuration
 public class SqlTestInit {
+    @Resource
+    private String initScriptPath;
 
     private CredentialsDAO creds;
     private UserDAO usr;
@@ -28,15 +30,15 @@ public class SqlTestInit {
     private GenericSqlDAO globalDao;
 
     @Resource
-    private Supplier<Connection> testConnectionSource;
+    private Supplier<Connection> testSetupConnectionSource;
 
     @PostConstruct
     private void runInitScript() {
-        globalDao.useConnectionSource(testConnectionSource);
+        globalDao.useConnectionSource(testSetupConnectionSource);
 
         String[] script = {};
         try {
-            script = Files.readAllLines(Paths.get("src/test/resources/InitDatabase_H2.sql")).toArray(script);
+            script = Files.readAllLines(Paths.get(initScriptPath)).toArray(script);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,21 +54,21 @@ public class SqlTestInit {
 
     @Bean
     public CredentialsDAO getCreds() {
-        return creds;
+        return this.creds;
     }
 
     @Bean
     public UserDAO getUsr() {
-        return usr;
+        return this.usr;
     }
 
     @Bean
     public MessageDAO getMsg() {
-        return msg;
+        return this.msg;
     }
 
     @Bean
     public ConversationDAO getConvs() {
-        return convs;
+        return this.convs;
     }
 }
