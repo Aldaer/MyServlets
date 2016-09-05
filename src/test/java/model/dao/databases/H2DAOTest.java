@@ -17,7 +17,6 @@ import java.util.function.Supplier;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-@SuppressWarnings("ConstantConditions")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:H2-test-context.xml")
 public class H2DAOTest {
