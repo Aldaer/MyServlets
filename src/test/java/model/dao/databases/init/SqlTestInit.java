@@ -29,7 +29,7 @@ public class SqlTestInit {
     @Resource
     private GenericSqlDAO globalDao;
 
-    @Resource
+    @Resource(name = "testSetupConnectionSource")
     private Supplier<Connection> testSetupConnectionSource;
 
     @PostConstruct

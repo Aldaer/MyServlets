@@ -10,7 +10,7 @@
 
     <bean id="h2DbDriver" class="com.mysql.cj.jdbc.Driver"/>
 
-    <bean id="testConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+    <bean id="tesSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
         <constructor-arg name="username" value="epam"/>
         <constructor-arg name="password" value="1234"/>
