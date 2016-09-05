@@ -8,7 +8,7 @@
 
     <context:component-scan base-package="model, controller"/>
 
-    <bean id="h2DbDriver" class="com.mysql.cj.jdbc.Driver"/>
+    <bean id="mySqlDbDriver" class="com.mysql.cj.jdbc.Driver"/>
 
     <bean id="tesSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
