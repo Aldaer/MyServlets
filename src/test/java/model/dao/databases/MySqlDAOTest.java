@@ -4,15 +4,14 @@ import model.dao.*;
 import model.dao.MessageDAO.MessageFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -20,10 +19,8 @@ import static org.junit.Assert.assertThat;
 @SuppressWarnings("ConstantConditions")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:MySql-test-context.xml")
+@ActiveProfiles("mySql")
 public class MySqlDAOTest {
-    @Resource
-    Supplier<Connection> testRunConnectionSource;
-
     @Resource
     private CredentialsDAO creds;
 

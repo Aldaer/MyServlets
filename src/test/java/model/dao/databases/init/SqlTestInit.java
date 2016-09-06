@@ -32,6 +32,9 @@ public class SqlTestInit {
     @Resource(name = "testSetupConnectionSource")
     private Supplier<Connection> testSetupConnectionSource;
 
+    @Resource(name = "testRunConnectionSource")
+    private Supplier<Connection> testRunConnectionSource;
+
     @PostConstruct
     private void runInitScript() {
         globalDao.useConnectionSource(testSetupConnectionSource);
@@ -43,6 +46,8 @@ public class SqlTestInit {
             e.printStackTrace();
         }
         globalDao.executeScript(script);
+
+        globalDao.useConnectionSource(testRunConnectionSource);
 
         creds = globalDao.getCredentialsDAO();
         creds.useSaltedHash(true);

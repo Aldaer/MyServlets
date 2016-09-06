@@ -4,13 +4,14 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       profile="mySql">
 
     <context:component-scan base-package="model, controller"/>
 
     <bean id="mySqlDbDriver" class="com.mysql.cj.jdbc.Driver"/>
 
-    <bean id="tesSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+    <bean id="testSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
         <constructor-arg name="username" value="epam"/>
         <constructor-arg name="password" value="1234"/>
