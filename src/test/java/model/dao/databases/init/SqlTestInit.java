@@ -1,6 +1,5 @@
 package model.dao.databases.init;
 
-import lombok.Getter;
 import model.dao.ConversationDAO;
 import model.dao.CredentialsDAO;
 import model.dao.MessageDAO;
@@ -17,21 +16,18 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.function.Supplier;
 
+// Actual context to inject beans from is selected by profile activated with annotation in test class
 @Configuration
 public class SqlTestInit {
     @Resource
     private String initScriptPath;
 
-    @Getter(onMethod = @__({@Bean}))
     private CredentialsDAO creds;
 
-    @Getter(onMethod = @__({@Bean}))
     private UserDAO usr;
 
-    @Getter(onMethod = @__({@Bean}))
     private MessageDAO msg;
 
-    @Getter(onMethod = @__({@Bean}))
     private ConversationDAO convs;
 
     @Resource
@@ -63,5 +59,25 @@ public class SqlTestInit {
         usr = globalDao.getUserDAO();
         msg = globalDao.getMessageDAO();
         convs = globalDao.getConversationDAO();
+    }
+
+    @Bean
+    public CredentialsDAO getCreds() {
+        return this.creds;
+    }
+
+    @Bean
+    public UserDAO getUsr() {
+        return this.usr;
+    }
+
+    @Bean
+    public MessageDAO getMsg() {
+        return this.msg;
+    }
+
+    @Bean
+    public ConversationDAO getConvs() {
+        return this.convs;
     }
 }
