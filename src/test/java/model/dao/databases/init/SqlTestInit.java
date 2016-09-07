@@ -1,5 +1,6 @@
 package model.dao.databases.init;
 
+import lombok.Getter;
 import model.dao.ConversationDAO;
 import model.dao.CredentialsDAO;
 import model.dao.MessageDAO;
@@ -21,18 +22,25 @@ public class SqlTestInit {
     @Resource
     private String initScriptPath;
 
+    @Getter(onMethod = @__({@Bean}))
     private CredentialsDAO creds;
+
+    @Getter(onMethod = @__({@Bean}))
     private UserDAO usr;
+
+    @Getter(onMethod = @__({@Bean}))
     private MessageDAO msg;
+
+    @Getter(onMethod = @__({@Bean}))
     private ConversationDAO convs;
 
     @Resource
     private GenericSqlDAO globalDao;
 
-    @Resource(name = "testSetupConnectionSource")
+    @Resource
     private Supplier<Connection> testSetupConnectionSource;
 
-    @Resource(name = "testRunConnectionSource")
+    @Resource
     private Supplier<Connection> testRunConnectionSource;
 
     @PostConstruct
@@ -55,25 +63,5 @@ public class SqlTestInit {
         usr = globalDao.getUserDAO();
         msg = globalDao.getMessageDAO();
         convs = globalDao.getConversationDAO();
-    }
-
-    @Bean
-    public CredentialsDAO getCreds() {
-        return this.creds;
-    }
-
-    @Bean
-    public UserDAO getUsr() {
-        return this.usr;
-    }
-
-    @Bean
-    public MessageDAO getMsg() {
-        return this.msg;
-    }
-
-    @Bean
-    public ConversationDAO getConvs() {
-        return this.convs;
     }
 }

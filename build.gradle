@@ -37,7 +37,6 @@ dependencies {
     compile 'org.springframework:spring-core:+'
     compile 'org.springframework:spring-context:+'
     testCompile 'org.springframework:spring-test:+'
-
 }
 
 task testWar(type: War) {

@@ -24,7 +24,7 @@
     </bean>
 
     <bean id="initScriptPath" class="java.lang.String">
-        <constructor-arg value="src/test/resources/InitDatabase_MySql.sql"/>
+        <constructor-arg value="src/test/resources/InitTestDatabase_MySql.sql"/>
     </bean>
 
     <bean id="globalDao" class="model.dao.databases.MySqlGlobalDao"/>

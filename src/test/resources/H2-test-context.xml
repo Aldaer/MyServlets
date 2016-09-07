@@ -20,7 +20,7 @@
     </bean>
 
     <bean id="initScriptPath" class="java.lang.String">
-        <constructor-arg value="src/test/resources/InitDatabase_H2.sql"/>
+        <constructor-arg value="src/test/resources/InitTestDatabase_H2.sql"/>
     </bean>
 
     <bean id="globalDao" class="model.dao.databases.H2GlobalDao"/>
