@@ -32,18 +32,10 @@ public class DatabaseConfigurator {
             throw new RuntimeException("Global DAO config error", e);
         }
 
-        String drv = conf.getString(CONFIG_DATABASE_DRIVER);
-
         String uri = conf.getString("database_init_uri");
         String scriptFile = conf.getString("database_init_script");
         String username = conf.getString(CONFIG_DATABASE_USER);
         String password = conf.getString(CONFIG_DATABASE_PASSWORD);
-
-        try {
-            Class.forName(drv);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
         Supplier<Connection> cs = () -> {
             try {

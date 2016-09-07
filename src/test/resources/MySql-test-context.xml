@@ -9,8 +9,6 @@
 
     <context:component-scan base-package="model, controller"/>
 
-    <bean id="mySqlDbDriver" class="com.mysql.cj.jdbc.Driver"/>
-
     <bean id="testSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
         <constructor-arg name="username" value="epam"/>

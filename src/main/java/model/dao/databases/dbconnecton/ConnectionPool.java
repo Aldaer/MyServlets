@@ -24,17 +24,11 @@ public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
      */
     @SuppressWarnings("unused")
     class Builder {
-        private String driver = "";
         private String url = "";
         private int poolSize = DEFAULT_POOL_SIZE;
         private String userName = "";
         private String password = "";
         private Logger LOG = new DummyLogger();
-
-        public Builder withDriver(@Nullable String driver) {
-            this.driver = driver == null ? "" : driver;
-            return this;
-        }
 
         public Builder withUrl(@Nullable String url) {
             this.url = url == null ? "" : url;
@@ -68,13 +62,6 @@ public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
                         DestructibleBlockingQueue.create(new ArrayBlockingQueue<>(poolSize));
 
                 {
-                    try {
-                        Class.forName(driver);              // Load driver to auto-register with Driver manager
-                    } catch (ClassNotFoundException e) {
-                        LOG.error("Could not find database driver {}", driver);
-                        throw new RuntimeException();
-                    }
-
                     try {
                         for (int i = 0; i < poolSize; i++) {
                             Connection conn = DriverManager.getConnection(url, userName, password);

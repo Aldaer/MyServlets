@@ -27,7 +27,6 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
     public static final String CONFIG_BUNDLE = "config";
     public static final String CONFIG_DAO_CLASS = "dao_class";
     private static final String CONFIG_DATABASE_URI = "database_uri";
-    public static final String CONFIG_DATABASE_DRIVER = "database_driver";
     public static final String CONFIG_DATABASE_USER = "username";
     public static final String CONFIG_DATABASE_PASSWORD = "password";
     private static final String CONFIG_DATABASE_USE_SHA_DIGEST = "sha_digest";
@@ -62,12 +61,10 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
 
         if (globalDao instanceof DatabaseDAO) {
             String uri = conf.getString(CONFIG_DATABASE_URI);
-            String drv = conf.getString(CONFIG_DATABASE_DRIVER);
-            log.info("Creating connection pool with driver {}, uri {}", drv, uri);
+            log.info("Creating connection pool with uri {}", uri);
             String un = conf.getString(CONFIG_DATABASE_USER);
             String pwd = conf.getString(CONFIG_DATABASE_PASSWORD);
             connectionPool = ConnectionPool.builder()
-                    .withDriver(drv)
                     .withUrl(uri)
                     .withUserName(un)
                     .withPassword(pwd)

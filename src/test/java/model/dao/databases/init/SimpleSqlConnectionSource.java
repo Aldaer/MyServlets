@@ -25,8 +25,7 @@ class SimpleSqlConnectionSource implements Supplier<Connection> {
         try {
             return DriverManager.getConnection(databaseUri, username, password);
         } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }
