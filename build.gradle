@@ -28,7 +28,7 @@ dependencies {
     testCompile 'junit:junit:+'
 
     testCompile 'com.h2database:h2:+'
-    compile 'mysql:mysql-connector-java:6.0.2'
+    providedCompile 'mysql:mysql-connector-java:+'
 
     // Required by H2 in-memory compiler when using lombok
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
@@ -36,6 +36,7 @@ dependencies {
     // Spring
     compile 'org.springframework:spring-core:+'
     compile 'org.springframework:spring-context:+'
+    compile 'org.springframework:spring-web:+'
     testCompile 'org.springframework:spring-test:+'
 }
 

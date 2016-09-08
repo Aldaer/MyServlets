@@ -2,6 +2,7 @@ package model.dao.databases.dbconnecton;
 
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.FactoryBean;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,39 +24,50 @@ public interface ConnectionPool extends AutoCloseable, Supplier<Connection> {
      * Creates a connection pool after setting required parameters
      */
     @SuppressWarnings("unused")
-    class Builder {
+    class Builder implements FactoryBean<ConnectionPool> {
         private String url = "";
         private int poolSize = DEFAULT_POOL_SIZE;
         private String userName = "";
         private String password = "";
         private Logger LOG = new DummyLogger();
 
-        public Builder withUrl(@Nullable String url) {
+        @Override
+        public Class<?> getObjectType() {
+            return ConnectionPool.class;
+        }
+
+        @Override
+        public boolean isSingleton() {
+            return false;
+        }
+
+        public Builder setUrl(@Nullable String url) {
             this.url = url == null ? "" : url;
             return this;
         }
 
-        public Builder withPoolSize(int poolSize) {
+        public Builder setPoolSize(int poolSize) {
             this.poolSize = poolSize;
             return this;
         }
 
-        public Builder withUserName(@Nullable String userName) {
+        public Builder setUserName(@Nullable String userName) {
             this.userName = userName == null ? "" : userName;
             return this;
         }
 
-        public Builder withPassword(@Nullable String password) {
+        public Builder setPassword(@Nullable String password) {
             this.password = password == null ? "" : password;
             return this;
         }
 
-        public Builder withLogger(@Nullable Logger logger) {
+        public Builder setLogger(@Nullable Logger logger) {
             LOG = logger == null ? new DummyLogger() : logger;
             return this;
         }
 
-        public ConnectionPool create() {
+        @Override
+        public ConnectionPool getObject() {
             return new ConnectionPool() {
                 private final int poolSize = Builder.this.poolSize;
                 private final DestructibleBlockingQueue<Connection> cQueue =

@@ -5,6 +5,7 @@ import model.dao.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Resource;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Supplier;
@@ -135,7 +136,9 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
 
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
+    @Resource(name="connectionSource")
     private Supplier<Connection> cSource;
+
     private UserDAO userDAO;
     private CredentialsDAO credsDAO;
     private MessageDAO messDAO;
@@ -200,6 +203,11 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             messDAO = null;
             cSource = src;
         }
+    }
+
+    @Override
+    public Supplier<Connection> getCurrentConnectionSource() {
+        return cSource;
     }
 
     public void executeScript(String[] script) {
@@ -924,4 +932,5 @@ class SqlConvDAO implements ConversationDAO {
             return 0;
         }
     }
+
 }

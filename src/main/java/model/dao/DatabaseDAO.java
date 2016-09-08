@@ -12,4 +12,6 @@ public interface DatabaseDAO {
      * @param src Connection factory, pool etc
      */
     void useConnectionSource(Supplier<Connection> src);
+
+    Supplier<Connection> getCurrentConnectionSource();
 }
