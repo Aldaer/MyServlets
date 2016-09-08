@@ -26,14 +26,10 @@ import static java.util.Optional.ofNullable;
 @WebListener
 public class ServletInitListener implements ServletContextListener /* , HttpSessionListener, HttpSessionAttributeListener*/ {
     public static final String CONFIG_BUNDLE = "config";
-    public static final String CONFIG_DAO_CLASS = "dao_class";
-    private static final String CONFIG_DATABASE_URI = "database_uri";
-    public static final String CONFIG_DATABASE_USER = "username";
-    public static final String CONFIG_DATABASE_PASSWORD = "password";
     private static final String CONFIG_DATABASE_USE_SHA_DIGEST = "sha_digest";
     private static final String CONFIG_CONTAINER_SECURITY = "container_security";           // "true" = container-based; "false" = own
 
-    ConnectionPool cPool = null;
+    private ConnectionPool cPool = null;                                                    // To close on shutdown
 
     // -------------------------------------------------------
     // ServletContextListener implementation
@@ -46,8 +42,8 @@ public class ServletInitListener implements ServletContextListener /* , HttpSess
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("application-context.xml");
         GlobalDAO globalDao = (GlobalDAO) context.getBean("globalDao");
         if (globalDao instanceof DatabaseDAO) {
-            Supplier<Connection> cs = ((DatabaseDAO) globalDao).getCurrentConnectionSource();
-            if (cs instanceof ConnectionPool) cPool = (ConnectionPool) cs;
+            Supplier<Connection> connectionSource = ((DatabaseDAO) globalDao).getCurrentConnectionSource();
+            if (connectionSource instanceof ConnectionPool) cPool = (ConnectionPool) connectionSource;
         }
 
         final ServletContext srvContext = sce.getServletContext();
