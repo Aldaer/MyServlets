@@ -1,7 +1,8 @@
-Install MySql, create username and password. Set MySql default timezone to +00:00.
+Install MySql, create username and password with table creation rights.
+Set MySql default timezone to +00:00.
 
-Record username and password in config.properties.
+Record username and password in database-configure.xml.
 
 Execute DatabaseConfigurator.main() to create database and necessary tables.
 
-If using container-based authentication, verify parameters in context.xml and execute Gradle task 'updateTomcatLibs'.
+If using container-based authentication, verify parameters in META-INF/context.xml and execute Gradle task 'updateTomcatLibs'.

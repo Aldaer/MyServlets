@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean id="connectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+        <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
+        <constructor-arg name="username" value="epam"/>
+        <constructor-arg name="password" value="1234"/>
+    </bean>
+
+    <bean id="globalDao" class="model.dao.databases.MySqlGlobalDao"/>
+
+    <bean id="initScript" class="java.lang.String">
+        <constructor-arg value="src/main/java/installer/mysqlsetup.sql"/>
+    </bean>
+
+    <bean class="com.mysql.cj.jdbc.Driver"/>
+</beans>

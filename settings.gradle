@@ -1,5 +1,4 @@
 rootProject.name = 'MyServlet'
 include 'saltedjdbc'
 include 'crypto'
-include 'installer'
 

@@ -28,7 +28,7 @@ dependencies {
     testCompile 'junit:junit:+'
 
     testCompile 'com.h2database:h2:+'
-    providedCompile 'mysql:mysql-connector-java:+'
+    compile 'mysql:mysql-connector-java:+'
 
     // Required by H2 in-memory compiler when using lombok
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")

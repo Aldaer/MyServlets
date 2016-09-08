@@ -33,16 +33,11 @@ public class SqlTestInit {
     @Resource
     private GenericSqlDAO globalDao;
 
-    @Resource
-    private Supplier<Connection> testSetupConnectionSource;
-
-    @Resource
+    @Resource(name="secondaryConnectionSource")
     private Supplier<Connection> testRunConnectionSource;
 
     @PostConstruct
     private void runInitScript() {
-        globalDao.useConnectionSource(testSetupConnectionSource);
-
         String[] script = {};
         try {
             script = Files.readAllLines(Paths.get(initScriptPath)).toArray(script);

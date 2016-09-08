@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--suppress SpringFacetInspection -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -10,13 +9,13 @@
 
     <context:component-scan base-package="model, controller"/>
 
-    <bean id="testSetupConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+    <bean id="connectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306?useSSL=false"/>
         <constructor-arg name="username" value="epam"/>
         <constructor-arg name="password" value="1234"/>
     </bean>
 
-    <bean id="testRunConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
+    <bean id="secondaryConnectionSource" class="model.dao.databases.init.SimpleSqlConnectionSource">
         <constructor-arg name="databaseUri" value="jdbc:mysql://localhost:3306/test?useSSL=false"/>
         <constructor-arg name="username" value="epam"/>
         <constructor-arg name="password" value="1234"/>
