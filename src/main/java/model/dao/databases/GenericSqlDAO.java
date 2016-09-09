@@ -1,5 +1,6 @@
 package model.dao.databases;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import model.dao.*;
 import org.jetbrains.annotations.NotNull;
@@ -137,7 +138,8 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     static final String WRONG_ROW_COUNT = "Wrong affected row count";
 
     @Resource(name="connectionSource")
-    private Supplier<Connection> cSource;
+    @Getter
+    private Supplier<Connection> currentConnectionSource;
 
     private UserDAO userDAO;
     private CredentialsDAO credsDAO;
@@ -165,7 +167,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public UserDAO getUserDAO() {
         synchronized (this) {
-            if (userDAO == null) userDAO = new SqlUserDAO(cSource, upsertPrefix);
+            if (userDAO == null) userDAO = new SqlUserDAO(currentConnectionSource, upsertPrefix);
             return userDAO;
         }
     }
@@ -173,7 +175,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public CredentialsDAO getCredentialsDAO() {
         synchronized (this) {
-            if (credsDAO == null) credsDAO = new SqlCredentialsDAO(cSource);
+            if (credsDAO == null) credsDAO = new SqlCredentialsDAO(currentConnectionSource);
             return credsDAO;
         }
     }
@@ -181,7 +183,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public MessageDAO getMessageDAO() {
         synchronized (this) {
-            if (messDAO == null) messDAO = new SqlMessageDAO(cSource);
+            if (messDAO == null) messDAO = new SqlMessageDAO(currentConnectionSource);
             return messDAO;
         }
     }
@@ -189,7 +191,7 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
     @Override
     public ConversationDAO getConversationDAO() {
         synchronized (this) {
-            if (convDAO == null) convDAO = new SqlConvDAO(cSource, upsertPrefix);
+            if (convDAO == null) convDAO = new SqlConvDAO(currentConnectionSource, upsertPrefix);
             return convDAO;
         }
     }
@@ -201,17 +203,12 @@ public class GenericSqlDAO implements GlobalDAO, DatabaseDAO {
             credsDAO = null;
             userDAO = null;
             messDAO = null;
-            cSource = src;
+            currentConnectionSource = src;
         }
     }
 
-    @Override
-    public Supplier<Connection> getCurrentConnectionSource() {
-        return cSource;
-    }
-
     public void executeScript(String[] script) {
-        try (Connection connection = cSource.get();
+        try (Connection connection = currentConnectionSource.get();
              Statement statement = connection.createStatement()) {
 
             StringBuilder currentCmd = new StringBuilder();
